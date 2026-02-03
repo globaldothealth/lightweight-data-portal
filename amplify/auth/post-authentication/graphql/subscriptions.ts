@@ -10,13 +10,12 @@ type GeneratedSubscription<InputType, OutputType> = string & {
 
 export const onCreateSignInEvent = /* GraphQL */ `subscription OnCreateSignInEvent(
   $filter: ModelSubscriptionSignInEventFilterInput
-  $profileOwner: String
+  $userId: String
 ) {
-  onCreateSignInEvent(filter: $filter, profileOwner: $profileOwner) {
+  onCreateSignInEvent(filter: $filter, userId: $userId) {
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -46,13 +45,12 @@ export const onCreateUserProfile = /* GraphQL */ `subscription OnCreateUserProfi
 >;
 export const onDeleteSignInEvent = /* GraphQL */ `subscription OnDeleteSignInEvent(
   $filter: ModelSubscriptionSignInEventFilterInput
-  $profileOwner: String
+  $userId: String
 ) {
-  onDeleteSignInEvent(filter: $filter, profileOwner: $profileOwner) {
+  onDeleteSignInEvent(filter: $filter, userId: $userId) {
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -82,13 +80,12 @@ export const onDeleteUserProfile = /* GraphQL */ `subscription OnDeleteUserProfi
 >;
 export const onUpdateSignInEvent = /* GraphQL */ `subscription OnUpdateSignInEvent(
   $filter: ModelSubscriptionSignInEventFilterInput
-  $profileOwner: String
+  $userId: String
 ) {
-  onUpdateSignInEvent(filter: $filter, profileOwner: $profileOwner) {
+  onUpdateSignInEvent(filter: $filter, userId: $userId) {
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId

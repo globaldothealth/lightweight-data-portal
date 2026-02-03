@@ -13,7 +13,6 @@ export const getSignInEvent = /* GraphQL */ `query GetSignInEvent($id: ID!) {
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -48,7 +47,6 @@ export const listSignInEvents = /* GraphQL */ `query ListSignInEvents(
       createdAt
       email
       id
-      profileOwner
       timestamp
       updatedAt
       userId

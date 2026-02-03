@@ -16,7 +16,6 @@ export const createSignInEvent = /* GraphQL */ `mutation CreateSignInEvent(
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -52,7 +51,6 @@ export const deleteSignInEvent = /* GraphQL */ `mutation DeleteSignInEvent(
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -88,7 +86,6 @@ export const updateSignInEvent = /* GraphQL */ `mutation UpdateSignInEvent(
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId

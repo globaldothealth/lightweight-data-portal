@@ -7,7 +7,6 @@ export type SignInEvent = {
   createdAt: string,
   email?: string | null,
   id: string,
-  profileOwner?: string | null,
   timestamp?: string | null,
   updatedAt: string,
   userId?: string | null,
@@ -29,7 +28,6 @@ export type ModelSignInEventFilterInput = {
   id?: ModelIDInput | null,
   not?: ModelSignInEventFilterInput | null,
   or?: Array< ModelSignInEventFilterInput | null > | null,
-  profileOwner?: ModelStringInput | null,
   timestamp?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
   userId?: ModelStringInput | null,
@@ -120,7 +118,6 @@ export type ModelSignInEventConditionInput = {
   email?: ModelStringInput | null,
   not?: ModelSignInEventConditionInput | null,
   or?: Array< ModelSignInEventConditionInput | null > | null,
-  profileOwner?: ModelStringInput | null,
   timestamp?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
   userId?: ModelStringInput | null,
@@ -176,10 +173,9 @@ export type ModelSubscriptionSignInEventFilterInput = {
   email?: ModelSubscriptionStringInput | null,
   id?: ModelSubscriptionIDInput | null,
   or?: Array< ModelSubscriptionSignInEventFilterInput | null > | null,
-  profileOwner?: ModelStringInput | null,
   timestamp?: ModelSubscriptionStringInput | null,
   updatedAt?: ModelSubscriptionStringInput | null,
-  userId?: ModelSubscriptionStringInput | null,
+  userId?: ModelStringInput | null,
 };
 
 export type ModelSubscriptionStringInput = {
@@ -232,7 +228,6 @@ export type GetSignInEventQuery = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
@@ -268,7 +263,6 @@ export type ListSignInEventsQuery = {
       createdAt: string,
       email?: string | null,
       id: string,
-      profileOwner?: string | null,
       timestamp?: string | null,
       updatedAt: string,
       userId?: string | null,
@@ -309,7 +303,6 @@ export type CreateSignInEventMutation = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
@@ -343,7 +336,6 @@ export type DeleteSignInEventMutation = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
@@ -377,7 +369,6 @@ export type UpdateSignInEventMutation = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
@@ -402,7 +393,7 @@ export type UpdateUserProfileMutation = {
 
 export type OnCreateSignInEventSubscriptionVariables = {
   filter?: ModelSubscriptionSignInEventFilterInput | null,
-  profileOwner?: string | null,
+  userId?: string | null,
 };
 
 export type OnCreateSignInEventSubscription = {
@@ -411,7 +402,6 @@ export type OnCreateSignInEventSubscription = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
@@ -436,7 +426,7 @@ export type OnCreateUserProfileSubscription = {
 
 export type OnDeleteSignInEventSubscriptionVariables = {
   filter?: ModelSubscriptionSignInEventFilterInput | null,
-  profileOwner?: string | null,
+  userId?: string | null,
 };
 
 export type OnDeleteSignInEventSubscription = {
@@ -445,7 +435,6 @@ export type OnDeleteSignInEventSubscription = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
@@ -470,7 +459,7 @@ export type OnDeleteUserProfileSubscription = {
 
 export type OnUpdateSignInEventSubscriptionVariables = {
   filter?: ModelSubscriptionSignInEventFilterInput | null,
-  profileOwner?: string | null,
+  userId?: string | null,
 };
 
 export type OnUpdateSignInEventSubscription = {
@@ -479,7 +468,6 @@ export type OnUpdateSignInEventSubscription = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,

@@ -1,9 +1,8 @@
-import type {PostConfirmationTriggerHandler} from "aws-lambda";
+import type {PostAuthenticationTriggerHandler} from "aws-lambda";
 import {type Schema} from "../../data/resource";
 import {Amplify} from "aws-amplify";
 import {generateClient} from "aws-amplify/data";
-import {env} from "$amplify/env/post-confirmation";
-import {createUserProfile} from "./graphql/mutations";
+import {env} from "$amplify/env/post-authentication";
 import {createSignInEvent} from "./graphql/mutations";
 
 Amplify.configure(
@@ -36,16 +35,7 @@ Amplify.configure(
 const client = generateClient<Schema>({
     authMode: "iam",
 });
-export const handler: PostConfirmationTriggerHandler = async (event) => {
-    await client.graphql({
-        query: createUserProfile,
-        variables: {
-            input: {
-                email: event.request.userAttributes.email,
-                profileOwner: `${event.request.userAttributes.sub}::${event.userName}`,
-            },
-        },
-    });
+export const handler: PostAuthenticationTriggerHandler = async (event) => {
     await client.graphql({
         query: createSignInEvent,
         variables: {
