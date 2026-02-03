@@ -16,6 +16,7 @@ export const onCreateUserProfile = /* GraphQL */ `subscription OnCreateUserProfi
     createdAt
     email
     id
+    loginCount
     profileOwner
     updatedAt
     __typename
@@ -33,6 +34,7 @@ export const onDeleteUserProfile = /* GraphQL */ `subscription OnDeleteUserProfi
     createdAt
     email
     id
+    loginCount
     profileOwner
     updatedAt
     __typename
@@ -50,6 +52,7 @@ export const onUpdateUserProfile = /* GraphQL */ `subscription OnUpdateUserProfi
     createdAt
     email
     id
+    loginCount
     profileOwner
     updatedAt
     __typename

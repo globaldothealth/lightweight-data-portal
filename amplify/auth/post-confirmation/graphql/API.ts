@@ -7,6 +7,7 @@ export type UserProfile = {
   createdAt: string,
   email?: string | null,
   id: string,
+  loginCount?: number | null,
   profileOwner?: string | null,
   updatedAt: string,
 };
@@ -16,6 +17,7 @@ export type ModelUserProfileFilterInput = {
   createdAt?: ModelStringInput | null,
   email?: ModelStringInput | null,
   id?: ModelIDInput | null,
+  loginCount?: ModelIntInput | null,
   not?: ModelUserProfileFilterInput | null,
   or?: Array< ModelUserProfileFilterInput | null > | null,
   profileOwner?: ModelStringInput | null,
@@ -78,6 +80,18 @@ export type ModelIDInput = {
   size?: ModelSizeInput | null,
 };
 
+export type ModelIntInput = {
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+  between?: Array< number | null > | null,
+  eq?: number | null,
+  ge?: number | null,
+  gt?: number | null,
+  le?: number | null,
+  lt?: number | null,
+  ne?: number | null,
+};
+
 export type ModelUserProfileConnection = {
   __typename: "ModelUserProfileConnection",
   items:  Array<UserProfile | null >,
@@ -88,6 +102,7 @@ export type ModelUserProfileConditionInput = {
   and?: Array< ModelUserProfileConditionInput | null > | null,
   createdAt?: ModelStringInput | null,
   email?: ModelStringInput | null,
+  loginCount?: ModelIntInput | null,
   not?: ModelUserProfileConditionInput | null,
   or?: Array< ModelUserProfileConditionInput | null > | null,
   profileOwner?: ModelStringInput | null,
@@ -97,6 +112,7 @@ export type ModelUserProfileConditionInput = {
 export type CreateUserProfileInput = {
   email?: string | null,
   id?: string | null,
+  loginCount?: number | null,
   profileOwner?: string | null,
 };
 
@@ -107,6 +123,7 @@ export type DeleteUserProfileInput = {
 export type UpdateUserProfileInput = {
   email?: string | null,
   id: string,
+  loginCount?: number | null,
   profileOwner?: string | null,
 };
 
@@ -115,6 +132,7 @@ export type ModelSubscriptionUserProfileFilterInput = {
   createdAt?: ModelSubscriptionStringInput | null,
   email?: ModelSubscriptionStringInput | null,
   id?: ModelSubscriptionIDInput | null,
+  loginCount?: ModelSubscriptionIntInput | null,
   or?: Array< ModelSubscriptionUserProfileFilterInput | null > | null,
   profileOwner?: ModelStringInput | null,
   updatedAt?: ModelSubscriptionStringInput | null,
@@ -150,6 +168,18 @@ export type ModelSubscriptionIDInput = {
   notIn?: Array< string | null > | null,
 };
 
+export type ModelSubscriptionIntInput = {
+  between?: Array< number | null > | null,
+  eq?: number | null,
+  ge?: number | null,
+  gt?: number | null,
+  in?: Array< number | null > | null,
+  le?: number | null,
+  lt?: number | null,
+  ne?: number | null,
+  notIn?: Array< number | null > | null,
+};
+
 export type GetUserProfileQueryVariables = {
   id: string,
 };
@@ -160,6 +190,7 @@ export type GetUserProfileQuery = {
     createdAt: string,
     email?: string | null,
     id: string,
+    loginCount?: number | null,
     profileOwner?: string | null,
     updatedAt: string,
   } | null,
@@ -179,6 +210,7 @@ export type ListUserProfilesQuery = {
       createdAt: string,
       email?: string | null,
       id: string,
+      loginCount?: number | null,
       profileOwner?: string | null,
       updatedAt: string,
     } | null >,
@@ -197,6 +229,7 @@ export type CreateUserProfileMutation = {
     createdAt: string,
     email?: string | null,
     id: string,
+    loginCount?: number | null,
     profileOwner?: string | null,
     updatedAt: string,
   } | null,
@@ -213,6 +246,7 @@ export type DeleteUserProfileMutation = {
     createdAt: string,
     email?: string | null,
     id: string,
+    loginCount?: number | null,
     profileOwner?: string | null,
     updatedAt: string,
   } | null,
@@ -229,6 +263,7 @@ export type UpdateUserProfileMutation = {
     createdAt: string,
     email?: string | null,
     id: string,
+    loginCount?: number | null,
     profileOwner?: string | null,
     updatedAt: string,
   } | null,
@@ -245,6 +280,7 @@ export type OnCreateUserProfileSubscription = {
     createdAt: string,
     email?: string | null,
     id: string,
+    loginCount?: number | null,
     profileOwner?: string | null,
     updatedAt: string,
   } | null,
@@ -261,6 +297,7 @@ export type OnDeleteUserProfileSubscription = {
     createdAt: string,
     email?: string | null,
     id: string,
+    loginCount?: number | null,
     profileOwner?: string | null,
     updatedAt: string,
   } | null,
@@ -277,6 +314,7 @@ export type OnUpdateUserProfileSubscription = {
     createdAt: string,
     email?: string | null,
     id: string,
+    loginCount?: number | null,
     profileOwner?: string | null,
     updatedAt: string,
   } | null,
