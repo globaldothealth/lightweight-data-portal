@@ -21,6 +21,16 @@ const schema = a
             .authorization((allow) => [
                 allow.ownerDefinedIn("userId"),
             ]),
+        DownloadEvent: a
+            .model({
+                userId: a.string(),
+                email: a.string(),
+                filename: a.string(),
+                timestamp: a.string(),
+            })
+            .authorization((allow) => [
+                allow.ownerDefinedIn("userId"),
+            ]),
     })
     .authorization((allow) => [allow.resource(postConfirmation), allow.resource(postAuthentication)]);
 export type Schema = ClientSchema<typeof schema>;
