@@ -37,24 +37,29 @@ const client = generateClient<Schema>({
     authMode: "iam",
 });
 export const handler: PostConfirmationTriggerHandler = async (event) => {
-    await client.graphql({
-        query: createUserProfile,
-        variables: {
-            input: {
-                email: event.request.userAttributes.email,
-                profileOwner: `${event.request.userAttributes.sub}::${event.userName}`,
+    try {
+        await client.graphql({
+            query: createUserProfile,
+            variables: {
+                input: {
+                    email: event.request.userAttributes.email,
+                    profileOwner: `${event.request.userAttributes.sub}::${event.userName}`,
+                },
             },
-        },
-    });
-    await client.graphql({
-        query: createSignInEvent,
-        variables: {
-            input: {
-                userId: event.request.userAttributes.sub,
-                email: event.request.userAttributes.email,
-                timestamp: new Date().toISOString(),
+        });
+        await client.graphql({
+            query: createSignInEvent,
+            variables: {
+                input: {
+                    userId: event.request.userAttributes.sub,
+                    email: event.request.userAttributes.email,
+                    timestamp: new Date().toISOString(),
+                },
             },
-        },
-    });
+        });
+    } catch (error) {
+        console.error("Error in post-confirmation trigger:", error);
+    }
+
     return event;
 };

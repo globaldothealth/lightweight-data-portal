@@ -40,7 +40,6 @@ const {StorageBrowser} = createStorageBrowser({
 });
 
 export default function App() {
-    const [files, setFiles] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [userprofiles, setUserProfiles] = useState([]);
     const [signInEvents, setSignInEvents] = useState([]);
@@ -52,7 +51,6 @@ export default function App() {
     useEffect(() => {
         async function loadFiles() {
             const result = await list({path: 'public/'});
-            setFiles(result.items);
             setTableData(result.items.map(file => ({
                 filename: file.path,
                 name: file.path.split('/').pop(),
