@@ -19,8 +19,8 @@ export const auth = defineAuth({
                 'https://ad77271eca38abe45ab6.auth.eu-central-1.amazoncognito.com',
                 'https://f75ab5ba7777e2ccc233.auth.eu-central-1.amazoncognito.com',
                 'http://localhost:5173',
-                'https://data.global.health',
-                'https://dev.data.global.health'
+                'https://www.data.global.health',
+                'https://www.dev.data.global.health'
             ],
             logoutUrls: ['http://localhost:5173', 'https://data.global.health',
                 'https://dev.data.global.health'],
