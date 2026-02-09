@@ -11,9 +11,12 @@ export const auth = defineAuth({
                 clientSecret: secret('GOOGLE_CLIENT_SECRET')
             },
             callbackUrls: [
-                'http://localhost:5173/oauth2/idpresponse',
-                'https://data.global.health/oauth2/idpresponse',
-                'https://dev.data.global.health/oauth2/idpresponse'
+                'https://dcad610d56d2f7dc2120.auth.eu-central-1.amazoncognito.com',
+                'https://ad77271eca38abe45ab6.auth.eu-central-1.amazoncognito.com',
+                'https://f75ab5ba7777e2ccc233.auth.eu-central-1.amazoncognito.com',
+                'http://localhost:5173',
+                'https://data.global.health',
+                'https://dev.data.global.health'
             ],
             logoutUrls: ['http://localhost:5173', 'https://data.global.health',
                 'https://dev.data.global.health'],
