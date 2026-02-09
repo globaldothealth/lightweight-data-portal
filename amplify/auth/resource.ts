@@ -8,7 +8,11 @@ export const auth = defineAuth({
         externalProviders: {
             google: {
                 clientId: secret('GOOGLE_CLIENT_ID'),
-                clientSecret: secret('GOOGLE_CLIENT_SECRET')
+                clientSecret: secret('GOOGLE_CLIENT_SECRET'),
+                scopes: ['email'],
+                attributeMapping: {
+                    email: 'email'
+                }
             },
             callbackUrls: [
                 'https://dcad610d56d2f7dc2120.auth.eu-central-1.amazoncognito.com',
