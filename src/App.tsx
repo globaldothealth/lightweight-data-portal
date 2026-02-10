@@ -20,6 +20,7 @@ import {
     createAmplifyAuthAdapter,
     createStorageBrowser,
 } from '@aws-amplify/ui-react-storage/browser';
+import { signOut } from 'aws-amplify/auth';
 
 /**
  * @type {import('aws-amplify/data').Client<import('../amplify/data/
@@ -31,7 +32,6 @@ const client = generateClient<Schema>({
     authMode: "userPool",
 });
 import {list, getUrl} from 'aws-amplify/storage';
-import {a} from "@aws-amplify/backend";
 
 
 
@@ -44,8 +44,6 @@ export default function App() {
     const [userprofiles, setUserProfiles] = useState([]);
     const [signInEvents, setSignInEvents] = useState([]);
     const [downloadEvents, setDownloadEvents] = useState([]);
-    console.log('UP',userprofiles)
-    console.log(client.models)
 
     // 1. Fetch files
     useEffect(() => {
@@ -122,6 +120,10 @@ export default function App() {
         setSignInEvents(sie);
     }
     console.log('SIE', signInEvents)
+
+    async function handleSignOut() {
+        await signOut()
+    }
 
     return (
         <Flex
@@ -310,7 +312,7 @@ export default function App() {
                     ))}</tbody>
 
                 </table>)}
-            <Button onClick={signOut}>Sign Out</Button>
+            <Button onClick={handleSignOut}>Sign Out</Button>
         </Flex>
     );
 }
