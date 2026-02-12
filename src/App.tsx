@@ -36,24 +36,21 @@ export default function App() {
             console.error("User attributes missing");
             return;
         }
-        setUserProfile({
-            email, id
-        });
+        return {email, id};
     }
 
-    async function loadFiles() {
+    async function fetchFiles() {
         const result: any = await list({path: 'public/'});
-        setTableData(result.items.map((file: { path: string }) => ({
+        return (result.items.map((file: { path: string }) => ({
             filename: file.path,
             name: file.path.split('/').pop(),
         })).filter((file: { name: string; filename: string }) => file.name !== ''));
     }
 
     useEffect(() => {
-        fetchUserProfile();
-        loadFiles();
+        fetchUserProfile().then((userProfileData: UserProfile | undefined) => userProfileData && setUserProfile(userProfileData));
+        fetchFiles().then(files => setTableData(files));
     }, []);
-
 
     const handleDownload = async (fileKey: string, user: UserProfile) => {
         try {
@@ -72,12 +69,7 @@ export default function App() {
         }
     };
 
-
     const {signOut} = useAuthenticator((context) => [context.user]);
-
-    async function handleSignOut() {
-        await signOut()
-    }
 
     return (
         <Flex
@@ -89,7 +81,7 @@ export default function App() {
             margin="0 auto"
         >
             <div style={{width: '100%', float: 'right', textAlign: 'right'}}>
-                <Button onClick={handleSignOut}>Sign Out</Button>
+                <Button onClick={signOut}>Sign Out</Button>
             </div>
             <Paper style={{width: '100%'}}>
                 <MaterialTable

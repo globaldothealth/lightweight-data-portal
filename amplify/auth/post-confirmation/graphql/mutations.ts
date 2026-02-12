@@ -8,6 +8,25 @@ type GeneratedMutation<InputType, OutputType> = string & {
   __generatedMutationOutput: OutputType;
 };
 
+export const createDownloadEvent = /* GraphQL */ `mutation CreateDownloadEvent(
+  $condition: ModelDownloadEventConditionInput
+  $input: CreateDownloadEventInput!
+) {
+  createDownloadEvent(condition: $condition, input: $input) {
+    createdAt
+    email
+    filename
+    id
+    timestamp
+    updatedAt
+    userId
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.CreateDownloadEventMutationVariables,
+  APITypes.CreateDownloadEventMutation
+>;
 export const createSignInEvent = /* GraphQL */ `mutation CreateSignInEvent(
   $condition: ModelSignInEventConditionInput
   $input: CreateSignInEventInput!
@@ -16,7 +35,6 @@ export const createSignInEvent = /* GraphQL */ `mutation CreateSignInEvent(
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -27,22 +45,24 @@ export const createSignInEvent = /* GraphQL */ `mutation CreateSignInEvent(
   APITypes.CreateSignInEventMutationVariables,
   APITypes.CreateSignInEventMutation
 >;
-export const createUserProfile = /* GraphQL */ `mutation CreateUserProfile(
-  $condition: ModelUserProfileConditionInput
-  $input: CreateUserProfileInput!
+export const deleteDownloadEvent = /* GraphQL */ `mutation DeleteDownloadEvent(
+  $condition: ModelDownloadEventConditionInput
+  $input: DeleteDownloadEventInput!
 ) {
-  createUserProfile(condition: $condition, input: $input) {
+  deleteDownloadEvent(condition: $condition, input: $input) {
     createdAt
     email
+    filename
     id
-    profileOwner
+    timestamp
     updatedAt
+    userId
     __typename
   }
 }
 ` as GeneratedMutation<
-  APITypes.CreateUserProfileMutationVariables,
-  APITypes.CreateUserProfileMutation
+  APITypes.DeleteDownloadEventMutationVariables,
+  APITypes.DeleteDownloadEventMutation
 >;
 export const deleteSignInEvent = /* GraphQL */ `mutation DeleteSignInEvent(
   $condition: ModelSignInEventConditionInput
@@ -52,7 +72,6 @@ export const deleteSignInEvent = /* GraphQL */ `mutation DeleteSignInEvent(
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -63,22 +82,24 @@ export const deleteSignInEvent = /* GraphQL */ `mutation DeleteSignInEvent(
   APITypes.DeleteSignInEventMutationVariables,
   APITypes.DeleteSignInEventMutation
 >;
-export const deleteUserProfile = /* GraphQL */ `mutation DeleteUserProfile(
-  $condition: ModelUserProfileConditionInput
-  $input: DeleteUserProfileInput!
+export const updateDownloadEvent = /* GraphQL */ `mutation UpdateDownloadEvent(
+  $condition: ModelDownloadEventConditionInput
+  $input: UpdateDownloadEventInput!
 ) {
-  deleteUserProfile(condition: $condition, input: $input) {
+  updateDownloadEvent(condition: $condition, input: $input) {
     createdAt
     email
+    filename
     id
-    profileOwner
+    timestamp
     updatedAt
+    userId
     __typename
   }
 }
 ` as GeneratedMutation<
-  APITypes.DeleteUserProfileMutationVariables,
-  APITypes.DeleteUserProfileMutation
+  APITypes.UpdateDownloadEventMutationVariables,
+  APITypes.UpdateDownloadEventMutation
 >;
 export const updateSignInEvent = /* GraphQL */ `mutation UpdateSignInEvent(
   $condition: ModelSignInEventConditionInput
@@ -88,7 +109,6 @@ export const updateSignInEvent = /* GraphQL */ `mutation UpdateSignInEvent(
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -98,21 +118,4 @@ export const updateSignInEvent = /* GraphQL */ `mutation UpdateSignInEvent(
 ` as GeneratedMutation<
   APITypes.UpdateSignInEventMutationVariables,
   APITypes.UpdateSignInEventMutation
->;
-export const updateUserProfile = /* GraphQL */ `mutation UpdateUserProfile(
-  $condition: ModelUserProfileConditionInput
-  $input: UpdateUserProfileInput!
-) {
-  updateUserProfile(condition: $condition, input: $input) {
-    createdAt
-    email
-    id
-    profileOwner
-    updatedAt
-    __typename
-  }
-}
-` as GeneratedMutation<
-  APITypes.UpdateUserProfileMutationVariables,
-  APITypes.UpdateUserProfileMutation
 >;

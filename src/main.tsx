@@ -1,14 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import {Authenticator} from "@aws-amplify/ui-react";
+
 import App from "./App.tsx";
 import "./index.css";
-import { Authenticator } from "@aws-amplify/ui-react";
 
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById("root") as Element).render(
     <React.StrictMode>
         <Authenticator socialProviders={['google']}>
-            <App />
+            <App/>
         </Authenticator>
     </React.StrictMode>
 );
