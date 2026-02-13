@@ -4,10 +4,11 @@ import {fetchUserAttributes, FetchUserAttributesOutput} from 'aws-amplify/auth';
 import {generateClient} from "aws-amplify/data";
 import {list, getUrl} from 'aws-amplify/storage';
 import "@aws-amplify/ui-react/styles.css";
-import {Button, Flex, useAuthenticator} from "@aws-amplify/ui-react";
+import {useAuthenticator} from "@aws-amplify/ui-react";
 import MaterialTable from '@material-table/core';
 import {SaveAlt as SaveAltIcon} from '@mui/icons-material';
-import {Button as MUIButton, Paper} from '@mui/material';
+import {Button, Paper, MenuItem, FormControl, InputLabel, Grid} from '@mui/material';
+import Select, {SelectChangeEvent} from '@mui/material/Select';
 
 import outputs from "../amplify_outputs.json";
 import {Schema} from "../amplify/data/resource";
@@ -24,11 +25,16 @@ interface UserProfile {
 
 Amplify.configure(outputs);
 
+const availableOutbreaks = [
+    'Mpox 2024', 'Avian Influenza'
+]
+
 
 export default function App() {
     const [tableData, setTableData] =
         useState<[{ name: string; filename: string }]>();
     const [userProfile, setUserProfile] = useState<UserProfile>();
+    const [selectedOutbreak, setSelectedOutbreak] = useState<string>(availableOutbreaks[0]);
 
     async function fetchUserProfile() {
         const {email, sub: id}: FetchUserAttributesOutput = await fetchUserAttributes();
@@ -39,8 +45,15 @@ export default function App() {
         return {email, id};
     }
 
+    const handleChange = (event: SelectChangeEvent) => {
+        setSelectedOutbreak(event.target.value as string);
+    };
+
     async function fetchFiles() {
-        const result: any = await list({path: 'public/'});
+        // const folders: any = await list({path: ''});
+        // console.log(folders);
+        const result: any = await list({path: `public/${selectedOutbreak}/`});
+        console.log(result);
         return (result.items.map((file: { path: string }) => ({
             filename: file.path,
             name: file.path.split('/').pop(),
@@ -49,8 +62,11 @@ export default function App() {
 
     useEffect(() => {
         fetchUserProfile().then((userProfileData: UserProfile | undefined) => userProfileData && setUserProfile(userProfileData));
-        fetchFiles().then(files => setTableData(files));
     }, []);
+
+    useEffect(() => {
+        fetchFiles().then(files => setTableData(files));
+    }, [selectedOutbreak]);
 
     const handleDownload = async (fileKey: string, user: UserProfile) => {
         try {
@@ -72,60 +88,73 @@ export default function App() {
     const {signOut} = useAuthenticator((context) => [context.user]);
 
     return (
-        <Flex
-            className="App"
-            justifyContent="center"
-            alignItems="center"
-            direction="column"
-            width="70%"
-            margin="0 auto"
-        >
-            <div style={{width: '100%', float: 'right', textAlign: 'right'}}>
-                <Button onClick={signOut}>Sign Out</Button>
-            </div>
-            <Paper style={{width: '100%'}}>
-                <MaterialTable
-                    options={{
-                        search: true,
-                        paging: false,
-                        searchFieldAlignment: 'right',
-                        filtering: true,
-                        sorting: true,
-                    }}
-                    columns={[
-                        {
-                            title: 'Name',
-                            field: 'name',
-                            filtering: false,
-                        },
-                        {
-                            title: '',
-                            field: 'filename',
-                            width: '120px',
-                            filtering: false,
-                            render: userProfile ? (rowData: { filename: string }) => {
-                                return (
-                                    <MUIButton
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={() => handleDownload(rowData.filename, userProfile)}
-                                        startIcon={<SaveAltIcon/>}
-                                        sx={{
-                                            whiteSpace: 'nowrap',
-                                            minWidth: '140px',
-                                        }}
-                                    >
-                                        Download
-                                    </MUIButton>
-                                );
-                            } : undefined,
-                        },
-                    ]}
-                    data={tableData || []}
-                    title="Data downloads"
-                    isLoading={!tableData || !userProfile}
-                />
-            </Paper>
-        </Flex>
+        <Grid container spacing={2} style={{width: '100%'}}>
+            <Grid size={4}>
+                <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Selected Outbreak</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={selectedOutbreak}
+                        label="Selected Outbreak"
+                        onChange={handleChange}
+                    >
+                        {availableOutbreaks.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                    </Select>
+                </FormControl>
+            </Grid>
+            <Grid size={6}>
+
+            </Grid>
+            <Grid size={2}>
+                <Button onClick={signOut} variant="contained" color="error" style={{height: '100%', width: '100%'}}>Sign
+                    Out</Button>
+            </Grid>
+            <Grid size={12}>
+                <Paper style={{width: '100%'}}>
+                    <MaterialTable
+                        options={{
+                            search: true,
+                            paging: false,
+                            searchFieldAlignment: 'right',
+                            filtering: true,
+                            sorting: true,
+                        }}
+                        columns={[
+                            {
+                                title: 'Name',
+                                field: 'name',
+                                filtering: false,
+                            },
+                            {
+                                title: '',
+                                field: 'filename',
+                                width: '120px',
+                                filtering: false,
+                                render: userProfile ? (rowData: { filename: string }) => {
+                                    return (
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => handleDownload(rowData.filename, userProfile)}
+                                            startIcon={<SaveAltIcon/>}
+                                            sx={{
+                                                whiteSpace: 'nowrap',
+                                                minWidth: '140px',
+                                            }}
+                                        >
+                                            Download
+                                        </Button>
+                                    );
+                                } : undefined,
+                            },
+                        ]}
+                        data={tableData || []}
+                        title="Data downloads"
+                        isLoading={!tableData || !userProfile}
+                    />
+                </Paper>
+            </Grid>
+        </Grid>
     );
 }
