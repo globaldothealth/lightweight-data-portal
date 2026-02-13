@@ -8,15 +8,33 @@ type GeneratedSubscription<InputType, OutputType> = string & {
   __generatedSubscriptionOutput: OutputType;
 };
 
+export const onCreateDownloadEvent = /* GraphQL */ `subscription OnCreateDownloadEvent(
+  $filter: ModelSubscriptionDownloadEventFilterInput
+  $userId: String
+) {
+  onCreateDownloadEvent(filter: $filter, userId: $userId) {
+    createdAt
+    email
+    filename
+    id
+    timestamp
+    updatedAt
+    userId
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateDownloadEventSubscriptionVariables,
+  APITypes.OnCreateDownloadEventSubscription
+>;
 export const onCreateSignInEvent = /* GraphQL */ `subscription OnCreateSignInEvent(
   $filter: ModelSubscriptionSignInEventFilterInput
-  $profileOwner: String
+  $userId: String
 ) {
-  onCreateSignInEvent(filter: $filter, profileOwner: $profileOwner) {
+  onCreateSignInEvent(filter: $filter, userId: $userId) {
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -27,32 +45,33 @@ export const onCreateSignInEvent = /* GraphQL */ `subscription OnCreateSignInEve
   APITypes.OnCreateSignInEventSubscriptionVariables,
   APITypes.OnCreateSignInEventSubscription
 >;
-export const onCreateUserProfile = /* GraphQL */ `subscription OnCreateUserProfile(
-  $filter: ModelSubscriptionUserProfileFilterInput
-  $profileOwner: String
+export const onDeleteDownloadEvent = /* GraphQL */ `subscription OnDeleteDownloadEvent(
+  $filter: ModelSubscriptionDownloadEventFilterInput
+  $userId: String
 ) {
-  onCreateUserProfile(filter: $filter, profileOwner: $profileOwner) {
+  onDeleteDownloadEvent(filter: $filter, userId: $userId) {
     createdAt
     email
+    filename
     id
-    profileOwner
+    timestamp
     updatedAt
+    userId
     __typename
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnCreateUserProfileSubscriptionVariables,
-  APITypes.OnCreateUserProfileSubscription
+  APITypes.OnDeleteDownloadEventSubscriptionVariables,
+  APITypes.OnDeleteDownloadEventSubscription
 >;
 export const onDeleteSignInEvent = /* GraphQL */ `subscription OnDeleteSignInEvent(
   $filter: ModelSubscriptionSignInEventFilterInput
-  $profileOwner: String
+  $userId: String
 ) {
-  onDeleteSignInEvent(filter: $filter, profileOwner: $profileOwner) {
+  onDeleteSignInEvent(filter: $filter, userId: $userId) {
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -63,32 +82,33 @@ export const onDeleteSignInEvent = /* GraphQL */ `subscription OnDeleteSignInEve
   APITypes.OnDeleteSignInEventSubscriptionVariables,
   APITypes.OnDeleteSignInEventSubscription
 >;
-export const onDeleteUserProfile = /* GraphQL */ `subscription OnDeleteUserProfile(
-  $filter: ModelSubscriptionUserProfileFilterInput
-  $profileOwner: String
+export const onUpdateDownloadEvent = /* GraphQL */ `subscription OnUpdateDownloadEvent(
+  $filter: ModelSubscriptionDownloadEventFilterInput
+  $userId: String
 ) {
-  onDeleteUserProfile(filter: $filter, profileOwner: $profileOwner) {
+  onUpdateDownloadEvent(filter: $filter, userId: $userId) {
     createdAt
     email
+    filename
     id
-    profileOwner
+    timestamp
     updatedAt
+    userId
     __typename
   }
 }
 ` as GeneratedSubscription<
-  APITypes.OnDeleteUserProfileSubscriptionVariables,
-  APITypes.OnDeleteUserProfileSubscription
+  APITypes.OnUpdateDownloadEventSubscriptionVariables,
+  APITypes.OnUpdateDownloadEventSubscription
 >;
 export const onUpdateSignInEvent = /* GraphQL */ `subscription OnUpdateSignInEvent(
   $filter: ModelSubscriptionSignInEventFilterInput
-  $profileOwner: String
+  $userId: String
 ) {
-  onUpdateSignInEvent(filter: $filter, profileOwner: $profileOwner) {
+  onUpdateSignInEvent(filter: $filter, userId: $userId) {
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -98,21 +118,4 @@ export const onUpdateSignInEvent = /* GraphQL */ `subscription OnUpdateSignInEve
 ` as GeneratedSubscription<
   APITypes.OnUpdateSignInEventSubscriptionVariables,
   APITypes.OnUpdateSignInEventSubscription
->;
-export const onUpdateUserProfile = /* GraphQL */ `subscription OnUpdateUserProfile(
-  $filter: ModelSubscriptionUserProfileFilterInput
-  $profileOwner: String
-) {
-  onUpdateUserProfile(filter: $filter, profileOwner: $profileOwner) {
-    createdAt
-    email
-    id
-    profileOwner
-    updatedAt
-    __typename
-  }
-}
-` as GeneratedSubscription<
-  APITypes.OnUpdateUserProfileSubscriptionVariables,
-  APITypes.OnUpdateUserProfileSubscription
 >;

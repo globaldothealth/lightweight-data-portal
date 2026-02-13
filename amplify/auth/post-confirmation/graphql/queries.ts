@@ -8,12 +8,27 @@ type GeneratedQuery<InputType, OutputType> = string & {
   __generatedQueryOutput: OutputType;
 };
 
+export const getDownloadEvent = /* GraphQL */ `query GetDownloadEvent($id: ID!) {
+  getDownloadEvent(id: $id) {
+    createdAt
+    email
+    filename
+    id
+    timestamp
+    updatedAt
+    userId
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.GetDownloadEventQueryVariables,
+  APITypes.GetDownloadEventQuery
+>;
 export const getSignInEvent = /* GraphQL */ `query GetSignInEvent($id: ID!) {
   getSignInEvent(id: $id) {
     createdAt
     email
     id
-    profileOwner
     timestamp
     updatedAt
     userId
@@ -24,19 +39,29 @@ export const getSignInEvent = /* GraphQL */ `query GetSignInEvent($id: ID!) {
   APITypes.GetSignInEventQueryVariables,
   APITypes.GetSignInEventQuery
 >;
-export const getUserProfile = /* GraphQL */ `query GetUserProfile($id: ID!) {
-  getUserProfile(id: $id) {
-    createdAt
-    email
-    id
-    profileOwner
-    updatedAt
+export const listDownloadEvents = /* GraphQL */ `query ListDownloadEvents(
+  $filter: ModelDownloadEventFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listDownloadEvents(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      createdAt
+      email
+      filename
+      id
+      timestamp
+      updatedAt
+      userId
+      __typename
+    }
+    nextToken
     __typename
   }
 }
 ` as GeneratedQuery<
-  APITypes.GetUserProfileQueryVariables,
-  APITypes.GetUserProfileQuery
+  APITypes.ListDownloadEventsQueryVariables,
+  APITypes.ListDownloadEventsQuery
 >;
 export const listSignInEvents = /* GraphQL */ `query ListSignInEvents(
   $filter: ModelSignInEventFilterInput
@@ -48,7 +73,6 @@ export const listSignInEvents = /* GraphQL */ `query ListSignInEvents(
       createdAt
       email
       id
-      profileOwner
       timestamp
       updatedAt
       userId
@@ -61,26 +85,4 @@ export const listSignInEvents = /* GraphQL */ `query ListSignInEvents(
 ` as GeneratedQuery<
   APITypes.ListSignInEventsQueryVariables,
   APITypes.ListSignInEventsQuery
->;
-export const listUserProfiles = /* GraphQL */ `query ListUserProfiles(
-  $filter: ModelUserProfileFilterInput
-  $limit: Int
-  $nextToken: String
-) {
-  listUserProfiles(filter: $filter, limit: $limit, nextToken: $nextToken) {
-    items {
-      createdAt
-      email
-      id
-      profileOwner
-      updatedAt
-      __typename
-    }
-    nextToken
-    __typename
-  }
-}
-` as GeneratedQuery<
-  APITypes.ListUserProfilesQueryVariables,
-  APITypes.ListUserProfilesQuery
 >;

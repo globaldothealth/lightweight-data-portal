@@ -1,186 +1,117 @@
 import {useState, useEffect} from "react";
-import {
-    Button,
-    Heading,
-    Flex,
-    View,
-    Grid,
-    Divider,
-} from "@aws-amplify/ui-react";
-import MaterialTable from '@material-table/core';
-import {Button as MUIButton, Grid as MUIGrid, Paper, Tooltip} from '@mui/material';
-import {useAuthenticator} from "@aws-amplify/ui-react";
 import {Amplify} from "aws-amplify";
-import "@aws-amplify/ui-react/styles.css";
+import {fetchUserAttributes, FetchUserAttributesOutput} from 'aws-amplify/auth';
 import {generateClient} from "aws-amplify/data";
-// import { StorageBrowser } from "@aws-amplify/ui-react-storage";
-import outputs from "../amplify_outputs.json";
+import {list, getUrl} from 'aws-amplify/storage';
+import "@aws-amplify/ui-react/styles.css";
+import {useAuthenticator} from "@aws-amplify/ui-react";
+import MaterialTable from '@material-table/core';
 import {SaveAlt as SaveAltIcon} from '@mui/icons-material';
-import {
-    createAmplifyAuthAdapter,
-    createStorageBrowser,
-} from '@aws-amplify/ui-react-storage/browser';
+import {Button, Paper, MenuItem, FormControl, InputLabel, Grid} from '@mui/material';
+import Select, {SelectChangeEvent} from '@mui/material/Select';
 
-/**
- * @type {import('aws-amplify/data').Client<import('../amplify/data/
- resource').Schema>}
- */
-Amplify.configure(outputs);
+import outputs from "../amplify_outputs.json";
 import {Schema} from "../amplify/data/resource";
+
+
 const client = generateClient<Schema>({
     authMode: "userPool",
 });
-import {list, getUrl} from 'aws-amplify/storage';
-import {a} from "@aws-amplify/backend";
 
+interface UserProfile {
+    email: string;
+    id: string;
+}
 
+Amplify.configure(outputs);
 
-const {StorageBrowser} = createStorageBrowser({
-    config: createAmplifyAuthAdapter(),
-});
+const availableOutbreaks = [
+    'Mpox 2024', 'Avian Influenza'
+]
+
 
 export default function App() {
-    const [tableData, setTableData] = useState([]);
-    const [userprofiles, setUserProfiles] = useState([]);
-    const [signInEvents, setSignInEvents] = useState([]);
-    const [downloadEvents, setDownloadEvents] = useState([]);
-    console.log('UP',userprofiles)
-    console.log(client.models)
+    const [tableData, setTableData] =
+        useState<[{ name: string; filename: string }]>();
+    const [userProfile, setUserProfile] = useState<UserProfile>();
+    const [selectedOutbreak, setSelectedOutbreak] = useState<string>(availableOutbreaks[0]);
 
-    // 1. Fetch files
-    useEffect(() => {
-        async function loadFiles() {
-            const result = await list({path: 'public/'});
-            setTableData(result.items.map(file => ({
-                filename: file.path,
-                name: file.path.split('/').pop(),
-                country: 'poland'
-            })).filter(file => file.name !== ''));
+    async function fetchUserProfile() {
+        const {email, sub: id}: FetchUserAttributesOutput = await fetchUserAttributes();
+        if (!email || !id) {
+            console.error("User attributes missing");
+            return;
         }
+        return {email, id};
+    }
 
-        loadFiles();
+    const handleChange = (event: SelectChangeEvent) => {
+        setSelectedOutbreak(event.target.value as string);
+    };
 
+    async function fetchFiles() {
+        // const folders: any = await list({path: ''});
+        // console.log(folders);
+        const result: any = await list({path: `public/${selectedOutbreak}/`});
+        console.log(result);
+        return (result.items.map((file: { path: string }) => ({
+            filename: file.path,
+            name: file.path.split('/').pop(),
+        })).filter((file: { name: string; filename: string }) => file.name !== ''));
+    }
+
+    useEffect(() => {
+        fetchUserProfile().then((userProfileData: UserProfile | undefined) => userProfileData && setUserProfile(userProfileData));
     }, []);
 
-    // 2. Handle the Download Click
-    const handleDownload = async (fileKey, user) => {
+    useEffect(() => {
+        fetchFiles().then(files => setTableData(files));
+    }, [selectedOutbreak]);
+
+    const handleDownload = async (fileKey: string, user: UserProfile) => {
         try {
-            // A: Save to Database FIRST
             await client.models.DownloadEvent.create({
-                userId: user.profileOwner,
+                userId: user.id,
                 email: user.email,
                 filename: fileKey,
                 timestamp: new Date().toISOString(),
             });
 
-            // B: Get the Download URL
             const link = await getUrl({path: fileKey});
 
-            // C: Open the file
             window.open(link.url.toString(), '_blank');
-
         } catch (error) {
             console.error("Error downloading:", error);
-        } finally {fetchDownloadEvents()}
+        }
     };
 
     const {signOut} = useAuthenticator((context) => [context.user]);
-    useEffect(() => {
-        fetchUserProfile();
-        fetchDownloadEvents();
-        fetchSignInEvents()
-    }, []);
-
-    async function fetchUserProfile() {
-        // @ts-ignore
-        const {data: profiles} = await client.models.UserProfile.list();
-
-        setUserProfiles(profiles);
-    }
-
-    async function fetchDownloadEvents() {
-        // @ts-ignore
-        const {data: de} = await client.models.DownloadEvent.list();
-        de.sort(function(a,b){
-            // Turn your strings into dates, and then subtract them
-            // to get a value that is either negative, positive, or zero.
-            // @ts-ignore
-            return new Date(b.createdAt) - new Date(a.createdAt);
-        });
-        setDownloadEvents(de);
-    }
-    console.log('DE', downloadEvents)
-    async function fetchSignInEvents() {
-        // @ts-ignore
-        const {data: sie} = await client.models.SignInEvent.list();
-        sie.sort(function(a,b){
-            // Turn your strings into dates, and then subtract them
-            // to get a value that is either negative, positive, or zero.
-            // @ts-ignore
-            return new Date(b.createdAt) - new Date(a.createdAt);
-        });
-        setSignInEvents(sie);
-    }
-    console.log('SIE', signInEvents)
 
     return (
-        <Flex
-            className="App"
-            justifyContent="center"
-            alignItems="center"
-            direction="column"
-            width="70%"
-            margin="0 auto"
-        >
-            <Heading level={1}>My Profile</Heading>
-            <Divider/>
-            <Grid
-                margin="3rem 0"
-                autoFlow="column"
-                justifyContent="center"
-                gap="2rem"
-                alignContent="center"
-            >
-                {userprofiles.map((userprofile) => (
-                    <Flex
-                        key={userprofile.id || userprofile.email}
-                        direction="column"
-                        justifyContent="center"
-                        alignItems="center"
-                        gap="2rem"
-                        border="1px solid #ccc"
-                        padding="2rem"
-                        borderRadius="5%"
-                        className="box"
+        <Grid container spacing={2} style={{width: '100%'}}>
+            <Grid size={4}>
+                <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Selected Outbreak</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={selectedOutbreak}
+                        label="Selected Outbreak"
+                        onChange={handleChange}
                     >
-                        <View>
-                            <Heading level="3">{userprofile.email}</Heading>
-                        </View>
-                    </Flex>
-                ))}
+                        {availableOutbreaks.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                    </Select>
+                </FormControl>
             </Grid>
-            {signInEvents.length > 0 &&
-                (<table>
-                    <thead>
-                    <tr>
-                    <th style={{backgroundColor: 'gray'}}>Email</th>
-                    <th style={{backgroundColor: 'gray'}}>Acess Time</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                {signInEvents.map((signInEvent) => (
-                    <tr>
-                        <td style={{backgroundColor: 'gray'}}>{signInEvent.email}</td>
-                        <td style={{backgroundColor: 'gray'}}>{signInEvent.createdAt}</td>
-                    </tr>
-                ))}</tbody>
+            <Grid size={6}>
 
-            </table>)}
-            <Divider/>
-            <Heading level={2}>File Storage</Heading>
-            <StorageBrowser/>
-            <Paper style={{width: '100%'}}>
-                {tableData && (
+            </Grid>
+            <Grid size={2}>
+                <Button onClick={signOut} variant="contained" color="error" style={{height: '100%', width: '100%'}}>Sign
+                    Out</Button>
+            </Grid>
+            <Grid size={12}>
+                <Paper style={{width: '100%'}}>
                     <MaterialTable
                         options={{
                             search: true,
@@ -196,24 +127,16 @@ export default function App() {
                                 filtering: false,
                             },
                             {
-                                title: 'Country',
-                                field: 'country',
-                                width: '25%',
-                                defaultSort: 'asc',
-                                lookup: ['poland'],
-                            },
-                            {
                                 title: '',
                                 field: 'filename',
                                 width: '120px',
                                 filtering: false,
-                                render: (rowData: {filename: string}) => {
-                                    // if (userIsResearcher) {
+                                render: userProfile ? (rowData: { filename: string }) => {
                                     return (
-                                        <MUIButton
+                                        <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => handleDownload(rowData.filename, userprofiles[0])}
+                                            onClick={() => handleDownload(rowData.filename, userProfile)}
                                             startIcon={<SaveAltIcon/>}
                                             sx={{
                                                 whiteSpace: 'nowrap',
@@ -221,157 +144,17 @@ export default function App() {
                                             }}
                                         >
                                             Download
-                                        </MUIButton>
+                                        </Button>
                                     );
-                                    // } else if (agreedToDataAcknowledgement) {
-                                    //     return (
-                                    //         <Tooltip
-                                    //             placement="left"
-                                    //             title={
-                                    //                 'To access file downloads your account must be verified by the G.h Administrator'
-                                    //             }
-                                    //         >
-                                    //                     <span>
-                                    //                         <Button
-                                    //                             variant="contained"
-                                    //                             color="primary"
-                                    //                             onClick={() =>
-                                    //                                 downloadDataButtonOnClick(
-                                    //                                     rowData.filename,
-                                    //                                 )
-                                    //                             }
-                                    //                             startIcon={
-                                    //                                 <SaveAltIcon />
-                                    //                             }
-                                    //                             sx={{
-                                    //                                 whiteSpace:
-                                    //                                     'nowrap',
-                                    //                                 minWidth: '140px',
-                                    //                             }}
-                                    //                             disabled={true}
-                                    //                         >
-                                    //                             Download
-                                    //                         </Button>
-                                    //                     </span>
-                                    //         </Tooltip>
-                                    //     );
-                                    // }
-                                    // return (
-                                    //     <Tooltip
-                                    //         placement="left"
-                                    //         title={
-                                    //             'To access file downloads you must agree to Data Acknowledgement and your account must be verified by the G.h Administrator'
-                                    //         }
-                                    //     >
-                                    //                 <span>
-                                    //                     <Button
-                                    //                         variant="contained"
-                                    //                         color="primary"
-                                    //                         onClick={() =>
-                                    //                             downloadDataButtonOnClick(
-                                    //                                 rowData.filename,
-                                    //                             )
-                                    //                         }
-                                    //                         startIcon={<SaveAltIcon />}
-                                    //                         sx={{
-                                    //                             whiteSpace: 'nowrap',
-                                    //                             minWidth: '140px',
-                                    //                         }}
-                                    //                         disabled={true}
-                                    //                     >
-                                    //                         Download
-                                    //                     </Button>
-                                    //                 </span>
-                                    //     </Tooltip>
-                                    // );
-                                },
+                                } : undefined,
                             },
                         ]}
-                        data={tableData}
+                        data={tableData || []}
                         title="Data downloads"
+                        isLoading={!tableData || !userProfile}
                     />
-                )}</Paper>
-            {downloadEvents.length > 0 &&
-                (<table>
-                    <thead>
-                    <tr>
-                        <th style={{backgroundColor: 'gray'}}>Email</th>
-                        <th style={{backgroundColor: 'gray'}}>File</th>
-                        <th style={{backgroundColor: 'gray'}}>Acess Time</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {downloadEvents.map((downloadEvent) => (
-                        <tr>
-                            <td style={{backgroundColor: 'gray'}}>{downloadEvent.email}</td>
-                            <td style={{backgroundColor: 'gray'}}>{downloadEvent.filename}</td>
-                            <td style={{backgroundColor: 'gray'}}>{downloadEvent.createdAt}</td>
-                        </tr>
-                    ))}</tbody>
-
-                </table>)}
-            <Button onClick={signOut}>Sign Out</Button>
-        </Flex>
+                </Paper>
+            </Grid>
+        </Grid>
     );
 }
-
-
-//
-// import { useState, useEffect } from 'react';
-// import { list, getUrl } from 'aws-amplify/storage';
-// import { generateClient } from 'aws-amplify/data';
-// import type { Schema } from '../amplify/data/resource'; // Your DB Schema
-//
-// const client = generateClient<Schema>();
-//
-// export default function MyCustomBrowser() {
-//     const [files, setFiles] = useState<any[]>([]);
-//
-//     // 1. Fetch files
-//     useEffect(() => {
-//         async function loadFiles() {
-//             const result = await list({ path: 'public/' });
-//             setFiles(result.items);
-//         }
-//         loadFiles();
-//     }, []);
-//
-//     // 2. Handle the Download Click
-//     const handleDownload = async (fileKey: string) => {
-//         try {
-//             // A: Save to Database FIRST
-//             await client.models.DownloadLog.create({
-//                 filename: fileKey,
-//                 username: 'currentUser', // Get this from Auth.getCurrentUser()
-//                 timestamp: new Date().toISOString()
-//             });
-//
-//             // B: Get the Download URL
-//             const link = await getUrl({ path: fileKey });
-//
-//             // C: Open the file
-//             window.open(link.url.toString(), '_blank');
-//
-//         } catch (error) {
-//             console.error("Error downloading:", error);
-//         }
-//     };
-//
-//     return (
-//         <div>
-//             <h2>My Files</h2>
-//             <ul>
-//                 {files.map(file => (
-//                     <li key={file.path}>
-//                         {file.path}
-//                         {/* Your Custom Button */}
-//                         <button onClick={() => handleDownload(file.path)}>
-//                             Download & Log
-//                         </button>
-//                     </li>
-//                 ))}
-//             </ul>
-//         </div>
-//     );
-// }
-//

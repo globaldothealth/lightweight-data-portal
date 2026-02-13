@@ -2,34 +2,35 @@
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
 
-export type SignInEvent = {
-  __typename: "SignInEvent",
+export type DownloadEvent = {
+  __typename: "DownloadEvent",
   createdAt: string,
   email?: string | null,
+  filename?: string | null,
   id: string,
-  profileOwner?: string | null,
   timestamp?: string | null,
   updatedAt: string,
   userId?: string | null,
 };
 
-export type UserProfile = {
-  __typename: "UserProfile",
+export type SignInEvent = {
+  __typename: "SignInEvent",
   createdAt: string,
   email?: string | null,
   id: string,
-  profileOwner?: string | null,
+  timestamp?: string | null,
   updatedAt: string,
+  userId?: string | null,
 };
 
-export type ModelSignInEventFilterInput = {
-  and?: Array< ModelSignInEventFilterInput | null > | null,
+export type ModelDownloadEventFilterInput = {
+  and?: Array< ModelDownloadEventFilterInput | null > | null,
   createdAt?: ModelStringInput | null,
   email?: ModelStringInput | null,
+  filename?: ModelStringInput | null,
   id?: ModelIDInput | null,
-  not?: ModelSignInEventFilterInput | null,
-  or?: Array< ModelSignInEventFilterInput | null > | null,
-  profileOwner?: ModelStringInput | null,
+  not?: ModelDownloadEventFilterInput | null,
+  or?: Array< ModelDownloadEventFilterInput | null > | null,
   timestamp?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
   userId?: ModelStringInput | null,
@@ -91,27 +92,48 @@ export type ModelIDInput = {
   size?: ModelSizeInput | null,
 };
 
+export type ModelDownloadEventConnection = {
+  __typename: "ModelDownloadEventConnection",
+  items:  Array<DownloadEvent | null >,
+  nextToken?: string | null,
+};
+
+export type ModelSignInEventFilterInput = {
+  and?: Array< ModelSignInEventFilterInput | null > | null,
+  createdAt?: ModelStringInput | null,
+  email?: ModelStringInput | null,
+  id?: ModelIDInput | null,
+  not?: ModelSignInEventFilterInput | null,
+  or?: Array< ModelSignInEventFilterInput | null > | null,
+  timestamp?: ModelStringInput | null,
+  updatedAt?: ModelStringInput | null,
+  userId?: ModelStringInput | null,
+};
+
 export type ModelSignInEventConnection = {
   __typename: "ModelSignInEventConnection",
   items:  Array<SignInEvent | null >,
   nextToken?: string | null,
 };
 
-export type ModelUserProfileFilterInput = {
-  and?: Array< ModelUserProfileFilterInput | null > | null,
+export type ModelDownloadEventConditionInput = {
+  and?: Array< ModelDownloadEventConditionInput | null > | null,
   createdAt?: ModelStringInput | null,
   email?: ModelStringInput | null,
-  id?: ModelIDInput | null,
-  not?: ModelUserProfileFilterInput | null,
-  or?: Array< ModelUserProfileFilterInput | null > | null,
-  profileOwner?: ModelStringInput | null,
+  filename?: ModelStringInput | null,
+  not?: ModelDownloadEventConditionInput | null,
+  or?: Array< ModelDownloadEventConditionInput | null > | null,
+  timestamp?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
+  userId?: ModelStringInput | null,
 };
 
-export type ModelUserProfileConnection = {
-  __typename: "ModelUserProfileConnection",
-  items:  Array<UserProfile | null >,
-  nextToken?: string | null,
+export type CreateDownloadEventInput = {
+  email?: string | null,
+  filename?: string | null,
+  id?: string | null,
+  timestamp?: string | null,
+  userId?: string | null,
 };
 
 export type ModelSignInEventConditionInput = {
@@ -120,7 +142,6 @@ export type ModelSignInEventConditionInput = {
   email?: ModelStringInput | null,
   not?: ModelSignInEventConditionInput | null,
   or?: Array< ModelSignInEventConditionInput | null > | null,
-  profileOwner?: ModelStringInput | null,
   timestamp?: ModelStringInput | null,
   updatedAt?: ModelStringInput | null,
   userId?: ModelStringInput | null,
@@ -133,28 +154,20 @@ export type CreateSignInEventInput = {
   userId?: string | null,
 };
 
-export type ModelUserProfileConditionInput = {
-  and?: Array< ModelUserProfileConditionInput | null > | null,
-  createdAt?: ModelStringInput | null,
-  email?: ModelStringInput | null,
-  not?: ModelUserProfileConditionInput | null,
-  or?: Array< ModelUserProfileConditionInput | null > | null,
-  profileOwner?: ModelStringInput | null,
-  updatedAt?: ModelStringInput | null,
-};
-
-export type CreateUserProfileInput = {
-  email?: string | null,
-  id?: string | null,
-  profileOwner?: string | null,
+export type DeleteDownloadEventInput = {
+  id: string,
 };
 
 export type DeleteSignInEventInput = {
   id: string,
 };
 
-export type DeleteUserProfileInput = {
+export type UpdateDownloadEventInput = {
+  email?: string | null,
+  filename?: string | null,
   id: string,
+  timestamp?: string | null,
+  userId?: string | null,
 };
 
 export type UpdateSignInEventInput = {
@@ -164,22 +177,16 @@ export type UpdateSignInEventInput = {
   userId?: string | null,
 };
 
-export type UpdateUserProfileInput = {
-  email?: string | null,
-  id: string,
-  profileOwner?: string | null,
-};
-
-export type ModelSubscriptionSignInEventFilterInput = {
-  and?: Array< ModelSubscriptionSignInEventFilterInput | null > | null,
+export type ModelSubscriptionDownloadEventFilterInput = {
+  and?: Array< ModelSubscriptionDownloadEventFilterInput | null > | null,
   createdAt?: ModelSubscriptionStringInput | null,
   email?: ModelSubscriptionStringInput | null,
+  filename?: ModelSubscriptionStringInput | null,
   id?: ModelSubscriptionIDInput | null,
-  or?: Array< ModelSubscriptionSignInEventFilterInput | null > | null,
-  profileOwner?: ModelStringInput | null,
+  or?: Array< ModelSubscriptionDownloadEventFilterInput | null > | null,
   timestamp?: ModelSubscriptionStringInput | null,
   updatedAt?: ModelSubscriptionStringInput | null,
-  userId?: ModelSubscriptionStringInput | null,
+  userId?: ModelStringInput | null,
 };
 
 export type ModelSubscriptionStringInput = {
@@ -212,14 +219,32 @@ export type ModelSubscriptionIDInput = {
   notIn?: Array< string | null > | null,
 };
 
-export type ModelSubscriptionUserProfileFilterInput = {
-  and?: Array< ModelSubscriptionUserProfileFilterInput | null > | null,
+export type ModelSubscriptionSignInEventFilterInput = {
+  and?: Array< ModelSubscriptionSignInEventFilterInput | null > | null,
   createdAt?: ModelSubscriptionStringInput | null,
   email?: ModelSubscriptionStringInput | null,
   id?: ModelSubscriptionIDInput | null,
-  or?: Array< ModelSubscriptionUserProfileFilterInput | null > | null,
-  profileOwner?: ModelStringInput | null,
+  or?: Array< ModelSubscriptionSignInEventFilterInput | null > | null,
+  timestamp?: ModelSubscriptionStringInput | null,
   updatedAt?: ModelSubscriptionStringInput | null,
+  userId?: ModelStringInput | null,
+};
+
+export type GetDownloadEventQueryVariables = {
+  id: string,
+};
+
+export type GetDownloadEventQuery = {
+  getDownloadEvent?:  {
+    __typename: "DownloadEvent",
+    createdAt: string,
+    email?: string | null,
+    filename?: string | null,
+    id: string,
+    timestamp?: string | null,
+    updatedAt: string,
+    userId?: string | null,
+  } | null,
 };
 
 export type GetSignInEventQueryVariables = {
@@ -232,25 +257,32 @@ export type GetSignInEventQuery = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
   } | null,
 };
 
-export type GetUserProfileQueryVariables = {
-  id: string,
+export type ListDownloadEventsQueryVariables = {
+  filter?: ModelDownloadEventFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
 };
 
-export type GetUserProfileQuery = {
-  getUserProfile?:  {
-    __typename: "UserProfile",
-    createdAt: string,
-    email?: string | null,
-    id: string,
-    profileOwner?: string | null,
-    updatedAt: string,
+export type ListDownloadEventsQuery = {
+  listDownloadEvents?:  {
+    __typename: "ModelDownloadEventConnection",
+    items:  Array< {
+      __typename: "DownloadEvent",
+      createdAt: string,
+      email?: string | null,
+      filename?: string | null,
+      id: string,
+      timestamp?: string | null,
+      updatedAt: string,
+      userId?: string | null,
+    } | null >,
+    nextToken?: string | null,
   } | null,
 };
 
@@ -268,7 +300,6 @@ export type ListSignInEventsQuery = {
       createdAt: string,
       email?: string | null,
       id: string,
-      profileOwner?: string | null,
       timestamp?: string | null,
       updatedAt: string,
       userId?: string | null,
@@ -277,24 +308,21 @@ export type ListSignInEventsQuery = {
   } | null,
 };
 
-export type ListUserProfilesQueryVariables = {
-  filter?: ModelUserProfileFilterInput | null,
-  limit?: number | null,
-  nextToken?: string | null,
+export type CreateDownloadEventMutationVariables = {
+  condition?: ModelDownloadEventConditionInput | null,
+  input: CreateDownloadEventInput,
 };
 
-export type ListUserProfilesQuery = {
-  listUserProfiles?:  {
-    __typename: "ModelUserProfileConnection",
-    items:  Array< {
-      __typename: "UserProfile",
-      createdAt: string,
-      email?: string | null,
-      id: string,
-      profileOwner?: string | null,
-      updatedAt: string,
-    } | null >,
-    nextToken?: string | null,
+export type CreateDownloadEventMutation = {
+  createDownloadEvent?:  {
+    __typename: "DownloadEvent",
+    createdAt: string,
+    email?: string | null,
+    filename?: string | null,
+    id: string,
+    timestamp?: string | null,
+    updatedAt: string,
+    userId?: string | null,
   } | null,
 };
 
@@ -309,26 +337,27 @@ export type CreateSignInEventMutation = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
   } | null,
 };
 
-export type CreateUserProfileMutationVariables = {
-  condition?: ModelUserProfileConditionInput | null,
-  input: CreateUserProfileInput,
+export type DeleteDownloadEventMutationVariables = {
+  condition?: ModelDownloadEventConditionInput | null,
+  input: DeleteDownloadEventInput,
 };
 
-export type CreateUserProfileMutation = {
-  createUserProfile?:  {
-    __typename: "UserProfile",
+export type DeleteDownloadEventMutation = {
+  deleteDownloadEvent?:  {
+    __typename: "DownloadEvent",
     createdAt: string,
     email?: string | null,
+    filename?: string | null,
     id: string,
-    profileOwner?: string | null,
+    timestamp?: string | null,
     updatedAt: string,
+    userId?: string | null,
   } | null,
 };
 
@@ -343,26 +372,27 @@ export type DeleteSignInEventMutation = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
   } | null,
 };
 
-export type DeleteUserProfileMutationVariables = {
-  condition?: ModelUserProfileConditionInput | null,
-  input: DeleteUserProfileInput,
+export type UpdateDownloadEventMutationVariables = {
+  condition?: ModelDownloadEventConditionInput | null,
+  input: UpdateDownloadEventInput,
 };
 
-export type DeleteUserProfileMutation = {
-  deleteUserProfile?:  {
-    __typename: "UserProfile",
+export type UpdateDownloadEventMutation = {
+  updateDownloadEvent?:  {
+    __typename: "DownloadEvent",
     createdAt: string,
     email?: string | null,
+    filename?: string | null,
     id: string,
-    profileOwner?: string | null,
+    timestamp?: string | null,
     updatedAt: string,
+    userId?: string | null,
   } | null,
 };
 
@@ -377,32 +407,33 @@ export type UpdateSignInEventMutation = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
   } | null,
 };
 
-export type UpdateUserProfileMutationVariables = {
-  condition?: ModelUserProfileConditionInput | null,
-  input: UpdateUserProfileInput,
+export type OnCreateDownloadEventSubscriptionVariables = {
+  filter?: ModelSubscriptionDownloadEventFilterInput | null,
+  userId?: string | null,
 };
 
-export type UpdateUserProfileMutation = {
-  updateUserProfile?:  {
-    __typename: "UserProfile",
+export type OnCreateDownloadEventSubscription = {
+  onCreateDownloadEvent?:  {
+    __typename: "DownloadEvent",
     createdAt: string,
     email?: string | null,
+    filename?: string | null,
     id: string,
-    profileOwner?: string | null,
+    timestamp?: string | null,
     updatedAt: string,
+    userId?: string | null,
   } | null,
 };
 
 export type OnCreateSignInEventSubscriptionVariables = {
   filter?: ModelSubscriptionSignInEventFilterInput | null,
-  profileOwner?: string | null,
+  userId?: string | null,
 };
 
 export type OnCreateSignInEventSubscription = {
@@ -411,32 +442,33 @@ export type OnCreateSignInEventSubscription = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
   } | null,
 };
 
-export type OnCreateUserProfileSubscriptionVariables = {
-  filter?: ModelSubscriptionUserProfileFilterInput | null,
-  profileOwner?: string | null,
+export type OnDeleteDownloadEventSubscriptionVariables = {
+  filter?: ModelSubscriptionDownloadEventFilterInput | null,
+  userId?: string | null,
 };
 
-export type OnCreateUserProfileSubscription = {
-  onCreateUserProfile?:  {
-    __typename: "UserProfile",
+export type OnDeleteDownloadEventSubscription = {
+  onDeleteDownloadEvent?:  {
+    __typename: "DownloadEvent",
     createdAt: string,
     email?: string | null,
+    filename?: string | null,
     id: string,
-    profileOwner?: string | null,
+    timestamp?: string | null,
     updatedAt: string,
+    userId?: string | null,
   } | null,
 };
 
 export type OnDeleteSignInEventSubscriptionVariables = {
   filter?: ModelSubscriptionSignInEventFilterInput | null,
-  profileOwner?: string | null,
+  userId?: string | null,
 };
 
 export type OnDeleteSignInEventSubscription = {
@@ -445,32 +477,33 @@ export type OnDeleteSignInEventSubscription = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
   } | null,
 };
 
-export type OnDeleteUserProfileSubscriptionVariables = {
-  filter?: ModelSubscriptionUserProfileFilterInput | null,
-  profileOwner?: string | null,
+export type OnUpdateDownloadEventSubscriptionVariables = {
+  filter?: ModelSubscriptionDownloadEventFilterInput | null,
+  userId?: string | null,
 };
 
-export type OnDeleteUserProfileSubscription = {
-  onDeleteUserProfile?:  {
-    __typename: "UserProfile",
+export type OnUpdateDownloadEventSubscription = {
+  onUpdateDownloadEvent?:  {
+    __typename: "DownloadEvent",
     createdAt: string,
     email?: string | null,
+    filename?: string | null,
     id: string,
-    profileOwner?: string | null,
+    timestamp?: string | null,
     updatedAt: string,
+    userId?: string | null,
   } | null,
 };
 
 export type OnUpdateSignInEventSubscriptionVariables = {
   filter?: ModelSubscriptionSignInEventFilterInput | null,
-  profileOwner?: string | null,
+  userId?: string | null,
 };
 
 export type OnUpdateSignInEventSubscription = {
@@ -479,25 +512,8 @@ export type OnUpdateSignInEventSubscription = {
     createdAt: string,
     email?: string | null,
     id: string,
-    profileOwner?: string | null,
     timestamp?: string | null,
     updatedAt: string,
     userId?: string | null,
-  } | null,
-};
-
-export type OnUpdateUserProfileSubscriptionVariables = {
-  filter?: ModelSubscriptionUserProfileFilterInput | null,
-  profileOwner?: string | null,
-};
-
-export type OnUpdateUserProfileSubscription = {
-  onUpdateUserProfile?:  {
-    __typename: "UserProfile",
-    createdAt: string,
-    email?: string | null,
-    id: string,
-    profileOwner?: string | null,
-    updatedAt: string,
   } | null,
 };

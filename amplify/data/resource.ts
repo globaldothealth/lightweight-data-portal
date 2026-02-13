@@ -4,14 +4,6 @@ import {postAuthentication} from "../auth/post-authentication/resource";
 
 const schema = a
     .schema({
-        UserProfile: a
-            .model({
-                email: a.string(),
-                profileOwner: a.string(),
-            })
-            .authorization((allow) => [
-                allow.ownerDefinedIn("profileOwner"),
-            ]),
         SignInEvent: a
             .model({
                 userId: a.string(),

@@ -3,7 +3,6 @@ import {type Schema} from "../../data/resource";
 import {Amplify} from "aws-amplify";
 import {generateClient} from "aws-amplify/data";
 import {env} from "$amplify/env/post-confirmation";
-import {createUserProfile} from "./graphql/mutations";
 import {createSignInEvent} from "./graphql/mutations";
 
 Amplify.configure(
@@ -38,15 +37,6 @@ const client = generateClient<Schema>({
 });
 export const handler: PostConfirmationTriggerHandler = async (event) => {
     try {
-        await client.graphql({
-            query: createUserProfile,
-            variables: {
-                input: {
-                    email: event.request.userAttributes.email,
-                    profileOwner: `${event.request.userAttributes.sub}::${event.userName}`,
-                },
-            },
-        });
         await client.graphql({
             query: createSignInEvent,
             variables: {
