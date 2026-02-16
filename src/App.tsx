@@ -25,6 +25,16 @@ interface UserProfile {
 
 Amplify.configure(outputs);
 
+Amplify.configure({...outputs,
+    auth: {
+        ...outputs.auth,
+        oauth: {
+            ...outputs.auth.oauth,
+            domain: 'auth.global.health',
+        }
+    }
+});
+
 const availableOutbreaks = [
     'Mpox 2024', 'Avian Influenza'
 ]
@@ -50,10 +60,7 @@ export default function App() {
     };
 
     async function fetchFiles() {
-        // const folders: any = await list({path: ''});
-        // console.log(folders);
         const result: any = await list({path: `public/${selectedOutbreak}/`});
-        console.log(result);
         return (result.items.map((file: { path: string }) => ({
             filename: file.path,
             name: file.path.split('/').pop(),
