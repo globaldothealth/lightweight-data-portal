@@ -25,15 +25,16 @@ interface UserProfile {
 
 Amplify.configure(outputs);
 
-Amplify.configure({...outputs,
-    auth: {
-        ...outputs.auth,
-        oauth: {
-            ...outputs.auth.oauth,
-            domain: 'auth.global.health',
-        }
-    }
-});
+// Custom domain for production Cognito
+// Amplify.configure({...outputs,
+//     auth: {
+//         ...outputs.auth,
+//         oauth: {
+//             ...outputs.auth.oauth,
+//             domain: 'auth.global.health',
+//         }
+//     }
+// });
 
 const availableOutbreaks = [
     'Mpox 2024', 'Avian Influenza'
