@@ -1,45 +1,37 @@
-import {useState, useEffect} from "react";
-import {list, getUrl} from 'aws-amplify/storage';
+import {useEffect} from "react";
+import {getUrl} from 'aws-amplify/storage';
 import "@aws-amplify/ui-react/styles.css";
 import {useAuthenticator} from "@aws-amplify/ui-react";
 import MaterialTable from '@material-table/core';
 import {SaveAlt as SaveAltIcon} from '@mui/icons-material';
 import {Button, Paper, MenuItem, FormControl, InputLabel, Grid} from '@mui/material';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
-import { useAppSelector } from '../../hooks/redux';
+import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {selectUserProfile} from "../../redux/app/selectors.ts";
+import {selectS3Folder, selectS3Files, selectIsLoading} from "../../redux/dataDownloads/selectors.ts";
+import {getFilesFromS3Folder} from "../../redux/dataDownloads/thunk.ts";
+import {S3Folder, setS3Folder} from "../../redux/dataDownloads/slice.ts";
 
 interface UserProfile {
     email: string;
     id: string;
 }
 
-const availableOutbreaks = [
-    'Mpox 2024', 'Avian Influenza'
-]
-
 
 export default function DataDownloads({client}: { client: any }) {
+    const dispatch = useAppDispatch();
+    const s3Folder = useAppSelector(selectS3Folder);
+    const s3Files = useAppSelector(selectS3Files);
+    const isLoading = useAppSelector(selectIsLoading);
     const userProfile = useAppSelector(selectUserProfile);
-    const [tableData, setTableData] =
-        useState<[{ name: string; filename: string }]>();
-    const [selectedOutbreak, setSelectedOutbreak] = useState<string>(availableOutbreaks[0]);
-
-    const handleChange = (event: SelectChangeEvent) => {
-        setSelectedOutbreak(event.target.value as string);
-    };
-
-    async function fetchFiles() {
-        const result: any = await list({path: `public/${selectedOutbreak}/`});
-        return (result.items.map((file: { path: string }) => ({
-            filename: file.path,
-            name: file.path.split('/').pop(),
-        })).filter((file: { name: string; filename: string }) => file.name !== ''));
-    }
 
     useEffect(() => {
-        fetchFiles().then(files => setTableData(files));
-    }, [selectedOutbreak]);
+        dispatch(getFilesFromS3Folder({s3Folder}));
+    }, [s3Folder]);
+
+    const handleS3FolderChange = (event: SelectChangeEvent) => {
+        dispatch(setS3Folder(event.target.value as S3Folder));
+    };
 
     const handleDownload = async (fileKey: string, user: UserProfile) => {
         try {
@@ -68,11 +60,11 @@ export default function DataDownloads({client}: { client: any }) {
                     <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={selectedOutbreak}
+                        value={s3Folder}
                         label="Selected Outbreak"
-                        onChange={handleChange}
+                        onChange={handleS3FolderChange}
                     >
-                        {availableOutbreaks.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                        {Object.values(S3Folder).map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
                     </Select>
                 </FormControl>
             </Grid>
@@ -122,9 +114,9 @@ export default function DataDownloads({client}: { client: any }) {
                                 } : undefined,
                             },
                         ]}
-                        data={tableData || []}
+                        data={s3Files}
                         title="Data downloads"
-                        isLoading={!tableData || !userProfile}
+                        isLoading={isLoading}
                     />
                 </Paper>
             </Grid>
