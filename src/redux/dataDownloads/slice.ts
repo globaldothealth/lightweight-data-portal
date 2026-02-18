@@ -34,18 +34,20 @@ const dataDownloadsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(getFilesFromS3Folder.pending, (state) => {
+            state.error = undefined;
             state.isLoading = true;
         });
         builder.addCase(getFilesFromS3Folder.fulfilled, (state, action) => {
-            state.s3Files = action.payload;
             state.isLoading = false;
+            state.s3Files = action.payload;
         });
         builder.addCase(getFilesFromS3Folder.rejected, (state, action) => {
             state.error = action.payload;
-            state.s3Files = [];
             state.isLoading = false;
+            state.s3Files = [];
         });
         builder.addCase(handleDownload.pending, (state) => {
+            state.error = undefined;
             state.isLoading = true;
         });
         builder.addCase(handleDownload.fulfilled, (state) => {
