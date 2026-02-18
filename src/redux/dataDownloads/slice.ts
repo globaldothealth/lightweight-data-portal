@@ -22,7 +22,7 @@ const initialState: DataDownloadsState = {
     s3Files: [],
 };
 
-const appSlice = createSlice({
+const dataDownloadsSlice = createSlice({
     name: 'dataDownloads',
     initialState,
     reducers: {
@@ -55,6 +55,6 @@ const appSlice = createSlice({
 });
 
 export const { setS3Folder } =
-    appSlice.actions;
+    dataDownloadsSlice.actions;
 
-export default appSlice.reducer;
+export default dataDownloadsSlice.reducer;

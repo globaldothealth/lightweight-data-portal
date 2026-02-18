@@ -8,7 +8,7 @@ import {getUserProfile, logout} from "../../redux/app/thunk.ts";
 
 export default function App() {
     const dispatch = useAppDispatch();
-    
+
     useEffect(() => {
         dispatch(getUserProfile());
     }, []);

@@ -1,6 +1,6 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import {fetchUserAttributes, FetchUserAttributesOutput} from "aws-amplify/auth";
-import {useAuthenticator} from "@aws-amplify/ui-react";
+import {createAsyncThunk} from '@reduxjs/toolkit';
+import {fetchUserAttributes, FetchUserAttributesOutput, signOut} from "aws-amplify/auth";
+
 
 export const getUserProfile = createAsyncThunk(
     'app/getUserProfile',
@@ -17,8 +17,7 @@ export const logout = createAsyncThunk(
     'app/logout',
     async (_, {rejectWithValue}) => {
         try {
-            const {signOut} = useAuthenticator((context) => [context.user]);
-            signOut();
+            await signOut();
         } catch (error) {
             return rejectWithValue("Logout failed");
         }

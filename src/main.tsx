@@ -1,15 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import {Amplify} from "aws-amplify";
 import {Authenticator} from "@aws-amplify/ui-react";
 import {BrowserRouter} from 'react-router-dom';
 import store from './redux/store';
 import {Provider} from 'react-redux';
 import App from "./containers/App";
 import "./index.css";
-import {generateClient} from "aws-amplify/api";
-import {Schema} from "../amplify/data/resource.ts";
 import outputs from "../amplify_outputs.json";
-import {Amplify} from "aws-amplify";
+
 
 Amplify.configure(outputs);
 
@@ -23,10 +22,6 @@ Amplify.configure(outputs);
 //         }
 //     }
 // });
-
-export const client = generateClient<Schema>({
-    authMode: "userPool",
-});
 
 ReactDOM.createRoot(document.getElementById("root") as Element).render(
     <React.StrictMode>

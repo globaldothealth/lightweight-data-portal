@@ -2,7 +2,7 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {getUrl, list} from "aws-amplify/storage";
 import {S3File} from "./slice";
 import {UserProfile} from "../app/slice";
-import {client} from "../../main";
+import {client} from "../../utils/amplifyClient";
 
 export const getFilesFromS3Folder = createAsyncThunk<S3File[],
     { s3Folder: string },
