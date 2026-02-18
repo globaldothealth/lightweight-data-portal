@@ -20,7 +20,7 @@ export default function DataDownloads() {
 
     useEffect(() => {
         dispatch(getFilesFromS3Folder({s3Folder}));
-    }, [s3Folder]);
+    }, [dispatch, s3Folder]);
 
     const handleS3FolderChange = (event: SelectChangeEvent) => {
         dispatch(setS3Folder(event.target.value as S3Folder));

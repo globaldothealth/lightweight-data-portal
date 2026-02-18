@@ -14,12 +14,14 @@ interface DataDownloadsState {
     isLoading: boolean;
     s3Folder: S3Folder;
     s3Files: S3File[];
+    error: string | undefined;
 }
 
 const initialState: DataDownloadsState = {
     isLoading: false,
     s3Folder: S3Folder.Mpox2024,
     s3Files: [],
+    error: undefined,
 };
 
 const dataDownloadsSlice = createSlice({
@@ -38,7 +40,8 @@ const dataDownloadsSlice = createSlice({
             state.s3Files = action.payload;
             state.isLoading = false;
         });
-        builder.addCase(getFilesFromS3Folder.rejected, (state) => {
+        builder.addCase(getFilesFromS3Folder.rejected, (state, action) => {
+            state.error = action.payload;
             state.s3Files = [];
             state.isLoading = false;
         });
@@ -48,7 +51,8 @@ const dataDownloadsSlice = createSlice({
         builder.addCase(handleDownload.fulfilled, (state) => {
             state.isLoading = false;
         });
-        builder.addCase(handleDownload.rejected, (state) => {
+        builder.addCase(handleDownload.rejected, (state, action) => {
+            state.error = action.payload;
             state.isLoading = false;
         });
     },

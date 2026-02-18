@@ -11,7 +11,7 @@ export default function App() {
 
     useEffect(() => {
         dispatch(getUserProfile());
-    }, []);
+    }, [dispatch]);
 
     const handleLogout = () => {
         dispatch(logout())
