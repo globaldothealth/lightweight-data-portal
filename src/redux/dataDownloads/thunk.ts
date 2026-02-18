@@ -1,6 +1,8 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {list} from "aws-amplify/storage";
+import {getUrl, list} from "aws-amplify/storage";
 import {S3File} from "./slice";
+import {UserProfile} from "../app/slice";
+import {client} from "../../main";
 
 export const getFilesFromS3Folder = createAsyncThunk<S3File[],
     { s3Folder: string },
@@ -16,5 +18,27 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
             return rejectWithValue('No files found in the specified S3 folder.');
         }
         return files;
+    },
+);
+
+export const handleDownload = createAsyncThunk<void,
+    { s3FileKey: string, user: UserProfile },
+    { rejectValue: string }>(
+    'dataDownloads/handleDownload',
+    async (data, {rejectWithValue}) => {
+        try {
+            await client.models.DownloadEvent.create({
+                userId: data.user.id,
+                email: data.user.email,
+                filename: data.s3FileKey,
+                timestamp: new Date().toISOString(),
+            });
+
+            const link = await getUrl({path: data.s3FileKey});
+
+            window.open(link.url.toString(), '_blank');
+        } catch (error: any) {
+            return rejectWithValue(`Error downloading: ${error.message}`);
+        }
     },
 );

@@ -1,6 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { UserProfile } from '../../containers/App';
-import { getUserProfile } from './thunk';
+import {getUserProfile, logout} from './thunk';
+
+export interface UserProfile {
+    email: string;
+    id: string;
+}
 
 interface AppState {
     isLoading: boolean;
@@ -26,6 +30,16 @@ const appSlice = createSlice({
         });
         builder.addCase(getUserProfile.rejected, (state) => {
             state.userProfile = undefined;
+            state.isLoading = false;
+        });
+        builder.addCase(logout.pending, (state) => {
+            state.isLoading = true;
+        });
+        builder.addCase(logout.fulfilled, (state) => {
+            state.userProfile = undefined
+            state.isLoading = false;
+        });
+        builder.addCase(logout.rejected, (state) => {
             state.isLoading = false;
         });
     },

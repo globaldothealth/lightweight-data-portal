@@ -1,7 +1,5 @@
 import {useEffect} from "react";
-import {getUrl} from 'aws-amplify/storage';
 import "@aws-amplify/ui-react/styles.css";
-import {useAuthenticator} from "@aws-amplify/ui-react";
 import MaterialTable from '@material-table/core';
 import {SaveAlt as SaveAltIcon} from '@mui/icons-material';
 import {Button, Paper, MenuItem, FormControl, InputLabel, Grid} from '@mui/material';
@@ -9,16 +7,11 @@ import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {selectUserProfile} from "../../redux/app/selectors.ts";
 import {selectS3Folder, selectS3Files, selectIsLoading} from "../../redux/dataDownloads/selectors.ts";
-import {getFilesFromS3Folder} from "../../redux/dataDownloads/thunk.ts";
+import {getFilesFromS3Folder, handleDownload} from "../../redux/dataDownloads/thunk.ts";
 import {S3Folder, setS3Folder} from "../../redux/dataDownloads/slice.ts";
 
-interface UserProfile {
-    email: string;
-    id: string;
-}
 
-
-export default function DataDownloads({client}: { client: any }) {
+export default function DataDownloads() {
     const dispatch = useAppDispatch();
     const s3Folder = useAppSelector(selectS3Folder);
     const s3Files = useAppSelector(selectS3Files);
@@ -33,24 +26,11 @@ export default function DataDownloads({client}: { client: any }) {
         dispatch(setS3Folder(event.target.value as S3Folder));
     };
 
-    const handleDownload = async (fileKey: string, user: UserProfile) => {
-        try {
-            await client.models.DownloadEvent.create({
-                userId: user.id,
-                email: user.email,
-                filename: fileKey,
-                timestamp: new Date().toISOString(),
-            });
-
-            const link = await getUrl({path: fileKey});
-
-            window.open(link.url.toString(), '_blank');
-        } catch (error) {
-            console.error("Error downloading:", error);
+    const handleDownloadClick = (fileKey: string) => () => {
+        if (userProfile) {
+            dispatch(handleDownload({s3FileKey: fileKey, user: userProfile}));
         }
-    };
-
-    const {signOut} = useAuthenticator((context) => [context.user]);
+    }
 
     return (
         <Grid container spacing={2} style={{width: '100%'}}>
@@ -68,13 +48,7 @@ export default function DataDownloads({client}: { client: any }) {
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid size={6}>
-
-            </Grid>
-            <Grid size={2}>
-                <Button onClick={signOut} variant="contained" color="error" style={{height: '100%', width: '100%'}}>Sign
-                    Out</Button>
-            </Grid>
+            <Grid size={8}/>
             <Grid size={12}>
                 <Paper style={{width: '100%'}}>
                     <MaterialTable
@@ -101,7 +75,7 @@ export default function DataDownloads({client}: { client: any }) {
                                         <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => handleDownload(rowData.filename, userProfile)}
+                                            onClick={handleDownloadClick(rowData.filename)}
                                             startIcon={<SaveAltIcon/>}
                                             sx={{
                                                 whiteSpace: 'nowrap',

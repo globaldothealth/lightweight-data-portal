@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getFilesFromS3Folder } from './thunk';
+import {getFilesFromS3Folder, handleDownload} from './thunk';
 
 export enum S3Folder {
     Mpox2024 ='Mpox 2024', AvianInfluenza = 'Avian Influenza'
@@ -40,6 +40,15 @@ const appSlice = createSlice({
         });
         builder.addCase(getFilesFromS3Folder.rejected, (state) => {
             state.s3Files = [];
+            state.isLoading = false;
+        });
+        builder.addCase(handleDownload.pending, (state) => {
+            state.isLoading = true;
+        });
+        builder.addCase(handleDownload.fulfilled, (state) => {
+            state.isLoading = false;
+        });
+        builder.addCase(handleDownload.rejected, (state) => {
             state.isLoading = false;
         });
     },
