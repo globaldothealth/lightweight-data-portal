@@ -1,7 +1,4 @@
 import {useState, useEffect} from "react";
-import {Amplify} from "aws-amplify";
-import {fetchUserAttributes, FetchUserAttributesOutput} from 'aws-amplify/auth';
-import {generateClient} from "aws-amplify/data";
 import {list, getUrl} from 'aws-amplify/storage';
 import "@aws-amplify/ui-react/styles.css";
 import {useAuthenticator} from "@aws-amplify/ui-react";
@@ -9,52 +6,24 @@ import MaterialTable from '@material-table/core';
 import {SaveAlt as SaveAltIcon} from '@mui/icons-material';
 import {Button, Paper, MenuItem, FormControl, InputLabel, Grid} from '@mui/material';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
-
-import outputs from "../amplify_outputs.json";
-import {Schema} from "../amplify/data/resource";
-
-
-const client = generateClient<Schema>({
-    authMode: "userPool",
-});
+import { useAppSelector } from '../../hooks/redux';
+import {selectUserProfile} from "../../redux/app/selectors.ts";
 
 interface UserProfile {
     email: string;
     id: string;
 }
 
-Amplify.configure(outputs);
-
-// Custom domain for production Cognito
-// Amplify.configure({...outputs,
-//     auth: {
-//         ...outputs.auth,
-//         oauth: {
-//             ...outputs.auth.oauth,
-//             domain: 'auth.global.health',
-//         }
-//     }
-// });
-
 const availableOutbreaks = [
     'Mpox 2024', 'Avian Influenza'
 ]
 
 
-export default function App() {
+export default function DataDownloads({client}: { client: any }) {
+    const userProfile = useAppSelector(selectUserProfile);
     const [tableData, setTableData] =
         useState<[{ name: string; filename: string }]>();
-    const [userProfile, setUserProfile] = useState<UserProfile>();
     const [selectedOutbreak, setSelectedOutbreak] = useState<string>(availableOutbreaks[0]);
-
-    async function fetchUserProfile() {
-        const {email, sub: id}: FetchUserAttributesOutput = await fetchUserAttributes();
-        if (!email || !id) {
-            console.error("User attributes missing");
-            return;
-        }
-        return {email, id};
-    }
 
     const handleChange = (event: SelectChangeEvent) => {
         setSelectedOutbreak(event.target.value as string);
@@ -67,10 +36,6 @@ export default function App() {
             name: file.path.split('/').pop(),
         })).filter((file: { name: string; filename: string }) => file.name !== ''));
     }
-
-    useEffect(() => {
-        fetchUserProfile().then((userProfileData: UserProfile | undefined) => userProfileData && setUserProfile(userProfileData));
-    }, []);
 
     useEffect(() => {
         fetchFiles().then(files => setTableData(files));
