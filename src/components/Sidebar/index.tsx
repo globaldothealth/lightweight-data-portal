@@ -1,5 +1,5 @@
 import {JSX} from "react";
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {Logout as LogoutIcon} from '@mui/icons-material';
 import {
     Box,
@@ -23,6 +23,8 @@ interface SidebarProps {
 
 export default function Sidebar({drawerOpen, menuList, selectedMenuIndex, handleLogout}: SidebarProps) {
     const navigate = useNavigate();
+    const location = useLocation();
+
     return (<Drawer
         open={drawerOpen}
         variant="persistent"

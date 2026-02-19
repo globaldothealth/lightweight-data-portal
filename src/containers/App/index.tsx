@@ -46,7 +46,7 @@ export default function App() {
             menuItem.to === location.pathname
         ));
         setSelectedMenuIndex(menuIndex);
-    }, [location.pathname, menuList]);
+    }, [location.pathname]);
 
     return (
         <>
@@ -68,7 +68,7 @@ export default function App() {
                 </AppBar>
                 <Sidebar drawerOpen={drawerOpen} menuList={menuList} selectedMenuIndex={selectedMenuIndex}
                          handleLogout={handleLogout}/>
-                <main>
+                <Box sx={{ flexGrow: 1, p: 1, ml: !drawerOpen ? '-240px' : 0, transition: "all .2s" }}>
                     <Toolbar/>
                     <Routes>
                         <Route path="/data-downloads" element={<DataDownloads/>}/>
@@ -76,16 +76,11 @@ export default function App() {
                         <Route
                             path="/"
                             element={
-                                <Navigate
-                                    to={{
-                                        pathname: '/data-downloads',
-                                    }}
-                                    replace
-                                />
+                                <Navigate to='/data-downloads' replace/>
                             }
                         />
                     </Routes>
-                </main>
+                </Box>
             </Box>
         </>
     );
