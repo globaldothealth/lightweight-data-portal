@@ -1,28 +1,15 @@
 import {useEffect, useState} from "react";
-import {Navigate, Route, Routes, useLocation, useNavigate} from 'react-router-dom';
+import {Navigate, Route, Routes, useLocation} from 'react-router-dom';
 import {
     Menu as MenuIcon,
     BrowserUpdated as BrowserUpdatedIcon,
     Public as PublicIcon,
-    Logout as LogoutIcon
 } from '@mui/icons-material';
-import {
-    AppBar,
-    Box,
-    CssBaseline,
-    Divider,
-    Drawer,
-    IconButton,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Toolbar,
-} from '@mui/material';
+import {AppBar, Box, CssBaseline, IconButton, Toolbar,} from '@mui/material';
 
 import DataDownloads from "../DataDownloads";
 import LocationAdminExplorer from "../LocationAdminExplorer";
+import Sidebar from "../../components/Sidebar";
 import {useAppDispatch} from '../../hooks/redux';
 import {getUserProfile, logout} from "../../redux/app/thunk.ts";
 
@@ -32,7 +19,6 @@ export default function App() {
     const [drawerOpen, setDrawerOpen] = useState(true);
     const [selectedMenuIndex, setSelectedMenuIndex] = useState<number>();
     const location = useLocation();
-    const navigate = useNavigate();
 
     useEffect(() => {
         dispatch(getUserProfile());
@@ -62,11 +48,6 @@ export default function App() {
         setSelectedMenuIndex(menuIndex);
     }, [location.pathname, menuList]);
 
-
-    const drawerWidth = 240;
-    console.log(menuList)
-
-
     return (
         <>
             <Box sx={{display: 'flex'}}>
@@ -85,46 +66,9 @@ export default function App() {
                         </IconButton>
                     </Toolbar>
                 </AppBar>
-                <Drawer
-                    open={drawerOpen}
-                    variant="persistent"
-                    sx={{
-                        width: drawerWidth,
-                        flexShrink: 0,
-                        [`& .MuiDrawer-paper`]: {width: drawerWidth, boxSizing: 'border-box'},
-                    }}
-                >
-                    <Toolbar/>
-                    <Box sx={{overflow: 'auto'}}>
-                        <List>
-                            {menuList.map(
-                                (item, index) =>
-                                    <ListItem
-                                        key={item.text}
-                                    >
-                                        <ListItemButton
-                                            onClick={() => navigate(item.to, {state: {lastLocation: location.pathname}})}
-                                            selected={selectedMenuIndex === index}>
-                                            <ListItemIcon>{item.icon}</ListItemIcon>
-                                            <ListItemText primary={item.text}/>
-                                        </ListItemButton>
-                                    </ListItem>
-                            )}
-                        </List>
-                        <Divider/>
-                        <List>
-                            <ListItem>
-                                <ListItemButton onClick={handleLogout}>
-                                    <ListItemIcon>
-                                        <LogoutIcon/>
-                                    </ListItemIcon>
-                                    <ListItemText primary={'Logout'}/>
-                                </ListItemButton>
-                            </ListItem>
-                        </List>
-                    </Box>
-                </Drawer>
-                <Box component="main" sx={{flexGrow: 1, p: 3}}>
+                <Sidebar drawerOpen={drawerOpen} menuList={menuList} selectedMenuIndex={selectedMenuIndex}
+                         handleLogout={handleLogout}/>
+                <main>
                     <Toolbar/>
                     <Routes>
                         <Route path="/data-downloads" element={<DataDownloads/>}/>
@@ -141,7 +85,7 @@ export default function App() {
                             }
                         />
                     </Routes>
-                </Box>
+                </main>
             </Box>
         </>
     );
