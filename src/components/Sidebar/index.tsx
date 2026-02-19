@@ -19,9 +19,10 @@ interface SidebarProps {
     menuList: { text: string; icon: JSX.Element; to: string }[];
     selectedMenuIndex: number | undefined;
     handleLogout: () => void;
+    drawerWidth: number
 }
 
-export default function Sidebar({drawerOpen, menuList, selectedMenuIndex, handleLogout}: SidebarProps) {
+export default function Sidebar({drawerOpen, menuList, selectedMenuIndex, handleLogout, drawerWidth}: SidebarProps) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -29,9 +30,9 @@ export default function Sidebar({drawerOpen, menuList, selectedMenuIndex, handle
         open={drawerOpen}
         variant="persistent"
         sx={{
-            width: 240,
+            width: drawerWidth,
             flexShrink: 0,
-            [`& .MuiDrawer-paper`]: {width: 240, boxSizing: 'border-box'},
+            [`& .MuiDrawer-paper`]: {width: drawerWidth, boxSizing: 'border-box'},
         }}
     >
         <Toolbar/>

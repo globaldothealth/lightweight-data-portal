@@ -3,7 +3,7 @@ import {fetchUserAttributes, FetchUserAttributesOutput, signOut} from "aws-ampli
 import {UserProfile} from "./slice.ts";
 
 
-export const getUserProfile = createAsyncThunk<UserProfile, undefined, { rejectValue: string }>(
+export const getUserProfile = createAsyncThunk<UserProfile, void, { rejectValue: string }>(
     'app/getUserProfile',
     async (_, {rejectWithValue}) => {
         const {email, sub: id}: FetchUserAttributesOutput = await fetchUserAttributes()
@@ -14,7 +14,7 @@ export const getUserProfile = createAsyncThunk<UserProfile, undefined, { rejectV
     },
 );
 
-export const logout = createAsyncThunk<void, undefined, { rejectValue: string }>(
+export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
     'app/logout',
     async (_, {rejectWithValue}) => {
         try {

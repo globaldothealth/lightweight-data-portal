@@ -20,6 +20,8 @@ export default function App() {
     const [selectedMenuIndex, setSelectedMenuIndex] = useState<number>();
     const location = useLocation();
 
+    const drawerWidth = 240
+
     useEffect(() => {
         dispatch(getUserProfile());
     }, [dispatch]);
@@ -67,8 +69,8 @@ export default function App() {
                     </Toolbar>
                 </AppBar>
                 <Sidebar drawerOpen={drawerOpen} menuList={menuList} selectedMenuIndex={selectedMenuIndex}
-                         handleLogout={handleLogout}/>
-                <Box sx={{ flexGrow: 1, p: 1, ml: !drawerOpen ? '-240px' : 0, transition: "all .2s" }}>
+                         handleLogout={handleLogout} drawerWidth={drawerWidth}/>
+                <Box sx={{ flexGrow: 1, p: 1, ml: !drawerOpen ? `-${drawerWidth}px` : 0, transition: "all .2s" }}>
                     <Toolbar/>
                     <Routes>
                         <Route path="/data-downloads" element={<DataDownloads/>}/>
