@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Autocomplete, Grid, TextField} from "@mui/material";
 import countries from 'i18n-iso-countries';
 import english from "i18n-iso-countries/langs/en.json";
@@ -8,23 +8,25 @@ import admin2 from '../../data/adm2_parsed_data.json';
 import admin3 from '../../data/adm3_parsed_data.json';
 
 
-type adminEntry = {
+type AdminEntry = {
     name: string;
     wiki: string;
 };
 
 export default function LocationAdminExplorer() {
-    countries.registerLocale(english);
+    useEffect(() => {
+        countries.registerLocale(english);
+    }, []);
 
     const countryNames = countries.getNames('en');
-    const [admin1Entries, setAdmin1Entries] = useState<adminEntry[] | null>(null);
-    const [admin2Entries, setAdmin2Entries] = useState<adminEntry[] | null>(null);
-    const [admin3Entries, setAdmin3Entries] = useState<adminEntry[] | null>(null);
+    const [admin1Entries, setAdmin1Entries] = useState<AdminEntry[] | null>(null);
+    const [admin2Entries, setAdmin2Entries] = useState<AdminEntry[] | null>(null);
+    const [admin3Entries, setAdmin3Entries] = useState<AdminEntry[] | null>(null);
 
     const [selectedCountry, setSelectedCountry] = useState<string>('');
-    const [selectedAdmin1, setSelectedAdmin1] = useState<adminEntry>({name: '', wiki: ''},);
-    const [selectedAdmin2, setSelectedAdmin2] = useState<adminEntry>({name: '', wiki: ''},);
-    const [selectedAdmin3, setSelectedAdmin3] = useState<adminEntry>({name: '', wiki: ''},);
+    const [selectedAdmin1, setSelectedAdmin1] = useState<AdminEntry>({name: '', wiki: ''},);
+    const [selectedAdmin2, setSelectedAdmin2] = useState<AdminEntry>({name: '', wiki: ''},);
+    const [selectedAdmin3, setSelectedAdmin3] = useState<AdminEntry>({name: '', wiki: ''},);
 
     useEffect(() => {
         if (selectedCountry) {
@@ -43,7 +45,7 @@ export default function LocationAdminExplorer() {
             setAdmin2Entries(null);
         }
         setSelectedAdmin2({name: '', wiki: ''});
-    }, [selectedAdmin1]);
+    }, [selectedAdmin1.wiki]);
 
 
     useEffect(() => {
@@ -53,7 +55,7 @@ export default function LocationAdminExplorer() {
             setAdmin3Entries(null);
 
         setSelectedAdmin3({name: '', wiki: ''});
-    }, [selectedAdmin2]);
+    }, [selectedAdmin2.wiki]);
 
 
     return <Grid container spacing={2}>
@@ -68,14 +70,12 @@ export default function LocationAdminExplorer() {
         </Grid>
         <Grid size={6}>
             <Autocomplete
-                itemType="string"
                 getOptionLabel={(option: string): string => option && `🌎 ${option}`}
                 options={Object.keys(countryNames)
                     .map((alpha2key) => countryNames[alpha2key])
                     .sort()}
                 value={selectedCountry}
                 disableClearable
-                defaultValue={''}
                 onChange={(_: unknown, newValue: string | null,): void => {
                     setSelectedCountry(newValue || '');
                 }}
@@ -87,12 +87,10 @@ export default function LocationAdminExplorer() {
         </Grid>
         <Grid size={6}>
             <Autocomplete
-                itemType="string"
-                getOptionLabel={(option: adminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
+                getOptionLabel={(option: AdminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
                 options={admin1Entries || []}
                 value={selectedAdmin1}
-                defaultValue={{name: '', wiki: ''}}
-                onChange={(_: unknown, newValue: adminEntry | null,): void => {
+                onChange={(_: unknown, newValue: AdminEntry | null,): void => {
                     setSelectedAdmin1(newValue || {name: '', wiki: ''});
                 }}
                 onInputChange={(_e, _v, reason): void => {
@@ -107,12 +105,10 @@ export default function LocationAdminExplorer() {
         </Grid>
         <Grid size={6}>
             <Autocomplete
-                itemType="string"
-                getOptionLabel={(option: adminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
+                getOptionLabel={(option: AdminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
                 options={admin2Entries || []}
                 value={selectedAdmin2}
-                defaultValue={{name: '', wiki: ''}}
-                onChange={(_: unknown, newValue: adminEntry | null,): void => {
+                onChange={(_: unknown, newValue: AdminEntry | null,): void => {
                     setSelectedAdmin2(newValue || {name: '', wiki: ''});
                 }}
                 onInputChange={(_e, _v, reason): void => {
@@ -127,12 +123,10 @@ export default function LocationAdminExplorer() {
         </Grid>
         <Grid size={6}>
             <Autocomplete
-                itemType="string"
-                getOptionLabel={(option: adminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
+                getOptionLabel={(option: AdminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
                 options={admin3Entries || []}
                 value={selectedAdmin3}
-                defaultValue={{name: '', wiki: ''}}
-                onChange={(_: unknown, newValue: adminEntry | null,): void => {
+                onChange={(_: unknown, newValue: AdminEntry | null,): void => {
                     setSelectedAdmin3(newValue || {name: '', wiki: ''});
                 }}
                 onInputChange={(_e, _v, reason): void => {
