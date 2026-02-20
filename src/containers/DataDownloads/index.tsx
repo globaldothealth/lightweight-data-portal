@@ -34,6 +34,10 @@ export default function DataDownloads() {
 
     return (
         <Grid container spacing={2} style={{width: '100%'}}>
+            <Grid size={12}>
+                <h2>Data Downloads</h2>
+                <p>This page is dedicated to downloading datasets available for a variety of outbreaks.</p>
+            </Grid>
             <Grid size={4}>
                 <FormControl fullWidth>
                     <InputLabel id="demo-simple-select-label">Selected Outbreak</InputLabel>
