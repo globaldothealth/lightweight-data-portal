@@ -3,6 +3,8 @@ import {Autocomplete, Grid, TextField} from "@mui/material";
 import countries from 'i18n-iso-countries';
 import english from "i18n-iso-countries/langs/en.json";
 
+// Importing large JSON files is far from an ideal solution.
+// In the future, we should consider a more efficient way to store and query this data, e.g. using a database or an API.
 import admin1 from '../../data/adm1_parsed_data.json';
 import admin2 from '../../data/adm2_parsed_data.json';
 import admin3 from '../../data/adm3_parsed_data.json';
@@ -29,9 +31,9 @@ export default function LocationAdminExplorer() {
     const [selectedAdmin3, setSelectedAdmin3] = useState<AdminEntry>({name: '', wiki: ''},);
 
     useEffect(() => {
-        if (selectedCountry) {
-            const countryCode: string = countries.getAlpha3Code(selectedCountry, "en") || ''
-            if (countryCode && countryCode in admin1) setAdmin1Entries(admin1[countryCode as keyof typeof admin1]);
+        const countryCode: string = countries.getAlpha3Code(selectedCountry, "en") || '';
+        if (countryCode && countryCode in admin1) {
+            setAdmin1Entries(admin1[countryCode as keyof typeof admin1]);
         } else {
             setAdmin1Entries(null);
         }
