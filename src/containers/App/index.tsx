@@ -32,12 +32,12 @@ export default function App() {
 
     const menuList = [
         {
-            text: 'Data downloads',
+            text: 'Data Downloads',
             icon: <BrowserUpdatedIcon/>,
             to: '/data-downloads',
         },
         {
-            text: 'Location admin explorer',
+            text: 'Location Admin Explorer',
             icon: <PublicIcon/>,
             to: '/location-admin-explorer',
         },
