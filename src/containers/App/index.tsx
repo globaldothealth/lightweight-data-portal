@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useMemo} from "react";
 import {Navigate, Route, Routes, useLocation} from 'react-router-dom';
 import {
     Menu as MenuIcon,
@@ -18,7 +18,6 @@ import {selectUserProfile} from "../../redux/app/selectors.ts";
 export default function App() {
     const dispatch = useAppDispatch();
     const [drawerOpen, setDrawerOpen] = useState(true);
-    const [selectedMenuIndex, setSelectedMenuIndex] = useState<number>();
     const location = useLocation();
     const userProfile = useAppSelector(selectUserProfile);
 
@@ -32,7 +31,7 @@ export default function App() {
         dispatch(logout())
     }
 
-    const menuList = [
+    const menuList = useMemo(() => [
         {
             text: 'Data Downloads',
             icon: <BrowserUpdatedIcon/>,
@@ -43,14 +42,11 @@ export default function App() {
             icon: <PublicIcon/>,
             to: '/location-admin-explorer',
         },
-    ]
+    ], []);
 
-    useEffect(() => {
-        const menuIndex = menuList.findIndex((menuItem) => (
-            menuItem.to === location.pathname
-        ));
-        setSelectedMenuIndex(menuIndex);
-    }, [location.pathname]);
+    const selectedMenuIndex = useMemo(() => menuList.findIndex((menuItem) => (
+        menuItem.to === location.pathname
+    )), [location.pathname, menuList]);
 
     return (
         <>
