@@ -22,14 +22,13 @@ export default function DataDownloads() {
         dispatch(getFilesFromS3Folder({s3Folder}));
     }, [dispatch, s3Folder]);
 
-    const handleS3FolderChange = (event: SelectChangeEvent) => {
+    const handleS3FolderChange = (event: SelectChangeEvent<unknown>) => {
         dispatch(setS3Folder(event.target.value as S3Folder));
     };
 
     const handleDownloadClick = (fileKey: string) => () => {
-        if (userProfile) {
-            dispatch(handleDownload({s3FileKey: fileKey, user: userProfile}));
-        }
+        // userProfile should always be defined when the download button is rendered
+        dispatch(handleDownload({s3FileKey: fileKey, user: userProfile!}));
     }
 
     return (
@@ -40,13 +39,14 @@ export default function DataDownloads() {
             </Grid>
             <Grid size={4}>
                 <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Selected Outbreak</InputLabel>
+                    <InputLabel id="outbreak-selector-label">Selected Outbreak</InputLabel>
                     <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
+                        labelId="outbreak-selector-label"
+                        id="outbreak-selector"
                         value={s3Folder}
                         label="Selected Outbreak"
                         onChange={handleS3FolderChange}
+                        variant="outlined"
                     >
                         {Object.values(S3Folder).map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
                     </Select>
@@ -74,7 +74,7 @@ export default function DataDownloads() {
                                 field: 'filename',
                                 width: '120px',
                                 filtering: false,
-                                render: userProfile ? (rowData: { filename: string }) => {
+                                render: (rowData: { filename: string }) => {
                                     return (
                                         <Button
                                             variant="contained"
@@ -89,12 +89,12 @@ export default function DataDownloads() {
                                             Download
                                         </Button>
                                     );
-                                } : undefined,
+                                },
                             },
                         ]}
                         data={s3Files}
                         title="Data downloads"
-                        isLoading={isLoading}
+                        isLoading={isLoading || !userProfile}
                     />
                 </Paper>
             </Grid>
