@@ -13,15 +13,15 @@ import outputs from "../amplify_outputs.json";
 Amplify.configure(outputs);
 
 // Custom domain for production Cognito
-// Amplify.configure({...outputs,
-//     auth: {
-//         ...outputs.auth,
-//         oauth: {
-//             ...outputs.auth.oauth,
-//             domain: 'auth.global.health',
-//         }
-//     }
-// });
+Amplify.configure({...outputs,
+    auth: {
+        ...outputs.auth,
+        oauth: {
+            ...outputs.auth.oauth,
+            domain: 'auth.global.health',
+        }
+    }
+});
 
 ReactDOM.createRoot(document.getElementById("root") as Element).render(
     <React.StrictMode>
