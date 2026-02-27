@@ -10,7 +10,7 @@ import App from "./containers/App";
 import "./index.css";
 import GoogleButton from 'react-google-button'
 import outputs from "../amplify_outputs.json";
-import {Divider, Typography} from "@mui/material";
+import {Divider, Typography, Grid} from "@mui/material";
 
 
 if (import.meta.env.VITE_BUILD_ENV === 'prod') {
@@ -30,6 +30,38 @@ if (import.meta.env.VITE_BUILD_ENV === 'prod') {
 }
 
 const components = {
+    Header() {
+        return (
+            <View textAlign="center" padding={24}>
+                <Typography color="black" variant="h3">
+                    Data Global.health
+                </Typography>
+                <br/>
+                <Typography color="black">
+                    A portal for browsing and downloading outbreak data curated by Global.health team.
+                </Typography>
+                <br/>
+            </View>
+        );
+    },
+
+    Footer() {
+
+
+        return (
+            <View textAlign="center" >
+                <br/>
+                <Grid container spacing={2}>
+                    <Grid size={6}>
+                        <a href="https://global.health/privacy/">Privacy Policy</a>
+                    </Grid>
+                    <Grid size={6}>
+                        <a href="https://global.health/about/terms-of-use/">Terms of Service</a>
+                    </Grid>
+                </Grid>
+            </View>
+        );
+    },
     SignIn: {
         Header() {
             return (
