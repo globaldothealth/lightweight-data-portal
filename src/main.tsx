@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import {Amplify} from "aws-amplify";
-import {Authenticator, View, Button} from "@aws-amplify/ui-react";
+import {Authenticator, View} from "@aws-amplify/ui-react";
 import {signInWithRedirect} from "aws-amplify/auth";
 import {BrowserRouter} from 'react-router-dom';
 import store from './redux/store';
@@ -13,7 +13,7 @@ import outputs from "../amplify_outputs.json";
 import {Divider, Typography} from "@mui/material";
 
 
-if (process.env.BUILD_ENV === 'prod') {
+if (import.meta.env.VITE_BUILD_ENV === 'prod') {
     // Custom domain for production Cognito
     Amplify.configure({
         ...outputs,
