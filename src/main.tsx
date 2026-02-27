@@ -29,38 +29,64 @@ if (import.meta.env.VITE_BUILD_ENV === 'prod') {
     Amplify.configure(outputs);
 }
 
-
-// const components = {
-//     SignIn: {
-//         Header() {
-//             return (
-//                 <View textAlign="center"
-//                       style={{marginLeft: '10px', marginRight: '10px', padding: '24px 24px 0px 24px'}}>
-//                     <GoogleButton
-//                         onClick={() => signInWithRedirect({
-//                             provider: "Google",
-//                             options: {
-//                                 prompt: "SELECT_ACCOUNT"
-//                             }
-//                         })}
-//                         style={{width: 'calc(100%-20px)', marginBottom: '24px'}}
-//                     />
-//                     <Divider sx={{
-//                         "&::before, &::after": {
-//                             borderColor: "#89949f",
-//                         },
-//                     }} style={{color: '#89949f', fontSize: '14px'}}><Typography>or</Typography></Divider>
-//                 </View>
-//             );
-//         },
-//     }
-// }
+const components = {
+    SignIn: {
+        Header() {
+            return (
+                <View textAlign="center"
+                      style={{marginLeft: '10px', marginRight: '10px', padding: '24px 24px 0px 24px'}}>
+                    <GoogleButton
+                        onClick={() => signInWithRedirect({
+                            provider: "Google",
+                            options: {
+                                prompt: "SELECT_ACCOUNT"
+                            }
+                        })}
+                        style={{width: 'calc(100%-20px)', marginBottom: '24px'}}
+                    />
+                    <Divider sx={{
+                        "&::before, &::after": {
+                            borderColor: "#89949f",
+                        },
+                    }} style={{color: '#89949f', fontSize: '14px'}}><Typography>or</Typography></Divider>
+                </View>
+            );
+        },
+    },
+    SignUp: {
+        Header() {
+            return (
+                <View textAlign="center"
+                      style={{marginLeft: '10px', marginRight: '10px', padding: '24px 24px 0px 24px'}}>
+                    <GoogleButton
+                        label='Sign up with Google'
+                        onClick={() => signInWithRedirect({
+                            provider: "Google",
+                            options: {
+                                prompt: "SELECT_ACCOUNT"
+                            }
+                        })}
+                        style={{width: 'calc(100%-20px)', marginBottom: '24px'}}
+                    />
+                    <Divider sx={{
+                        "&::before, &::after": {
+                            borderColor: "#89949f",
+                        },
+                    }} style={{color: '#89949f', fontSize: '14px'}}><Typography>or</Typography></Divider>
+                </View>
+            );
+        },
+    },
+}
 
 ReactDOM.createRoot(document.getElementById("root") as Element).render(
     <React.StrictMode>
         <BrowserRouter>
             <Provider store={store}>
-                <Authenticator> {/*components={components} socialProviders={[]}>*/}
+                {/*There is an issue with passing empty array for socialProviders,
+                google auth can sometimes appear despite it being hidden,
+                this is why in index.css federated-sign-in-container display is set to none */}
+                <Authenticator components={components} socialProviders={[]}>
                     <App/>
                 </Authenticator>
             </Provider>

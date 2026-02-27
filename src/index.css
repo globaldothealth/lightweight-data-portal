@@ -20,6 +20,13 @@
   padding: 2em;
 }
 
+{/*There is an issue with passing empty array for socialProviders in Authenticator Component,
+   google auth can sometimes appear despite it being hidden,
+   this is why in index.css federated-sign-in-container display is set to none */}
+.federated-sign-in-container {
+  display: none !important;
+}
+
 .read-the-docs {
   color: #888;
 }
