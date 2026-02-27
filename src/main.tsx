@@ -30,37 +30,37 @@ if (import.meta.env.VITE_BUILD_ENV === 'prod') {
 }
 
 
-const components = {
-    SignIn: {
-        Header() {
-            return (
-                <View textAlign="center"
-                      style={{marginLeft: '10px', marginRight: '10px', padding: '24px 24px 0px 24px'}}>
-                    <GoogleButton
-                        onClick={() => signInWithRedirect({
-                            provider: "Google",
-                            options: {
-                                prompt: "SELECT_ACCOUNT"
-                            }
-                        })}
-                        style={{width: 'calc(100%-20px)', marginBottom: '24px'}}
-                    />
-                    <Divider sx={{
-                        "&::before, &::after": {
-                            borderColor: "#89949f",
-                        },
-                    }} style={{color: '#89949f', fontSize: '14px'}}><Typography>or</Typography></Divider>
-                </View>
-            );
-        },
-    }
-}
+// const components = {
+//     SignIn: {
+//         Header() {
+//             return (
+//                 <View textAlign="center"
+//                       style={{marginLeft: '10px', marginRight: '10px', padding: '24px 24px 0px 24px'}}>
+//                     <GoogleButton
+//                         onClick={() => signInWithRedirect({
+//                             provider: "Google",
+//                             options: {
+//                                 prompt: "SELECT_ACCOUNT"
+//                             }
+//                         })}
+//                         style={{width: 'calc(100%-20px)', marginBottom: '24px'}}
+//                     />
+//                     <Divider sx={{
+//                         "&::before, &::after": {
+//                             borderColor: "#89949f",
+//                         },
+//                     }} style={{color: '#89949f', fontSize: '14px'}}><Typography>or</Typography></Divider>
+//                 </View>
+//             );
+//         },
+//     }
+// }
 
 ReactDOM.createRoot(document.getElementById("root") as Element).render(
     <React.StrictMode>
         <BrowserRouter>
             <Provider store={store}>
-                <Authenticator components={components} socialProviders={[]}>
+                <Authenticator> {/*components={components} socialProviders={[]}>*/}
                     <App/>
                 </Authenticator>
             </Provider>

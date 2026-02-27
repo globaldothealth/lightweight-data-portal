@@ -72,18 +72,20 @@ export default function App() {
                 </AppBar>
                 <Sidebar drawerOpen={drawerOpen} menuList={menuList} selectedMenuIndex={selectedMenuIndex}
                          handleLogout={handleLogout} drawerWidth={drawerWidth}/>
-                <Box sx={{ flexGrow: 1, p: 1, ml: !drawerOpen ? `-${drawerWidth}px` : 0, transition: "all .2s" }}>
+                <Box sx={{flexGrow: 1, p: 1, ml: !drawerOpen ? `-${drawerWidth}px` : 0, transition: "all .2s"}}>
                     <Toolbar/>
                     <Routes>
-                        <Route path="/data-downloads" element={<DataDownloads/>}/>
-                        <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
                         {userProfile ?
-                        <Route
-                            path="/"
-                            element={
-                                <Navigate to='/data-downloads' replace/>
-                            }
-                        /> : <Route path="/"/>}
+                            <>
+                                <Route path="/data-downloads" element={<DataDownloads/>}/>
+                                <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
+                                <Route
+                                    path="/"
+                                    element={
+                                        <Navigate to='/data-downloads' replace/>
+                                    }
+                                />
+                            </> : <Route path="*" element={<Navigate to="/" replace />} />}
                     </Routes>
                 </Box>
             </Box>
