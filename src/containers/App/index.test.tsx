@@ -34,6 +34,7 @@ vi.mock('../../components/Sidebar', () => ({
 // Mock Redux hooks and thunks
 vi.mock('../../hooks/redux', () => ({
     useAppDispatch: vi.fn(),
+    useAppSelector: vi.fn(),
 }));
 vi.mock('../../redux/app/thunk', () => ({
     getUserProfile: vi.fn(),
@@ -61,6 +62,9 @@ describe('App Container', () => {
 
     beforeEach(() => {
         vi.mocked(reduxHooks.useAppDispatch).mockReturnValue(mockDispatch);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        vi.mocked(reduxHooks.useAppSelector).mockReturnValue({id: 'test-id', email: 'test@example.com'} as any);
+
         mockDispatch.mockClear();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vi.mocked(getUserProfile).mockReturnValue({type: 'mock-getUserProfile'} as any);
