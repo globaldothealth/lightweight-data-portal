@@ -61,7 +61,7 @@ export default function DataDownloads() {
                             paging: false,
                             searchFieldAlignment: 'right',
                             filtering: true,
-                            sorting: true,
+                            maxColumnSort: 1,
                         }}
                         columns={[
                             {

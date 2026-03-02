@@ -10,7 +10,7 @@ vi.mock('aws-amplify/storage', () => ({
 }));
 
 // Mock amplify client
-vi.mock('../../utils/amplifyClient', () => ({
+vi.mock('../../../utils/amplifyClient', () => ({
     client: {
         models: {
             DownloadEvent: {
