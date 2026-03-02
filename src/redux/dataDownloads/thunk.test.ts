@@ -85,7 +85,6 @@ describe('DataDownloads thunks', () => {
 
             expect(result.meta.requestStatus).toBe('fulfilled');
 
-            // Validation of calls
             expect(client.models.DownloadEvent.create).toHaveBeenCalledWith(expect.objectContaining({
                 userId: mockUser.id,
                 email: mockUser.email,
@@ -103,8 +102,6 @@ describe('DataDownloads thunks', () => {
 
             expect(result.meta.requestStatus).toBe('rejected');
             expect(result.payload).toBe('Error downloading file from S3: DB Error');
-
-            // Ensure subsequent steps were skipped? Thunk implementation does this in try-catch block
             expect(getUrl).not.toHaveBeenCalled();
         });
 
