@@ -1,5 +1,5 @@
 import {render, screen, fireEvent, within} from '@testing-library/react';
-import {describe, it, expect, vi} from 'vitest';
+import {describe, it, expect, vi, beforeAll, afterAll} from 'vitest';
 import '@testing-library/jest-dom';
 
 import LocationAdminExplorer from './index';
@@ -45,6 +45,17 @@ vi.mock('../../data/adm3_parsed_data.json', () => ({
 }));
 
 describe('LocationAdminExplorer', () => {
+    const originalWarn = console.warn.bind(console.warn)
+
+    // Hide warnings about MUI anchorEl during tests
+    beforeAll(() => {
+        console.warn = (msg) =>
+            !msg.toString().includes('MUI: The `anchorEl` prop provided to the component is invalid.') && originalWarn(msg)
+    })
+    afterAll(() => {
+        console.warn = originalWarn
+    })
+
     it('updates next level of admin when previous was selected', async () => {
         render(<LocationAdminExplorer/>);
 
