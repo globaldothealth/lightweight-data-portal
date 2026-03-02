@@ -10,14 +10,16 @@ import {AppBar, Box, CssBaseline, IconButton, Toolbar,} from '@mui/material';
 import DataDownloads from "../DataDownloads";
 import LocationAdminExplorer from "../LocationAdminExplorer";
 import Sidebar from "../../components/Sidebar";
-import {useAppDispatch} from '../../hooks/redux';
+import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {getUserProfile, logout} from "../../redux/app/thunk.ts";
+import {selectUserProfile} from "../../redux/app/selectors.ts";
 
 
 export default function App() {
     const dispatch = useAppDispatch();
     const [drawerOpen, setDrawerOpen] = useState(true);
     const location = useLocation();
+    const userProfile = useAppSelector(selectUserProfile);
 
     const drawerWidth = 240
 
@@ -66,17 +68,20 @@ export default function App() {
                 </AppBar>
                 <Sidebar drawerOpen={drawerOpen} menuList={menuList} selectedMenuIndex={selectedMenuIndex}
                          handleLogout={handleLogout} drawerWidth={drawerWidth}/>
-                <Box sx={{ flexGrow: 1, p: 1, ml: !drawerOpen ? `-${drawerWidth}px` : 0, transition: "all .2s" }}>
+                <Box sx={{flexGrow: 1, p: 1, ml: !drawerOpen ? `-${drawerWidth}px` : 0, transition: "all .2s"}}>
                     <Toolbar/>
                     <Routes>
-                        <Route path="/data-downloads" element={<DataDownloads/>}/>
-                        <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
-                        <Route
-                            path="/"
-                            element={
-                                <Navigate to='/data-downloads' replace/>
-                            }
-                        />
+                        {userProfile ?
+                            <>
+                                <Route path="/data-downloads" element={<DataDownloads/>}/>
+                                <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
+                                <Route
+                                    path="/"
+                                    element={
+                                        <Navigate to='/data-downloads' replace/>
+                                    }
+                                />
+                            </> : <Route path="*" element={<Navigate to="/" replace />} />}
                     </Routes>
                 </Box>
             </Box>
