@@ -1,8 +1,8 @@
 
 import {vi, describe, it, expect, beforeEach} from 'vitest';
-import {getUserProfile, logout} from './thunk';
+import {getUserProfile, logout} from '../thunk.ts';
 import {fetchUserAttributes, signOut} from 'aws-amplify/auth';
-import {UserProfile} from "./slice.ts";
+import {UserProfile} from "../slice.ts";
 
 // Mock dependencies
 vi.mock('aws-amplify/auth', () => ({

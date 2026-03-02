@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { selectS3Folder, selectS3Files, selectIsLoading } from './selectors';
-import { RootState } from '../store';
-import { S3Folder } from './slice';
+import { selectS3Folder, selectS3Files, selectIsLoading } from '../selectors.ts';
+import { RootState } from '../../store.ts';
+import { S3Folder } from '../slice.ts';
 
 vi.mock('aws-amplify/data', () => ({
     generateClient: vi.fn(),

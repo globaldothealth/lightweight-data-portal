@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { selectUserProfile } from './selectors';
-import { RootState } from '../store';
+import { selectUserProfile } from '../selectors.ts';
+import { RootState } from '../../store.ts';
 
 describe('App Selectors', () => {
     it('should select user profile', () => {

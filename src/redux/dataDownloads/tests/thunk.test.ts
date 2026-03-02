@@ -1,7 +1,7 @@
 import {vi, describe, it, expect, beforeEach} from 'vitest';
-import {getFilesFromS3Folder, handleDownload} from './thunk';
+import {getFilesFromS3Folder, handleDownload} from '../thunk.ts';
 import {list, getUrl} from 'aws-amplify/storage';
-import {client} from '../../utils/amplifyClient';
+import {client} from '../../../utils/amplifyClient.ts';
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
