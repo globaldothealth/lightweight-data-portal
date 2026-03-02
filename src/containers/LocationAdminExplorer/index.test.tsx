@@ -122,17 +122,27 @@ describe('LocationAdminExplorer', () => {
         expect((admin2Input as HTMLInputElement).value).toContain(admin2Name);
         expect((admin3Input as HTMLInputElement).value).toContain(admin3Name);
 
-        // Clear Admin1 area
-        const admin1Container = admin1Input.parentElement as HTMLElement;
-        const clearButton = within(admin1Container).getByTitle('Clear');
-        fireEvent.click(clearButton);
+        // Clear Admin3 area
+        const admin3Container = admin3Input.parentElement as HTMLElement;
+        const clearButton3 = within(admin3Container).getByTitle('Clear');
+        fireEvent.click(clearButton3);
+        expect((admin3Input as HTMLInputElement).value).toBe('');
+        expect((admin2Input as HTMLInputElement).value).toContain(admin2Name);
 
-        // Verify that Admin1, Admin2, and Admin3 are cleared
-        expect((admin1Input as HTMLInputElement).value).toBe('');
+        // Clear Admin2 area
+        const admin2Container = admin2Input.parentElement as HTMLElement;
+        const clearButton2 = within(admin2Container).getByTitle('Clear');
+        fireEvent.click(clearButton2);
         expect((admin2Input as HTMLInputElement).value).toBe('');
         expect((admin3Input as HTMLInputElement).value).toBe('');
+        expect((admin1Input as HTMLInputElement).value).toContain(admin1Name);
 
-        // Admin0 should remain populated
+        // Clear Admin1 area
+        const admin1Container = admin1Input.parentElement as HTMLElement;
+        const clearButton1 = within(admin1Container).getByTitle('Clear');
+        fireEvent.click(clearButton1);
+        expect((admin1Input as HTMLInputElement).value).toBe('');
+        expect((admin2Input as HTMLInputElement).value).toBe('');
         expect((admin0Input as HTMLInputElement).value).toContain(admin0Name);
     });
 });
