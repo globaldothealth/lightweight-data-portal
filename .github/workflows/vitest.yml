@@ -1,9 +1,10 @@
 name: Run Vitest Tests
-# Trigger this workflow on every push or pull request
+
 on:
   push:
     branches: [main]
   pull_request:
+
 jobs:
   test:
     runs-on: ubuntu-latest
