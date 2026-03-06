@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {getFilesFromS3Folder, handleDownload} from './thunk';
 
 export enum S3Folder {
-    Mpox2024 ='Mpox 2024', AvianInfluenza = 'Avian Influenza'
+    Mpox2024 ='Mpox 2024', AvianInfluenza = 'Avian Influenza', Ebola = 'Ebola', Mpox2022 = 'Mpox 2022', COVID19 = 'COVID-19', Marburg = 'Marburg'
 }
 
 export type S3File = {
