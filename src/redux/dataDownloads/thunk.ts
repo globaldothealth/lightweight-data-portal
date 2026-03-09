@@ -20,7 +20,7 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
             }
             return files;
         } catch (error: unknown) {
-            const {message} = error as Error;
+            const message = error instanceof Error ? error.message : "An unknown error occurred";
             return rejectWithValue(`Error fetching files from S3: ${message}`);
         }
     },
@@ -43,7 +43,7 @@ export const handleDownload = createAsyncThunk<void,
 
             window.open(link.url.toString(), '_blank');
         } catch (error: unknown) {
-            const {message} = error as Error;
+            const message = error instanceof Error ? error.message : "An unknown error occurred";
             return rejectWithValue(`Error downloading file from S3: ${message}`);
         }
     },

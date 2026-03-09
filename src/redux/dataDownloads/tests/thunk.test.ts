@@ -61,7 +61,7 @@ describe('DataDownloads thunks', () => {
             expect(result.payload).toBe('No files found in the specified S3 folder.');
         });
 
-        it('should reject when list call fails', async () => {
+        it('should reject and return error message when list call fails', async () => {
             const errorMessage = 'S3 Access Denied';
             vi.mocked(list).mockRejectedValue(new Error(errorMessage));
 
@@ -69,6 +69,15 @@ describe('DataDownloads thunks', () => {
 
             expect(result.meta.requestStatus).toBe('rejected');
             expect(result.payload).toBe(`Error fetching files from S3: ${errorMessage}`);
+        });
+
+        it('should reject and return default message for missing error message when list call fails', async () => {
+            vi.mocked(list).mockRejectedValue(undefined);
+
+            const result = await getFilesFromS3Folder(payload)(mockDispatch, mockGetState, undefined);
+
+            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.payload).toBe(`Error fetching files from S3: An unknown error occurred`);
         });
     });
 
@@ -95,13 +104,23 @@ describe('DataDownloads thunks', () => {
             expect(window.open).toHaveBeenCalledWith('http://mock.url/file.txt', '_blank');
         });
 
-        it('should reject if DownloadEvent logging fails', async () => {
+        it('should reject with error message if handleDownload fails with error message', async () => {
             vi.mocked(client.models.DownloadEvent.create).mockRejectedValue(new Error('DB Error'));
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
 
             expect(result.meta.requestStatus).toBe('rejected');
             expect(result.payload).toBe('Error downloading file from S3: DB Error');
+            expect(getUrl).not.toHaveBeenCalled();
+        });
+
+        it('should reject with default message if handleDownload fails with no error message', async () => {
+            vi.mocked(client.models.DownloadEvent.create).mockRejectedValue(undefined);
+
+            const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
+
+            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.payload).toBe('Error downloading file from S3: An unknown error occurred');
             expect(getUrl).not.toHaveBeenCalled();
         });
 
