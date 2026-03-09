@@ -1,4 +1,4 @@
-import {Dispatch, SetStateAction, useEffect, useEffectEvent, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {Autocomplete, Grid, TextField} from "@mui/material";
 import countries from 'i18n-iso-countries';
 import english from "i18n-iso-countries/langs/en.json";
@@ -15,6 +15,21 @@ type AdminEntry = {
     wiki: string;
 };
 
+const clearSelectedAdmin = (setSelectedAdminFunction: Dispatch<SetStateAction<AdminEntry>>) => {
+    setSelectedAdminFunction({name: '', wiki: ''});
+};
+
+const updateAdminEntries = (
+    setAdminEntries: Dispatch<SetStateAction<AdminEntry[] | null>>,
+    adminAreaIdentifier: string,
+    adminEntries: object
+) => {
+    if (adminAreaIdentifier && adminAreaIdentifier in adminEntries)
+        setAdminEntries(adminEntries[adminAreaIdentifier as keyof typeof adminEntries]);
+    else
+        setAdminEntries(null);
+};
+
 export default function LocationAdminExplorer() {
     useEffect(() => {
         countries.registerLocale(english);
@@ -29,17 +44,6 @@ export default function LocationAdminExplorer() {
     const [selectedAdmin1, setSelectedAdmin1] = useState<AdminEntry>({name: '', wiki: ''},);
     const [selectedAdmin2, setSelectedAdmin2] = useState<AdminEntry>({name: '', wiki: ''},);
     const [selectedAdmin3, setSelectedAdmin3] = useState<AdminEntry>({name: '', wiki: ''},);
-
-    const clearSelectedAdmin = useEffectEvent((setSelectedAdminFunction: Dispatch<SetStateAction<AdminEntry>>) => {
-        setSelectedAdminFunction({name: '', wiki: ''});
-    })
-
-    const updateAdminEntries = useEffectEvent((setAdminEntries: Dispatch<SetStateAction<AdminEntry[] | null>>, adminAreaIdentifier: string, adminEntries: object) => {
-        if (adminAreaIdentifier && adminAreaIdentifier in adminEntries)
-            setAdminEntries(adminEntries[adminAreaIdentifier as keyof typeof adminEntries]);
-        else
-            setAdminEntries(null);
-    })
 
     useEffect(() => {
         const countryCode: string = countries.getAlpha3Code(selectedCountry, "en") || '';
@@ -76,8 +80,8 @@ export default function LocationAdminExplorer() {
                     .sort()}
                 value={selectedCountry}
                 disableClearable
-                onChange={(_: unknown, newValue: string | null,): void => {
-                    setSelectedCountry(newValue || '');
+                onChange={(_: unknown, newValue: string,): void => {
+                    setSelectedCountry(newValue);
                 }}
                 renderInput={(params) => <TextField {...params} label="Admin0"/>}
             />
