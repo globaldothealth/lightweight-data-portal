@@ -85,6 +85,7 @@ export default function DataDownloads() {
                                                 whiteSpace: 'nowrap',
                                                 minWidth: '140px',
                                             }}
+                                            disabled={!userProfile}
                                         >
                                             Download
                                         </Button>

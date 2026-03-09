@@ -72,7 +72,7 @@ export default function App() {
                         <Route path="/data-downloads" element={<DataDownloads/>}/>
                         <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
                         <Route
-                            path="/"
+                            path="*"
                             element={
                                 <Navigate to='/data-downloads' replace/>
                             }
