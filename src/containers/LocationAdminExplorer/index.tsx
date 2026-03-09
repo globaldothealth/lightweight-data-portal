@@ -22,7 +22,7 @@ const clearSelectedAdmin = (setSelectedAdminFunction: Dispatch<SetStateAction<Ad
 const updateAdminEntries = (
     setAdminEntries: Dispatch<SetStateAction<AdminEntry[] | null>>,
     adminAreaIdentifier: string,
-    adminEntries: object
+    adminEntries: Record<string, AdminEntry[]>
 ) => {
     if (adminAreaIdentifier && adminAreaIdentifier in adminEntries)
         setAdminEntries(adminEntries[adminAreaIdentifier as keyof typeof adminEntries]);
@@ -47,17 +47,17 @@ export default function LocationAdminExplorer() {
 
     useEffect(() => {
         const countryCode: string = countries.getAlpha3Code(selectedCountry, "en") || '';
-        updateAdminEntries(setAdmin1Entries, countryCode, admin1);
+        updateAdminEntries(setAdmin1Entries, countryCode, admin1 as Record<string, AdminEntry[]>);
         clearSelectedAdmin(setSelectedAdmin1);
     }, [selectedCountry]);
 
     useEffect(() => {
-        updateAdminEntries(setAdmin2Entries, selectedAdmin1.wiki, admin2);
+        updateAdminEntries(setAdmin2Entries, selectedAdmin1.wiki, admin2 as Record<string, AdminEntry[]>);
         clearSelectedAdmin(setSelectedAdmin2);
     }, [selectedAdmin1.wiki]);
 
     useEffect(() => {
-        updateAdminEntries(setAdmin3Entries, selectedAdmin2.wiki, admin3);
+        updateAdminEntries(setAdmin3Entries, selectedAdmin2.wiki, admin3 as Record<string, AdminEntry[]>);
         clearSelectedAdmin(setSelectedAdmin3);
     }, [selectedAdmin2.wiki]);
 
