@@ -18,9 +18,10 @@ export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
     'app/logout',
     async (_, {rejectWithValue}) => {
         try {
-            await signOut({ global: true });
-        } catch (error) {
-            return rejectWithValue("Logout failed");
+            await signOut();
+        } catch (error: unknown) {
+            const {message} = error as Error;
+            return rejectWithValue(`Logout failed: ${message}`);
         }
         return;
     },

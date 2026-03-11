@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {Autocomplete, Grid, TextField} from "@mui/material";
 import countries from 'i18n-iso-countries';
 import english from "i18n-iso-countries/langs/en.json";
@@ -13,6 +13,21 @@ import admin3 from '../../data/adm3_parsed_data.json';
 type AdminEntry = {
     name: string;
     wiki: string;
+};
+
+const clearSelectedAdmin = (setSelectedAdminFunction: Dispatch<SetStateAction<AdminEntry>>) => {
+    setSelectedAdminFunction({name: '', wiki: ''});
+};
+
+const updateAdminEntries = (
+    setAdminEntries: Dispatch<SetStateAction<AdminEntry[] | null>>,
+    adminAreaIdentifier: string,
+    adminEntries: Record<string, AdminEntry[]>
+) => {
+    if (adminAreaIdentifier && adminAreaIdentifier in adminEntries)
+        setAdminEntries(adminEntries[adminAreaIdentifier as keyof typeof adminEntries]);
+    else
+        setAdminEntries(null);
 };
 
 export default function LocationAdminExplorer() {
@@ -32,31 +47,18 @@ export default function LocationAdminExplorer() {
 
     useEffect(() => {
         const countryCode: string = countries.getAlpha3Code(selectedCountry, "en") || '';
-        if (countryCode && countryCode in admin1) {
-            setAdmin1Entries(admin1[countryCode as keyof typeof admin1]);
-        } else {
-            setAdmin1Entries(null);
-        }
-        setSelectedAdmin1({name: '', wiki: ''});
+        updateAdminEntries(setAdmin1Entries, countryCode, admin1 as Record<string, AdminEntry[]>);
+        clearSelectedAdmin(setSelectedAdmin1);
     }, [selectedCountry]);
 
     useEffect(() => {
-        if (selectedAdmin1.wiki) {
-            if (selectedAdmin1.wiki in admin2) setAdmin2Entries(admin2[selectedAdmin1.wiki as keyof typeof admin2]);
-        } else {
-            setAdmin2Entries(null);
-        }
-        setSelectedAdmin2({name: '', wiki: ''});
+        updateAdminEntries(setAdmin2Entries, selectedAdmin1.wiki, admin2 as Record<string, AdminEntry[]>);
+        clearSelectedAdmin(setSelectedAdmin2);
     }, [selectedAdmin1.wiki]);
 
-
     useEffect(() => {
-        if (selectedAdmin2.wiki && selectedAdmin2.wiki in admin3)
-            setAdmin3Entries(admin3[selectedAdmin2.wiki as keyof typeof admin3]);
-        else
-            setAdmin3Entries(null);
-
-        setSelectedAdmin3({name: '', wiki: ''});
+        updateAdminEntries(setAdmin3Entries, selectedAdmin2.wiki, admin3 as Record<string, AdminEntry[]>);
+        clearSelectedAdmin(setSelectedAdmin3);
     }, [selectedAdmin2.wiki]);
 
 
@@ -78,8 +80,8 @@ export default function LocationAdminExplorer() {
                     .sort()}
                 value={selectedCountry}
                 disableClearable
-                onChange={(_: unknown, newValue: string | null,): void => {
-                    setSelectedCountry(newValue || '');
+                onChange={(_: unknown, newValue: string,): void => {
+                    setSelectedCountry(newValue);
                 }}
                 renderInput={(params) => <TextField {...params} label="Admin0"/>}
             />
@@ -95,9 +97,7 @@ export default function LocationAdminExplorer() {
                 onChange={(_: unknown, newValue: AdminEntry | null,): void => {
                     setSelectedAdmin1(newValue || {name: '', wiki: ''});
                 }}
-                onInputChange={(_e, _v, reason): void => {
-                    reason === 'clear' && setSelectedAdmin1({name: '', wiki: ''});
-                }}
+                onInputChange={(_e, _v, reason) => reason === 'clear' && setSelectedAdmin1({name: '', wiki: ''})}
                 noOptionsText="No Admin1 locations are represented on the map for the given Country"
                 renderInput={(params) => <TextField {...params} label="Admin1"/>}
             />
@@ -113,9 +113,7 @@ export default function LocationAdminExplorer() {
                 onChange={(_: unknown, newValue: AdminEntry | null,): void => {
                     setSelectedAdmin2(newValue || {name: '', wiki: ''});
                 }}
-                onInputChange={(_e, _v, reason): void => {
-                    reason === 'clear' && setSelectedAdmin2({name: '', wiki: ''});
-                }}
+                onInputChange={(_e, _v, reason) => reason === 'clear' && setSelectedAdmin2({name: '', wiki: ''})}
                 noOptionsText="No Admin2 locations are represented on the map for the given Admin1"
                 renderInput={(params) => <TextField {...params} label="Admin2"/>}
             />
@@ -131,9 +129,7 @@ export default function LocationAdminExplorer() {
                 onChange={(_: unknown, newValue: AdminEntry | null,): void => {
                     setSelectedAdmin3(newValue || {name: '', wiki: ''});
                 }}
-                onInputChange={(_e, _v, reason): void => {
-                    reason === 'clear' && setSelectedAdmin3({name: '', wiki: ''});
-                }}
+                onInputChange={(_e, _v, reason) => reason === 'clear' && setSelectedAdmin3({name: '', wiki: ''})}
                 noOptionsText="No Admin3 locations are represented on the map for the given Admin2"
                 renderInput={(params) => <TextField {...params} label="Admin3"/>}
             />
