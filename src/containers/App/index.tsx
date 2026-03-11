@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useMemo} from "react";
 import {Navigate, Route, Routes, useLocation} from 'react-router-dom';
 import {
     Menu as MenuIcon,
@@ -10,17 +10,14 @@ import {AppBar, Box, CssBaseline, IconButton, Toolbar,} from '@mui/material';
 import DataDownloads from "../DataDownloads";
 import LocationAdminExplorer from "../LocationAdminExplorer";
 import Sidebar from "../../components/Sidebar";
-import {useAppDispatch, useAppSelector} from '../../hooks/redux';
+import {useAppDispatch} from '../../hooks/redux';
 import {getUserProfile, logout} from "../../redux/app/thunk.ts";
-import {selectUserProfile} from "../../redux/app/selectors.ts";
 
 
 export default function App() {
     const dispatch = useAppDispatch();
     const [drawerOpen, setDrawerOpen] = useState(true);
-    const [selectedMenuIndex, setSelectedMenuIndex] = useState<number>();
     const location = useLocation();
-    const userProfile = useAppSelector(selectUserProfile);
 
     const drawerWidth = 240
 
@@ -32,7 +29,7 @@ export default function App() {
         dispatch(logout())
     }
 
-    const menuList = [
+    const menuList = useMemo(() => [
         {
             text: 'Data Downloads',
             icon: <BrowserUpdatedIcon/>,
@@ -43,14 +40,11 @@ export default function App() {
             icon: <PublicIcon/>,
             to: '/location-admin-explorer',
         },
-    ]
+    ], []);
 
-    useEffect(() => {
-        const menuIndex = menuList.findIndex((menuItem) => (
-            menuItem.to === location.pathname
-        ));
-        setSelectedMenuIndex(menuIndex);
-    }, [location.pathname]);
+    const selectedMenuIndex = useMemo(() => menuList.findIndex((menuItem) => (
+        menuItem.to === location.pathname
+    )), [location.pathname, menuList]);
 
     return (
         <>
@@ -75,17 +69,14 @@ export default function App() {
                 <Box sx={{flexGrow: 1, p: 1, ml: !drawerOpen ? `-${drawerWidth}px` : 0, transition: "all .2s"}}>
                     <Toolbar/>
                     <Routes>
-                        {userProfile ?
-                            <>
-                                <Route path="/data-downloads" element={<DataDownloads/>}/>
-                                <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
-                                <Route
-                                    path="/"
-                                    element={
-                                        <Navigate to='/data-downloads' replace/>
-                                    }
-                                />
-                            </> : <Route path="*" element={<Navigate to="/" replace />} />}
+                        <Route path="/data-downloads" element={<DataDownloads/>}/>
+                        <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
+                        <Route
+                            path="*"
+                            element={
+                                <Navigate to='/data-downloads' replace/>
+                            }
+                        />
                     </Routes>
                 </Box>
             </Box>
