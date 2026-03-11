@@ -2,7 +2,7 @@ import {useEffect} from "react";
 import "@aws-amplify/ui-react/styles.css";
 import MaterialTable from '@material-table/core';
 import {SaveAlt as SaveAltIcon} from '@mui/icons-material';
-import {Button, Paper, MenuItem, FormControl, InputLabel, Grid} from '@mui/material';
+import {Button, Paper, MenuItem, FormControl, InputLabel, Grid, Typography} from '@mui/material';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {selectUserProfile} from "../../redux/app/selectors.ts";
@@ -35,7 +35,7 @@ export default function DataDownloads() {
     return (
         <Grid container spacing={2} style={{width: '100%'}}>
             <Grid size={12}>
-                <h2>Data Downloads</h2>
+                <Typography variant='h3'>Data Downloads</Typography>
                 <p>This page is dedicated to downloading datasets available for a variety of outbreaks.</p>
             </Grid>
             <Grid size={4}>

@@ -75,6 +75,30 @@ export const theme = createTheme({
     typography: {
         fontFamily: 'Inter, sans-serif',
         fontSize: 14,
+        h1: {
+            fontSize: '36px',
+            fontWeight: 'bold',
+        },
+        h2: {
+            fontSize: '24px',
+            fontWeight: 'bold',
+        },
+        h3: {
+            fontSize: '20px',
+            fontWeight: 'bold',
+        },
+        h4: {
+            fontSize: '18px',
+            fontWeight: 'bold',
+        },
+        h5: {
+            fontSize: '16px',
+            fontWeight: 'bold',
+        },
+        h6: {
+            fontSize: '14px',
+            fontWeight: 'bold',
+        },
     },
     shape: {
         borderRadius: 4,
