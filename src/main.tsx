@@ -11,6 +11,8 @@ import "./index.css";
 import GoogleButton from 'react-google-button'
 import outputs from "../amplify_outputs.json";
 import {Divider, Typography, Grid} from "@mui/material";
+import {theme} from './theme/theme';
+import {ThemeProvider, StyledEngineProvider} from '@mui/material/styles';
 
 
 if (import.meta.env.VITE_BUILD_ENV === 'prod') {
@@ -49,7 +51,7 @@ const components = {
 
 
         return (
-            <View textAlign="center" >
+            <View textAlign="center">
                 <br/>
                 <Grid container spacing={2}>
                     <Grid size={6}>
@@ -115,12 +117,16 @@ ReactDOM.createRoot(document.getElementById("root") as Element).render(
     <React.StrictMode>
         <BrowserRouter>
             <Provider store={store}>
-                {/*There is an issue with passing empty array for socialProviders,
-                google auth can sometimes appear despite it being hidden,
-                this is why in index.css federated-sign-in-container display is set to none */}
-                <Authenticator components={components} socialProviders={[]}>
-                    <App/>
-                </Authenticator>
+                <StyledEngineProvider injectFirst>
+                    <ThemeProvider theme={theme}>
+                        {/*There is an issue with passing empty array for socialProviders,
+                        google auth can sometimes appear despite it being hidden,
+                        this is why in index.css federated-sign-in-container display is set to none */}
+                        <Authenticator components={components} socialProviders={[]}>
+                            <App/>
+                        </Authenticator>
+                    </ThemeProvider>
+                </StyledEngineProvider>
             </Provider>
         </BrowserRouter>
     </React.StrictMode>
