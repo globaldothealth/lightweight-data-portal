@@ -1,6 +1,6 @@
-import { createTheme } from '@mui/material/styles';
+import {createTheme} from '@mui/material/styles';
 
-// to use our custom theme values in typescript we need to define an extension to the DeprecatedThemeOptions type.
+// to use our custom theme values in TypeScript we need to extend the Theme/ThemeOptions types via module augmentation.
 declare module '@mui/material/styles' {
     interface Theme {
         custom: {
@@ -26,6 +26,7 @@ declare module '@mui/material/styles' {
         };
         drawerWidth: number;
     }
+
     // allow configuration using `createTheme`
     interface ThemeOptions {
         custom?: {
@@ -45,7 +46,7 @@ declare module '@mui/material/styles' {
                     descriptionTextColor?: string;
                 };
                 link?: {
-                    color: string;
+                    color?: string;
                 };
             };
         };
@@ -109,9 +110,23 @@ export const theme = createTheme({
                 root: {
                     color: '#5D5D5D',
                     borderRadius: '4px',
-                    '&$selected': {
-                        backgroundColor: '#0E75691A',
+                },
+            },
+        },
+        MuiListItemButton: {
+            styleOverrides: {
+                root: {
+                    color: '#5D5D5D',
+                    borderRadius: '4px',
+                    '& .MuiSvgIcon-root': {
+                        color: '#5D5D5D',
+                    },
+                    '&.Mui-selected': {
+                        backgroundColor: '#ecf3f0',
                         color: '#0E7569',
+                        '& .MuiSvgIcon-root': {
+                            color: '#0E7569',
+                        },
                     },
                 },
             },
@@ -126,7 +141,7 @@ export const theme = createTheme({
         MuiCheckbox: {
             styleOverrides: {
                 colorSecondary: {
-                    '&$checked': {
+                    '&.Mui-checked': {
                         color: '#31A497',
                     },
                 },
