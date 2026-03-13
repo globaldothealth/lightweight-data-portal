@@ -1,42 +1,179 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color: rgba(255, 255, 255, 0.87);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
+/* Inter font files are stored locally to avoid issues with Google Fonts and CORS when the app is served from a different domain */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url(./fonts/Inter-300-latin-ext.woff2) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url(./fonts/Inter-300-latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(./fonts/Inter-400-latin-ext.woff2) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(./fonts/Inter-400-latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url(./fonts/Inter-500-latin-ext.woff2) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url(./fonts/Inter-500-latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(./fonts/Inter-700-latin-ext.woff2) format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(./fonts/Inter-700-latin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-.card {
-  padding: 2em;
+
+html {
+    height: 100%;
 }
 
-{/*There is an issue with passing empty array for socialProviders in Authenticator Component,
-   google auth can sometimes appear despite it being hidden,
-   this is why in index.css federated-sign-in-container display is set to none */}
+body {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+    margin: 0;
+    height: 100%;
+    font-size: 14px;
+    background-color: #ecf3f0;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+a {
+    font-weight: 600;
+    text-decoration: none;
+    color: #0e7569;
+}
+
+#root {
+    min-height: 100%;
+    padding-left: 30px;
+    padding-top: 10px;
+    padding-right: 30px;
+}
+
+.MuiTypography-root {
+    font-family: Inter, sans-serif;
+}
+
+/*  There is an issue with passing empty array for socialProviders,
+    google auth can sometimes appear despite it being hidden,
+    this is why in index.css federated-sign-in-container display is set to none */
 .federated-sign-in-container {
-  display: none !important;
+    display: none !important;
 }
 
-.read-the-docs {
-  color: #888;
+/*Auth form styling*/
+[data-amplify-authenticator] {
+    --amplify-colors-brand-primary: #0E7569;
+    --amplify-colors-brand-primary-80: #0E7569;
+    --amplify-colors-brand-primary-90: #00C6AF;
+    --amplify-colors-brand-primary-100: #0E7569;
+    --amplify-font-family: 'Inter', sans-serif;
+    /*--amplify-components-authenticator-router-box-shadow: 0 0 16px rgba(0, 0, 0, 0.02);*/
+    --amplify-components-authenticator-router-border-width: 0;
+    --amplify-components-button-primary-background-color: #0E7569;
+    --amplify-components-button-primary-hover-background-color: #095149;
+    --amplify-components-authenticator-max-width: 800px;
+    --amplify-components-authenticator-container-width-max: 700px;
+    --amplify-components-authenticator-or-container-color: #ff0000;
 }
 
-.box:nth-child(3n + 1) {
-  grid-column: 1;
+[data-amplify-authenticator] button {
+    font-family: 'Inter', sans-serif;
 }
-.box:nth-child(3n + 2) {
-  grid-column: 2;
+
+[data-amplify-authenticator] button[aria-selected="true"] {
+    color: var(--amplify-colors-brand-primary);
+    border-width: 0;
 }
-.box:nth-child(3n + 3) {
-  grid-column: 3;
+
+[data-amplify-authenticator] button[aria-selected="false"] {
+    color: #454545;
+    background-color: #ecf3f0;
+    font-weight: 500;
 }
+
+[data-amplify-authenticator] .landing-page-header {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+[data-amplify-authenticator] .landing-page-header p {
+    text-align: justify;
+    padding-top: 10px;
+    font-size: 16px;
+}
+
+[data-amplify-authenticator] .amplify-button--small {
+    color: #0e7569;
+}
+
+[data-amplify-authenticator] .google-container {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 24px 24px 0 24px;
+    width: calc(100% - 120px);
+}
+
+[data-amplify-authenticator] .or-divider {
+    margin-top: 20px;
+    color: #89949f;
+    font-size: 14px;
+}
+
+[data-amplify-form] {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
