@@ -130,46 +130,49 @@ body {
     --amplify-components-authenticator-max-width: 800px;
     --amplify-components-authenticator-container-width-max: 700px;
     --amplify-components-authenticator-or-container-color: #ff0000;
-    button {
-        font-family: 'Inter', sans-serif;
+}
 
-    }
-    button[aria-selected="true"] {
-        color: var(--amplify-colors-brand-primary);
-        border-width: 0;
-    }
-    button[aria-selected="false"] {
-        color: #454545;
-        background-color: #ecf3f0;
-        font-weight: 500
-    }
+[data-amplify-authenticator] button {
+    font-family: 'Inter', sans-serif;
+}
 
-    .landing-page-header {
-        padding-top: 50px;
-        padding-bottom: 20px;
-        p {
-            text-align: justify;
-            padding-top: 10px;
-            font-size: 16px;
-        }
-    }
+[data-amplify-authenticator] button[aria-selected="true"] {
+    color: var(--amplify-colors-brand-primary);
+    border-width: 0;
+}
 
-    .amplify-button--small {
-        color: #0e7569;
-    }
+[data-amplify-authenticator] button[aria-selected="false"] {
+    color: #454545;
+    background-color: #ecf3f0;
+    font-weight: 500;
+}
 
-    .google-container {
-        margin-left: auto;
-        margin-right: auto;
-        padding: 24px 24px 0 24px;
-        width: calc(100% - 120px);
-    }
+[data-amplify-authenticator] .landing-page-header {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
 
-    .or-divider {
-        margin-top: 20px;
-        color: #89949f;
-        font-size: 14px;
-    }
+[data-amplify-authenticator] .landing-page-header p {
+    text-align: justify;
+    padding-top: 10px;
+    font-size: 16px;
+}
+
+[data-amplify-authenticator] .amplify-button--small {
+    color: #0e7569;
+}
+
+[data-amplify-authenticator] .google-container {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 24px 24px 0 24px;
+    width: calc(100% - 120px);
+}
+
+[data-amplify-authenticator] .or-divider {
+    margin-top: 20px;
+    color: #89949f;
+    font-size: 14px;
 }
 
 [data-amplify-form] {
