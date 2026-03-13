@@ -1,5 +1,5 @@
 import {Dispatch, SetStateAction, useEffect, useState} from "react";
-import {Autocomplete, Grid, TextField} from "@mui/material";
+import {Autocomplete, Grid, Paper, TextField, Typography} from "@mui/material";
 import countries from 'i18n-iso-countries';
 import english from "i18n-iso-countries/langs/en.json";
 
@@ -62,80 +62,93 @@ export default function LocationAdminExplorer() {
     }, [selectedAdmin2.wiki]);
 
 
-    return <Grid container spacing={2}>
-        <Grid size={12}>
-            <h2>Admin Location Explorer</h2>
-            <p>This explorer is based on Mapbox Boundaries v3. It helps to use recognizable admin area names and
-                relations between them. </p>
-            <p>We use <b>iso3</b> code for identifying Admin0 Areas (e.g. countries) and <b>wikidata</b> to identify
-                Admin1 (e.g. state), Admin2 (e.g. county) and admin3 (e.g. township) areas for the G.h map
-                visualizations. Areas available for the G.h map views are indicated with 🌎 before the admin area name.
-            </p>
-        </Grid>
-        <Grid size={6}>
-            <Autocomplete
-                getOptionLabel={(option: string): string => option && `🌎 ${option}`}
-                options={Object.keys(countryNames)
-                    .map((alpha2key) => countryNames[alpha2key])
-                    .sort()}
-                value={selectedCountry}
-                disableClearable
-                onChange={(_: unknown, newValue: string,): void => {
-                    setSelectedCountry(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} label="Admin0"/>}
-            />
-        </Grid>
-        <Grid size={6}>
-            <p><b>iso3</b>: {countries.getAlpha3Code(selectedCountry, "en") || 'N/A'}</p>
-        </Grid>
-        <Grid size={6}>
-            <Autocomplete
-                getOptionLabel={(option: AdminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
-                options={admin1Entries || []}
-                value={selectedAdmin1}
-                onChange={(_: unknown, newValue: AdminEntry | null,): void => {
-                    setSelectedAdmin1(newValue || {name: '', wiki: ''});
-                }}
-                onInputChange={(_e, _v, reason) => reason === 'clear' && setSelectedAdmin1({name: '', wiki: ''})}
-                noOptionsText="No Admin1 locations are represented on the map for the given Country"
-                renderInput={(params) => <TextField {...params} label="Admin1"/>}
-            />
-        </Grid>
-        <Grid size={6}>
-            <p><b>wikidata</b>: {selectedAdmin1?.wiki || 'N/A'}</p>
-        </Grid>
-        <Grid size={6}>
-            <Autocomplete
-                getOptionLabel={(option: AdminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
-                options={admin2Entries || []}
-                value={selectedAdmin2}
-                onChange={(_: unknown, newValue: AdminEntry | null,): void => {
-                    setSelectedAdmin2(newValue || {name: '', wiki: ''});
-                }}
-                onInputChange={(_e, _v, reason) => reason === 'clear' && setSelectedAdmin2({name: '', wiki: ''})}
-                noOptionsText="No Admin2 locations are represented on the map for the given Admin1"
-                renderInput={(params) => <TextField {...params} label="Admin2"/>}
-            />
-        </Grid>
-        <Grid size={6}>
-            <p><b>wikidata</b>: {selectedAdmin2?.wiki || 'N/A'}</p>
-        </Grid>
-        <Grid size={6}>
-            <Autocomplete
-                getOptionLabel={(option: AdminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
-                options={admin3Entries || []}
-                value={selectedAdmin3}
-                onChange={(_: unknown, newValue: AdminEntry | null,): void => {
-                    setSelectedAdmin3(newValue || {name: '', wiki: ''});
-                }}
-                onInputChange={(_e, _v, reason) => reason === 'clear' && setSelectedAdmin3({name: '', wiki: ''})}
-                noOptionsText="No Admin3 locations are represented on the map for the given Admin2"
-                renderInput={(params) => <TextField {...params} label="Admin3"/>}
-            />
-        </Grid>
-        <Grid size={6}>
-            <p><b>wikidata</b>: {selectedAdmin3?.wiki || 'N/A'}</p>
-        </Grid>
-    </Grid>
+    return <>
+        <Typography variant={'h2'} sx={{color: "#1e1e1e"}}>Admin Location Explorer</Typography>
+        <Typography sx={{marginTop: '10px', color: "#1e1e1e"}}>This explorer is based on Mapbox Boundaries v3. It helps
+            to use
+            recognizable admin area names and relations between them. </Typography>
+        <Typography sx={{marginTop: '10px', color: "#1e1e1e"}}>We use <b>iso3</b> code for identifying Admin0 Areas
+            (e.g. countries) and <b>wikidata</b> to identify
+            Admin1 (e.g. state), Admin2 (e.g. county) and admin3 (e.g. township) areas for the G.h map
+            visualizations. Areas available for the G.h map views are indicated with 🌎 before the admin area name.
+        </Typography>
+        <Paper sx={{marginTop: '20px', padding: '20px'}}>
+            <Grid container spacing={2}>
+                <Grid size={6}>
+                    <Autocomplete
+                        getOptionLabel={(option: string): string => option && `🌎 ${option}`}
+                        options={Object.keys(countryNames)
+                            .map((alpha2key) => countryNames[alpha2key])
+                            .sort()}
+                        value={selectedCountry}
+                        disableClearable
+                        onChange={(_: unknown, newValue: string,): void => {
+                            setSelectedCountry(newValue);
+                        }}
+                        renderInput={(params) => <TextField {...params} label="Admin0"/>}
+                    />
+                </Grid>
+                <Grid size={6} sx={{marginTop: 'auto', marginBottom: 'auto'}}>
+                    <Typography><b>iso3</b>: {countries.getAlpha3Code(selectedCountry, "en") || 'N/A'}</Typography>
+                </Grid>
+                <Grid size={6}>
+                    <Autocomplete
+                        getOptionLabel={(option: AdminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
+                        options={admin1Entries || []}
+                        value={selectedAdmin1}
+                        onChange={(_: unknown, newValue: AdminEntry | null,): void => {
+                            setSelectedAdmin1(newValue || {name: '', wiki: ''});
+                        }}
+                        onInputChange={(_e, _v, reason) => reason === 'clear' && setSelectedAdmin1({
+                            name: '',
+                            wiki: ''
+                        })}
+                        noOptionsText="No Admin1 locations are represented on the map for the given Country"
+                        renderInput={(params) => <TextField {...params} label="Admin1"/>}
+                    />
+                </Grid>
+                <Grid size={6} sx={{marginTop: 'auto', marginBottom: 'auto'}}>
+                    <Typography><b>wikidata</b>: {selectedAdmin1?.wiki || 'N/A'}</Typography>
+                </Grid>
+                <Grid size={6}>
+                    <Autocomplete
+                        getOptionLabel={(option: AdminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
+                        options={admin2Entries || []}
+                        value={selectedAdmin2}
+                        onChange={(_: unknown, newValue: AdminEntry | null,): void => {
+                            setSelectedAdmin2(newValue || {name: '', wiki: ''});
+                        }}
+                        onInputChange={(_e, _v, reason) => reason === 'clear' && setSelectedAdmin2({
+                            name: '',
+                            wiki: ''
+                        })}
+                        noOptionsText="No Admin2 locations are represented on the map for the given Admin1"
+                        renderInput={(params) => <TextField {...params} label="Admin2"/>}
+                    />
+                </Grid>
+                <Grid size={6} sx={{marginTop: 'auto', marginBottom: 'auto'}}>
+                    <Typography><b>wikidata</b>: {selectedAdmin2?.wiki || 'N/A'}</Typography>
+                </Grid>
+                <Grid size={6}>
+                    <Autocomplete
+                        getOptionLabel={(option: AdminEntry): string => `${option.wiki && "🌎 "}${option.name}`}
+                        options={admin3Entries || []}
+                        value={selectedAdmin3}
+                        onChange={(_: unknown, newValue: AdminEntry | null,): void => {
+                            setSelectedAdmin3(newValue || {name: '', wiki: ''});
+                        }}
+                        onInputChange={(_e, _v, reason) => reason === 'clear' && setSelectedAdmin3({
+                            name: '',
+                            wiki: ''
+                        })}
+                        noOptionsText="No Admin3 locations are represented on the map for the given Admin2"
+                        renderInput={(params) => <TextField {...params} label="Admin3"/>}
+                    />
+                </Grid>
+                <Grid size={6} sx={{marginTop: 'auto', marginBottom: 'auto'}}>
+                    <Typography><b>wikidata</b>: {selectedAdmin3?.wiki || 'N/A'}</Typography>
+                </Grid>
+            </Grid>
+        </Paper>
+    </>
 }

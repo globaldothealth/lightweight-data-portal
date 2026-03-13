@@ -1,5 +1,5 @@
 import {useEffect} from "react";
-import MaterialTable from '@material-table/core';
+import MaterialTable, {MTableToolbar} from '@material-table/core';
 import {SaveAlt as SaveAltIcon} from '@mui/icons-material';
 import {Button, Paper, MenuItem, FormControl, InputLabel, Grid, Typography} from '@mui/material';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
@@ -8,7 +8,6 @@ import {selectUserProfile} from "../../redux/app/selectors.ts";
 import {selectS3Folder, selectS3Files, selectIsLoading} from "../../redux/dataDownloads/selectors.ts";
 import {getFilesFromS3Folder, handleDownload} from "../../redux/dataDownloads/thunk.ts";
 import {S3Folder, setS3Folder} from "../../redux/dataDownloads/slice.ts";
-
 
 export default function DataDownloads() {
     const dispatch = useAppDispatch();
@@ -26,40 +25,23 @@ export default function DataDownloads() {
     };
 
     const handleDownloadClick = (fileKey: string) => () => {
-        // userProfile should always be defined when the download button is rendered
         dispatch(handleDownload({s3FileKey: fileKey, user: userProfile!}));
     }
 
     return (
-        <Grid container spacing={2} style={{width: '100%'}}>
-            <Grid size={12}>
-                <Typography variant='h3'>Data Downloads</Typography>
-                <p>This page is dedicated to downloading datasets available for a variety of outbreaks.</p>
+        <Grid container spacing={2}>
+            <Grid size={12} sx={{color: '#1e1e1e'}}>
+                <Typography variant='h2'>Data Downloads</Typography>
+                <Typography sx={{marginTop: '10px'}}>Select a dataset below to download and begin exploring the
+                    data.</Typography>
             </Grid>
-            <Grid size={4}>
-                <FormControl fullWidth>
-                    <InputLabel id="outbreak-selector-label">Selected Outbreak</InputLabel>
-                    <Select
-                        labelId="outbreak-selector-label"
-                        id="outbreak-selector"
-                        value={s3Folder}
-                        label="Selected Outbreak"
-                        onChange={handleS3FolderChange}
-                        variant="outlined"
-                    >
-                        {Object.values(S3Folder).map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
-                    </Select>
-                </FormControl>
-            </Grid>
-            <Grid size={8}/>
             <Grid size={12}>
-                <Paper style={{width: '100%'}}>
+                <Paper>
                     <MaterialTable
                         options={{
                             search: true,
                             paging: false,
                             searchFieldAlignment: 'right',
-                            filtering: true,
                             maxColumnSort: 1,
                         }}
                         columns={[
@@ -93,8 +75,33 @@ export default function DataDownloads() {
                             },
                         ]}
                         data={s3Files}
-                        title="Data downloads"
+                        title=""
                         isLoading={isLoading || !userProfile}
+                        components={{
+                            Toolbar: props => (
+                                <Grid container spacing={2}>
+                                    {/* pt: 2.5 is approx 20px, pl: 2 is 16px */}
+                                    <Grid size={6} sx={{pt: 2.5, pl: 2}}>
+                                        <FormControl fullWidth variant="standard">
+                                            <InputLabel id="outbreak-selector-label">Selected Outbreak</InputLabel>
+                                            <Select
+                                                labelId="outbreak-selector-label"
+                                                id="outbreak-selector"
+                                                value={s3Folder}
+                                                label="Selected Outbreak"
+                                                onChange={handleS3FolderChange}
+                                            >
+                                                {Object.values(S3Folder).map(s => <MenuItem key={s}
+                                                                                            value={s}>{s}</MenuItem>)}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid size={6} sx={{pt: 2.5}}>
+                                        <MTableToolbar {...props} />
+                                    </Grid>
+                                </Grid>
+                            ),
+                        }}
                     />
                 </Paper>
             </Grid>
