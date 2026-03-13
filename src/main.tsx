@@ -35,7 +35,7 @@ if (import.meta.env.VITE_BUILD_ENV === 'prod') {
 const components = {
     Header() {
         return (
-            <View textAlign="center" className={'landing-page-header'}>
+            <View textAlign="center" className='landing-page-header'>
                 <Typography variant="h1">
                     The Global.health Data Portal
                 </Typography>
@@ -81,7 +81,7 @@ const components = {
                                 prompt: "SELECT_ACCOUNT"
                             }
                         })}
-                        style={{width: 'calc(100%-20px)', marginBottom: '20px'}}
+                        style={{width: '100%', marginBottom: '20px'}}
                     />
                     <Divider className='or-divider' sx={{
                         "&::before, &::after": {
@@ -104,7 +104,7 @@ const components = {
                                 prompt: "SELECT_ACCOUNT"
                             }
                         })}
-                        style={{width: 'calc(100%-20px)', marginBottom: '24px'}}
+                        style={{width: '100%', marginBottom: '24px'}}
                     />
                     <Divider className='or-divider' sx={{
                         "&::before, &::after": {

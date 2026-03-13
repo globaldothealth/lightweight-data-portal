@@ -78,6 +78,7 @@ body {
     margin: 0;
     height: 100%;
     font-size: 14px;
+    background-color: #ecf3f0;
 }
 
 code {
@@ -107,13 +108,6 @@ a {
     this is why in index.css federated-sign-in-container display is set to none */
 .federated-sign-in-container {
     display: none !important;
-}
-
-
-
-
-body {
-    background-color: #ecf3f0;
 }
 
 /*Auth form styling*/
