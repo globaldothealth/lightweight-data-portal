@@ -1,5 +1,4 @@
 import {useEffect} from "react";
-import "@aws-amplify/ui-react/styles.css";
 import MaterialTable from '@material-table/core';
 import {SaveAlt as SaveAltIcon} from '@mui/icons-material';
 import {Button, Paper, MenuItem, FormControl, InputLabel, Grid, Typography} from '@mui/material';

@@ -78,6 +78,7 @@ body {
     margin: 0;
     height: 100%;
     font-size: 14px;
+    background-color: #ecf3f0;
 }
 
 code {
@@ -108,3 +109,71 @@ a {
 .federated-sign-in-container {
     display: none !important;
 }
+
+/*Auth form styling*/
+[data-amplify-authenticator] {
+    --amplify-colors-brand-primary: #0E7569;
+    --amplify-colors-brand-primary-80: #0E7569;
+    --amplify-colors-brand-primary-90: #00C6AF;
+    --amplify-colors-brand-primary-100: #0E7569;
+    --amplify-font-family: 'Inter', sans-serif;
+    /*--amplify-components-authenticator-router-box-shadow: 0 0 16px rgba(0, 0, 0, 0.02);*/
+    --amplify-components-authenticator-router-border-width: 0;
+    --amplify-components-button-primary-background-color: #0E7569;
+    --amplify-components-button-primary-hover-background-color: #095149;
+    --amplify-components-authenticator-max-width: 800px;
+    --amplify-components-authenticator-container-width-max: 700px;
+    --amplify-components-authenticator-or-container-color: #ff0000;
+}
+
+[data-amplify-authenticator] button {
+    font-family: 'Inter', sans-serif;
+}
+
+[data-amplify-authenticator] button[aria-selected="true"] {
+    color: var(--amplify-colors-brand-primary);
+    border-width: 0;
+}
+
+[data-amplify-authenticator] button[aria-selected="false"] {
+    color: #454545;
+    background-color: #ecf3f0;
+    font-weight: 500;
+}
+
+[data-amplify-authenticator] .landing-page-header {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+[data-amplify-authenticator] .landing-page-header p {
+    text-align: justify;
+    padding-top: 10px;
+    font-size: 16px;
+}
+
+[data-amplify-authenticator] .amplify-button--small {
+    color: #0e7569;
+}
+
+[data-amplify-authenticator] .google-container {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 24px 24px 0 24px;
+    width: calc(100% - 120px);
+}
+
+[data-amplify-authenticator] .or-divider {
+    margin-top: 20px;
+    color: #89949f;
+    font-size: 14px;
+}
+
+[data-amplify-form] {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
