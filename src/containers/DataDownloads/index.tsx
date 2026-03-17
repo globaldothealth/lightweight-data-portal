@@ -30,9 +30,9 @@ export default function DataDownloads() {
 
     return (
         <Grid container spacing={2}>
-            <Grid size={12} sx={{color: '#1e1e1e'}}>
+            <Grid size={12} sx={{color: 'text.primary'}}>
                 <Typography variant='h2'>Data Downloads</Typography>
-                <Typography sx={{marginTop: '10px'}}>Select a dataset below to download and begin exploring the
+                <Typography sx={{marginTop: '1em'}}>Select a dataset below to download and begin exploring the
                     data.</Typography>
             </Grid>
             <Grid size={12}>
@@ -43,6 +43,8 @@ export default function DataDownloads() {
                             paging: false,
                             searchFieldAlignment: 'right',
                             maxColumnSort: 1,
+                            // Remove fixed margin set inside the component and set it to 1em
+                            searchFieldStyle: {marginRight: 'calc(1em - 24px)'},
                         }}
                         columns={[
                             {
@@ -53,7 +55,7 @@ export default function DataDownloads() {
                             {
                                 title: '',
                                 field: 'filename',
-                                width: '120px',
+                                align: 'right',
                                 filtering: false,
                                 render: (rowData: { filename: string }) => {
                                     return (
@@ -62,10 +64,6 @@ export default function DataDownloads() {
                                             color="primary"
                                             onClick={handleDownloadClick(rowData.filename)}
                                             startIcon={<SaveAltIcon/>}
-                                            sx={{
-                                                whiteSpace: 'nowrap',
-                                                minWidth: '140px',
-                                            }}
                                             disabled={!userProfile}
                                         >
                                             Download
@@ -97,7 +95,7 @@ export default function DataDownloads() {
                                         </FormControl>
                                     </Grid>
                                     <Grid size={6} sx={{pt: 2.5}}>
-                                        <MTableToolbar {...props} />
+                                        <MTableToolbar {...props}/>
                                     </Grid>
                                 </Grid>
                             ),

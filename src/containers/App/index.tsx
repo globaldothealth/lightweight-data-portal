@@ -59,7 +59,7 @@ export default function App() {
                             edge="start"
                             data-testid="toggle-sidebar"
                             size="large"
-                            sx={{color: '#0e7569', marginRight: '12px'}}
+                            sx={{color: 'primary.main', marginRight: '.5em'}}
                         >
                             <MenuIcon/>
                         </IconButton>
@@ -90,11 +90,12 @@ export default function App() {
                         </Routes>
                     </Box>
                     <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto'}}>
-                        <Typography variant="body2" color="text.secondary" align="left">
-                            <Link href="https://global.health/privacy/" sx={{marginRight: '20px'}}>
+                        <Typography variant="body2" color="secondary.main" align="left">
+                            <Link href="https://global.health/privacy/" sx={{marginRight: '1em'}}>
                                 Privacy Policy
                             </Link>
-                            <Link href="https://global.health/about/terms-of-use/" sx={{marginLeft: '20px'}}>
+                            |
+                            <Link href="https://global.health/about/terms-of-use/" sx={{marginLeft: '1em'}}>
                                 Terms of Use
                             </Link>
                         </Typography>
