@@ -81,7 +81,7 @@ const components = {
                                 prompt: "SELECT_ACCOUNT"
                             }
                         })}
-                        style={{width: '100%', marginBottom: '20px'}}
+                        style={{width: '100%', marginBottom: '1em'}}
                     />
                     <Divider className='or-divider' sx={{
                         "&::before, &::after": {
@@ -104,7 +104,7 @@ const components = {
                                 prompt: "SELECT_ACCOUNT"
                             }
                         })}
-                        style={{width: '100%', marginBottom: '24px'}}
+                        style={{width: '100%', marginBottom: '1em'}}
                     />
                     <Divider className='or-divider' sx={{
                         "&::before, &::after": {

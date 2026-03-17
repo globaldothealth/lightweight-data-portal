@@ -78,7 +78,6 @@ export default function DataDownloads() {
                         components={{
                             Toolbar: props => (
                                 <Grid container spacing={2}>
-                                    {/* pt: 2.5 is approx 20px, pl: 2 is 16px */}
                                     <Grid size={6} sx={{pt: 2.5, pl: 2}}>
                                         <FormControl fullWidth variant="standard">
                                             <InputLabel id="outbreak-selector-label">Selected Outbreak</InputLabel>
