@@ -32,7 +32,9 @@ export default function GHLogo(): JSX.Element {
                     href="https://global.health/"
                     data-testid="home-button-gh"
                     rel="noopener noreferrer"
+                    aria-label="Global.health home"
                 >
+                    <title>Global.health home</title>
                     <rect
                         className="rect"
                         fill="none"
