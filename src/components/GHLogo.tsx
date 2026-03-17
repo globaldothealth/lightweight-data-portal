@@ -31,7 +31,9 @@ export default function GHLogo(): JSX.Element {
                 <a
                     href="https://global.health/"
                     data-testid="home-button-gh"
+                    aria-label="Global.health home"
                 >
+                    <title>Global.health home</title>
                     <rect
                         className="rect"
                         fill="none"
