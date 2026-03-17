@@ -94,9 +94,8 @@ a {
 
 #root {
     min-height: 100%;
-    padding-left: 30px;
-    padding-top: 10px;
-    padding-right: 30px;
+    padding-left: 2em;
+    padding-top: 1em;
 }
 
 .MuiTypography-root {
@@ -120,9 +119,7 @@ a {
     --amplify-components-authenticator-router-border-width: 0;
     --amplify-components-button-primary-background-color: #0E7569;
     --amplify-components-button-primary-hover-background-color: #095149;
-    --amplify-components-authenticator-max-width: 800px;
-    --amplify-components-authenticator-container-width-max: 700px;
-    --amplify-components-authenticator-or-container-color: #ff0000;
+    --amplify-components-authenticator-container-width-max: 45em;
 }
 
 [data-amplify-authenticator] button {
@@ -141,13 +138,13 @@ a {
 }
 
 [data-amplify-authenticator] .landing-page-header {
-    padding-top: 50px;
-    padding-bottom: 20px;
+    padding-top: 4em;
+    padding-bottom: 1em;
 }
 
 [data-amplify-authenticator] .landing-page-header p {
     text-align: justify;
-    padding-top: 10px;
+    padding-top: 1em;
     font-size: 16px;
 }
 
@@ -158,21 +155,19 @@ a {
 [data-amplify-authenticator] .google-container {
     margin-left: auto;
     margin-right: auto;
-    padding: 24px 24px 0 24px;
-    width: calc(100% - 120px);
+    padding: 1em 2em 0 2em;
+    width: 100%;
 }
 
 [data-amplify-authenticator] .or-divider {
-    margin-top: 20px;
+    margin-top: 1em;
     color: #89949f;
     font-size: 14px;
 }
 
 [data-amplify-form] {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+    max-width: 45em;
+    padding: 0 2em 0 2em !important;
 }
 
