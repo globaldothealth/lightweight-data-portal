@@ -89,7 +89,7 @@ export default function App() {
                             />
                         </Routes>
                     </Box>
-                    <Box component="footer" sx={{ py: 3, mt: 'auto'}}>
+                    <Box component="footer" sx={{mt: 'auto'}}>
                         <Typography variant="body2" color="secondary.main" align="left">
                             <Link href="https://global.health/privacy/" sx={{marginRight: '1rem'}}>
                                 Privacy Policy
