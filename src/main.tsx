@@ -85,7 +85,7 @@ const components = {
                     />
                     <Divider className='or-divider' sx={{
                         "&::before, &::after": {
-                            borderColor: "#89949f",
+                            borderColor: "secondary.main",
                         },
                     }}><Typography>or</Typography></Divider>
                 </View>
@@ -108,7 +108,7 @@ const components = {
                     />
                     <Divider className='or-divider' sx={{
                         "&::before, &::after": {
-                            borderColor: "#89949f",
+                            borderColor: "secondary.main",
                         },
                     }} ><Typography>or</Typography></Divider>
                 </View>
