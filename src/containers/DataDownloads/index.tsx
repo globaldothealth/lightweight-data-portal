@@ -43,8 +43,6 @@ export default function DataDownloads() {
                             paging: false,
                             searchFieldAlignment: 'right',
                             maxColumnSort: 1,
-                            // Remove fixed margin set inside the component and set it to 1em
-                            searchFieldStyle: {marginRight: 'calc(1em - 24px)'},
                         }}
                         columns={[
                             {
@@ -77,8 +75,8 @@ export default function DataDownloads() {
                         isLoading={isLoading || !userProfile}
                         components={{
                             Toolbar: props => (
-                                <Grid container spacing={2}>
-                                    <Grid size={6} sx={{pt: 2.5, pl: 2}}>
+                                <Grid container>
+                                    <Grid size={{xs: 12, md: 6}} sx={{padding: '1rem'}}>
                                         <FormControl fullWidth variant="standard">
                                             <InputLabel id="outbreak-selector-label">Selected Outbreak</InputLabel>
                                             <Select
@@ -93,7 +91,17 @@ export default function DataDownloads() {
                                             </Select>
                                         </FormControl>
                                     </Grid>
-                                    <Grid size={6} sx={{pt: 2.5}}>
+                                    <Grid size={{xs: 12, md: 6}} sx={{
+                                        padding: '1rem',
+                                        '& .MuiToolbar-root': {
+                                            padding: '1rem 0 0 0',
+                                            display: 'block',
+                                        },
+                                        '& .MuiFormControl-root': {
+                                            padding: 0,
+                                            width: '100%',
+                                        }
+                                    }}>
                                         <MTableToolbar {...props}/>
                                     </Grid>
                                 </Grid>
