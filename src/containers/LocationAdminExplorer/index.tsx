@@ -64,15 +64,15 @@ export default function LocationAdminExplorer() {
 
     return <>
         <Typography variant={'h2'} sx={{color: "text.primary"}}>Admin Location Explorer</Typography>
-        <Typography sx={{marginTop: '1em', color: "text.primary"}}>This explorer is based on Mapbox Boundaries v3. It helps
+        <Typography sx={{marginTop: '1rem', color: "text.primary"}}>This explorer is based on Mapbox Boundaries v3. It helps
             to use
             recognizable admin area names and relations between them. </Typography>
-        <Typography sx={{marginTop: '1em', color: "text.primary"}}>We use <b>iso3</b> code for identifying Admin0 Areas
+        <Typography sx={{marginTop: '1rem', color: "text.primary"}}>We use <b>iso3</b> code for identifying Admin0 Areas
             (e.g. countries) and <b>wikidata</b> to identify
             Admin1 (e.g. state), Admin2 (e.g. county) and admin3 (e.g. township) areas for the G.h map
             visualizations. Areas available for the G.h map views are indicated with 🌎 before the admin area name.
         </Typography>
-        <Paper sx={{marginTop: '2em', padding: '2em'}}>
+        <Paper sx={{marginTop: '2rem', padding: '2rem'}}>
             <Grid container spacing={2}>
                 <Grid size={6}>
                     <Autocomplete

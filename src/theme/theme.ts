@@ -82,27 +82,27 @@ export const theme = createTheme({
         fontFamily: 'Inter, sans-serif',
         fontSize: 14,
         h1: {
-            fontSize: '36px',
+            fontSize: '2rem',
             fontWeight: 'bold',
         },
         h2: {
-            fontSize: '24px',
+            fontSize: '1.8rem',
             fontWeight: 'bold',
         },
         h3: {
-            fontSize: '20px',
+            fontSize: '1.6rem',
             fontWeight: 'bold',
         },
         h4: {
-            fontSize: '18px',
+            fontSize: '1.4rem',
             fontWeight: 'bold',
         },
         h5: {
-            fontSize: '16px',
+            fontSize: '1.2rem',
             fontWeight: 'bold',
         },
         h6: {
-            fontSize: '14px',
+            fontSize: '1rem',
             fontWeight: 'bold',
         },
     },

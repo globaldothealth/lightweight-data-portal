@@ -59,7 +59,7 @@ export default function App() {
                             edge="start"
                             data-testid="toggle-sidebar"
                             size="large"
-                            sx={{color: 'primary.main', marginRight: '.5em'}}
+                            sx={{color: 'primary.main', marginRight: '1rem'}}
                         >
                             <MenuIcon/>
                         </IconButton>
@@ -77,7 +77,7 @@ export default function App() {
                     minHeight: '100vh'
                 }}>
                     <Toolbar/>
-                    <Box sx={{ flexGrow: 1, p: 1, maxWidth: '45em' }}>
+                    <Box sx={{ flexGrow: 1, p: 1, maxWidth: '45rem' }}>
                         <Routes>
                             <Route path="/data-downloads" element={<DataDownloads/>}/>
                             <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
@@ -91,11 +91,11 @@ export default function App() {
                     </Box>
                     <Box component="footer" sx={{ py: 3, mt: 'auto'}}>
                         <Typography variant="body2" color="secondary.main" align="left">
-                            <Link href="https://global.health/privacy/" sx={{marginRight: '1em'}}>
+                            <Link href="https://global.health/privacy/" sx={{marginRight: '1rem'}}>
                                 Privacy Policy
                             </Link>
                             |
-                            <Link href="https://global.health/about/terms-of-use/" sx={{marginLeft: '1em'}}>
+                            <Link href="https://global.health/about/terms-of-use/" sx={{marginLeft: '1rem'}}>
                                 Terms of Use
                             </Link>
                         </Typography>
