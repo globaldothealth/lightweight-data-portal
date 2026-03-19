@@ -2,12 +2,14 @@ import {useEffect, useState, useMemo} from "react";
 import {Navigate, Route, Routes, useLocation} from 'react-router-dom';
 import {
     Menu as MenuIcon,
-    BrowserUpdated as BrowserUpdatedIcon,
-    Public as PublicIcon,
+    BrowserUpdated as OutbreakDataIcon,
+    Public as LocationAdminExplorerIcon,
+    Satellite as DengueGeodataIcon
 } from '@mui/icons-material';
 import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography} from '@mui/material';
 
 import DataDownloads from "../DataDownloads";
+import DengueGeodata from "../DengueGeodata";
 import LocationAdminExplorer from "../LocationAdminExplorer";
 import Sidebar from "../../components/Sidebar";
 import {useAppDispatch} from '../../hooks/redux';
@@ -32,13 +34,18 @@ export default function App() {
 
     const menuList = useMemo(() => [
         {
-            text: 'Data Downloads',
-            icon: <BrowserUpdatedIcon/>,
+            text: 'Outbreak Data',
+            icon: <OutbreakDataIcon/>,
             to: '/data-downloads',
         },
         {
+            text: 'Dengue Geodata',
+            icon: <DengueGeodataIcon/>,
+            to: '/dengue-geodata',
+        },
+        {
             text: 'Location Admin Explorer',
-            icon: <PublicIcon/>,
+            icon: <LocationAdminExplorerIcon/>,
             to: '/location-admin-explorer',
         },
     ], []);
@@ -80,6 +87,7 @@ export default function App() {
                     <Box sx={{ flexGrow: 1, p: 1, maxWidth: '45rem' }}>
                         <Routes>
                             <Route path="/data-downloads" element={<DataDownloads/>}/>
+                            <Route path="/dengue-geodata" element={<DengueGeodata/>}/>
                             <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
                             <Route
                                 path="*"
