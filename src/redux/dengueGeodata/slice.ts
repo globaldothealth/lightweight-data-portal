@@ -7,22 +7,22 @@ export type S3File = {
     name: string;
 }
 
-interface DataDownloadsState {
+interface DengueGeodataState {
     isLoading: boolean;
     s3Files: S3File[];
     availableCountries: {[key: string]: string};
     error: string | undefined;
 }
 
-const initialState: DataDownloadsState = {
+const initialState: DengueGeodataState = {
     isLoading: false,
     s3Files: [],
     availableCountries: {},
     error: undefined,
 };
 
-const dataDownloadsSlice = createSlice({
-    name: 'dataDownloads',
+const dengueGeodataSlice = createSlice({
+    name: 'dengueGeodata',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
@@ -54,4 +54,4 @@ const dataDownloadsSlice = createSlice({
     },
 });
 
-export default dataDownloadsSlice.reducer;
+export default dengueGeodataSlice.reducer;

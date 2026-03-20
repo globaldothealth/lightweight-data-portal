@@ -1,6 +1,6 @@
 import {vi, describe, it, expect, beforeEach} from 'vitest';
 import {getFilesFromMetadata, handleDownload} from '../thunk.ts';
-import {list, getUrl, downloadData} from 'aws-amplify/storage';
+import {getUrl, downloadData} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
 
 // Mock Amplify Storage
@@ -79,6 +79,38 @@ describe('DataDownloads thunks', () => {
             expect(result.meta.requestStatus).toBe('rejected');
             expect(result.payload).toBe(`Error fetching metadata.json.`);
         });
+
+        it('should reject and return error message when Json file is broken', async () => {
+            vi.mocked(downloadData).mockReturnValue({
+                result: Promise.resolve({
+                    body: {
+                        text: async () => undefined,
+                    },
+                }),
+            } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+            const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
+
+            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.payload).toBe('Error fetching files from S3: "undefined" is not valid JSON');
+        });
+
+        it('should reject with generic message when error is not an Error instance', async () => {
+            vi.mocked(downloadData).mockReturnValue({
+                result: Promise.resolve({
+                    body: {
+                        text: () => Promise.reject('Just a string error'),
+                    },
+                }),
+            } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+            const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
+
+            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.payload).toBe('Error fetching files from S3: An unknown error occurred');
+        });
+
+
     });
 
     describe('handleDownload', () => {

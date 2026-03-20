@@ -7,7 +7,7 @@ import {client} from "../../utils/amplifyClient";
 export const getFilesFromMetadata = createAsyncThunk<{files: S3File[], availableCountries: {[key: string]: string}},
     undefined,
     { rejectValue: string }>(
-    'dataDownloads/getFilesFromS3Folder',
+    'dengueGeodata/getFilesFromS3Folder',
     async (_, {rejectWithValue}) => {
         try {
             const result = await downloadData({
@@ -52,7 +52,7 @@ export const getFilesFromMetadata = createAsyncThunk<{files: S3File[], available
 export const handleDownload = createAsyncThunk<void,
     { s3FileKey: string, user: UserProfile },
     { rejectValue: string }>(
-    'dataDownloads/handleDownload',
+    'dengueGeodata/handleDownload',
     async (data, {rejectWithValue}) => {
         try {
             await client.models.DownloadEvent.create({
