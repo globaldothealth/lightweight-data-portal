@@ -1,21 +1,21 @@
-import {render, screen, cleanup, fireEvent} from '@testing-library/react';
-import {describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll} from 'vitest';
+import {render, screen, fireEvent, within, waitFor} from '@testing-library/react';
+import {describe, it, expect, vi, beforeEach} from 'vitest';
+import userEvent from '@testing-library/user-event';
 
-import DataDownloads from './index';
+import DengueGeodata from './index';
 import * as reduxHooks from '../../hooks/redux';
 import {selectUserProfile} from '../../redux/app/selectors';
 import {
     selectS3Files,
-    selectS3Folder,
+    selectAvailableCountries,
     selectIsLoading
-} from '../../redux/dataDownloads/selectors';
-import {S3File, S3Folder} from '../../redux/dataDownloads/slice';
-import * as downloadThunks from '../../redux/dataDownloads/thunk';
+} from '../../redux/dengueGeodata/selectors';
+import * as dengueThunks from '../../redux/dengueGeodata/thunk';
 
 
-// Mock the dataDownloads thunks
-vi.mock('../../redux/dataDownloads/thunk', () => ({
-    getFilesFromS3Folder: vi.fn(),
+// Mock the thunks
+vi.mock('../../redux/dengueGeodata/thunk', () => ({
+    getFilesFromMetadata: vi.fn(),
     handleDownload: vi.fn(),
 }));
 
@@ -25,10 +25,10 @@ vi.mock('../../hooks/redux', () => ({
     useAppSelector: vi.fn(),
 }));
 
-// Mock app and dataDownloads selectors
-vi.mock('../../redux/dataDownloads/selectors', () => ({
+// Mock selectors
+vi.mock('../../redux/dengueGeodata/selectors', () => ({
     selectS3Files: vi.fn(),
-    selectS3Folder: vi.fn(),
+    selectAvailableCountries: vi.fn(),
     selectIsLoading: vi.fn(),
 }));
 
@@ -37,119 +37,120 @@ vi.mock('../../redux/app/selectors', () => ({
 }));
 
 
-describe('DataDownloads Container', () => {
+describe('DengueGeodata Container', () => {
     const mockDispatch = vi.fn();
-    const visibleFilename1 = 'Mpox_2022.csv';
-    const visibleFilename2 = 'Mpox_2024.csv';
-    const file1 = {name: 'Mpox_2022.csv', filename: `public/${visibleFilename1}`};
-    const file2 = {name: 'Mpox_2024.csv', filename: `public/${visibleFilename2}`};
-    const mockUserProfile = {name: 'Test User'};
-    const originalWarn = console.warn.bind(console.warn)
+    const mockUserProfile = { id: 'Test User', email: 'test@example.com' };
 
-    // Hide warnings about MUI anchorEl during tests
-    beforeAll(() => {
-        console.warn = (msg) =>
-            !msg.toString().includes('MUI: The `anchorEl` prop provided to the component is invalid.') && originalWarn(msg)
-    })
-    afterAll(() => {
-        console.warn = originalWarn
-    })
+    const mockFiles = [
+        {
+            name: 'Dataset A',
+            filename: 'dataset_a.csv',
+            country: 'Brazil',
+        },
+        {
+            name: 'Dataset B',
+            filename: 'dataset_b.csv',
+            country: 'Vietnam',
+        }
+    ];
+
+    const mockCountries = {
+        'Brazil': 'Brazil',
+        'Vietnam': 'Vietnam'
+    };
 
     beforeEach(() => {
+        vi.resetAllMocks();
         vi.mocked(reduxHooks.useAppDispatch).mockReturnValue(mockDispatch);
-        // Reset mocks
-        mockDispatch.mockClear();
-        // We cannot easily type this return types
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        vi.mocked(downloadThunks.getFilesFromS3Folder).mockReturnValue({type: 'mock-getFilesFromS3Folder'} as any);
-    });
-
-    afterEach(() => {
-        cleanup();
-        vi.clearAllMocks();
-    });
-
-    it('fetches data using getFilesFromS3Folder action and displays them in the table', () => {
-        const mockS3Folder = S3Folder.Mpox2024;
-        const mockFiles = [file1, file2];
-
-        // Mock Selector implementations
-        vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector) => {
-            if (selector === selectS3Folder) return mockS3Folder;
-            if (selector === selectS3Files) return mockFiles;
-            if (selector === selectIsLoading) return false;
-            if (selector === selectUserProfile) return mockUserProfile;
-            return undefined;
-        });
-
-        render(<DataDownloads/>);
-
-        // Check if getFilesFromS3Folder was dispatched with the correct folder
-        expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({type: 'mock-getFilesFromS3Folder'}));
-        expect(downloadThunks.getFilesFromS3Folder).toHaveBeenCalledWith({s3Folder: mockS3Folder});
-
-        // Verify that returned files are listed in the table
-        expect(screen.getByText(file1.name)).toBeInTheDocument();
-        expect(screen.getByText(visibleFilename1)).toBeInTheDocument();
-        expect(screen.getByText(file2.name)).toBeInTheDocument();
-        expect(screen.getByText(visibleFilename2)).toBeInTheDocument();
-    });
-
-    it('refetches list of files when a different folder is selected', () => {
-        const initialS3Folder = S3Folder.Mpox2024;
-        const newS3Folder = S3Folder.AvianInfluenza;
-        const mockFiles: S3File[] = [];
-
-        // Mock Selector implementations - flexible based on call count or simply mocked
-        let currentS3Folder = initialS3Folder;
-
-        vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector) => {
-            if (selector === selectS3Folder) return currentS3Folder;
-            if (selector === selectS3Files) return mockFiles;
-            if (selector === selectIsLoading) return false;
-            if (selector === selectUserProfile) return mockUserProfile;
-            return undefined;
-        });
-
-        const {rerender} = render(<DataDownloads/>);
-
-        // Select another outbreaks from the dropdown
-        const selectButton = screen.getByRole('combobox', {name: /Selected Outbreak/i});
-        fireEvent.mouseDown(selectButton);
-        const newOption = screen.getByRole('option', {name: newS3Folder});
-        fireEvent.click(newOption);
-
-        // Simulate Redux state update and re-render to trigger useEffect
-        currentS3Folder = newS3Folder;
-        rerender(<DataDownloads/>);
-
-        // Check if folder change triggered getFilesFromS3Folder with new folder
-        expect(downloadThunks.getFilesFromS3Folder).toHaveBeenCalledWith({s3Folder: newS3Folder});
-        expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({type: 'mock-getFilesFromS3Folder'}));
-    });
-
-    it('dispatches handleDownload action when download button is clicked', () => {
-        const mockFiles = [file1];
-        const mockS3Folder = S3Folder.Mpox2024;
-
-        // We cannot easily type this return types
+        vi.mocked(dengueThunks.getFilesFromMetadata).mockReturnValue({ type: 'test-action' } as any);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        vi.mocked(downloadThunks.handleDownload).mockReturnValue({type: 'mock-handleDownload'} as any);
+        vi.mocked(dengueThunks.handleDownload).mockReturnValue({ type: 'test-download-action' } as any);
+    });
 
+    it('fetches data and displays it in the table', () => {
         vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector) => {
-            if (selector === selectS3Folder) return mockS3Folder;
+            if (selector === selectAvailableCountries) return mockCountries;
             if (selector === selectS3Files) return mockFiles;
             if (selector === selectIsLoading) return false;
             if (selector === selectUserProfile) return mockUserProfile;
             return undefined;
         });
+        render(<DengueGeodata />);
 
-        render(<DataDownloads/>);
+        // Check if fetch thunk was dispatched
+        expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'test-action' }));
 
-        // Click the download button and check if handleDownload was dispatched with correct file key and user profile
-        const downloadButton = screen.getByRole('button', {name: /download/i});
-        fireEvent.click(downloadButton);
-        expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({type: 'mock-handleDownload'}));
-        expect(downloadThunks.handleDownload).toHaveBeenCalledWith({s3FileKey: file1.filename, user: mockUserProfile});
+        // Check if title is present
+        expect(screen.getByText('Dengue Geodata')).toBeInTheDocument();
+
+        // Check if data rows are rendered
+        expect(screen.getByText('Dataset A')).toBeInTheDocument();
+        expect(screen.getByText('Brazil')).toBeInTheDocument();
+        expect(screen.getByText('Dataset B')).toBeInTheDocument();
+        expect(screen.getByText('Vietnam')).toBeInTheDocument();
+    });
+
+    it('renders the usable table country filter', async () => {
+        const user = userEvent.setup();
+        vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector) => {
+            if (selector === selectAvailableCountries) return mockCountries;
+            if (selector === selectS3Files) return mockFiles;
+            if (selector === selectIsLoading) return false;
+            if (selector === selectUserProfile) return mockUserProfile;
+            return undefined;
+        });
+        render(<DengueGeodata />);
+        const selectButton = screen.getByRole('combobox');
+        await user.click(selectButton);
+
+        const listbox = await screen.findByRole('listbox');
+        const options = within(listbox).getAllByRole('option');
+        const brazilOption = options.find(opt => opt.textContent?.includes('Brazil'));
+
+        if (!brazilOption) throw new Error('Brazil option not found');
+
+        // Click the checkbox specifically
+        const checkbox = within(brazilOption).getByRole('checkbox');
+        await user.click(checkbox);
+
+        // Close the menu (optional but good practice for multi-selects often)
+        await user.keyboard('{Escape}');
+
+        // Material table standard filter placeholder for lookup columns might depend on implementation details,
+        // but typically it renders input fields or select boxes in the filter row.
+        // Since 'filtering: true' is set, we look for filter inputs.
+
+        // We can verify that the text "Country" exists in the header
+        expect(screen.getByText('Country')).toBeInTheDocument();
+
+        // Check that the table is filtered: Dataset A (Brazil) should be visible, Dataset B (Vietnam) should not
+        expect(await screen.findByText('Dataset A')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.queryByText('Dataset B')).not.toBeInTheDocument();
+        });
+    });
+
+    it('dispatches handleDownload when clicking the download button', async () => {
+        vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector) => {
+            if (selector === selectAvailableCountries) return mockCountries;
+            if (selector === selectS3Files) return mockFiles;
+            if (selector === selectIsLoading) return false;
+            if (selector === selectUserProfile) return mockUserProfile;
+            return undefined;
+        });
+        render(<DengueGeodata />);
+
+        const downloadButtons = screen.getAllByText('Download');
+        expect(downloadButtons.length).toBe(2);
+
+        // Click the first download button (Dataset A)
+        fireEvent.click(downloadButtons[0]);
+
+        expect(mockDispatch).toHaveBeenCalledTimes(2); // 1 for initial fetch, 1 for click
+        expect(dengueThunks.handleDownload).toHaveBeenCalledWith({
+            s3FileKey: 'dataset_a.csv',
+            user: mockUserProfile
+        });
     });
 });

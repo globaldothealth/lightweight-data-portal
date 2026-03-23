@@ -84,7 +84,7 @@ export default function App() {
                     minHeight: '100vh'
                 }}>
                     <Toolbar/>
-                    <Box sx={{ flexGrow: 1, p: 1, maxWidth: '45rem' }}>
+                    <Box sx={{ flexGrow: 1, p: '1rem', maxWidth: '45rem' }}>
                         <Routes>
                             <Route path="/data-downloads" element={<DataDownloads/>}/>
                             <Route path="/dengue-geodata" element={<DengueGeodata/>}/>
@@ -97,7 +97,7 @@ export default function App() {
                             />
                         </Routes>
                     </Box>
-                    <Box component="footer" sx={{mt: 'auto'}}>
+                    <Box component="footer" sx={{p: '1rem'}}>
                         <Typography variant="body2" color="secondary.main" align="left">
                             <Link href="https://global.health/privacy/" sx={{marginRight: '1rem'}}>
                                 Privacy Policy

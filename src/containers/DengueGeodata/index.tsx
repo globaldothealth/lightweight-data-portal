@@ -25,9 +25,26 @@ export default function DengueGeodata() {
     return (
         <Grid container spacing={2}>
             <Grid size={12} sx={{color: 'text.primary'}}>
-                <Typography variant='h2'>Data Downloads</Typography>
-                <Typography sx={{marginTop: '1em'}}>Select a dataset below to download and begin exploring the
-                    data.</Typography>
+                <Typography variant='h2'>Dengue Geodata</Typography>
+            </Grid>
+            <Grid size={12}>
+                <Paper sx={{p: '1rem'}}>
+                    <Typography sx={{textAlign: 'justify'}}>
+                        By accessing or downloading these datasets, you agree to handle the data responsibly and in
+                        accordance with the ethical research and data protection standards outlined in the Global.health
+                        Terms of Use, Privacy Policy, and Code of Conduct. The data are provided for research purposes
+                        only, and users may not attempt to re-identify individuals. While reasonable efforts are made to
+                        ensure accuracy, the data are subject to ongoing verification and may be updated or revised.
+                        Global.health makes no warranties regarding the accuracy or completeness of the data and
+                        disclaims liability for any use of, or reliance on, the information. Users are responsible for
+                        the interpretation, analysis, and use of the data and any outputs derived from it.
+                    </Typography>
+                    <br/>
+                    <Typography sx={{textAlign: 'justify'}}>
+                        By accessing or using the datasets, you acknowledge that you have read, understood, and agreed
+                        to comply with these terms.
+                    </Typography>
+                </Paper>
             </Grid>
             <Grid size={12}>
                 <Paper>
