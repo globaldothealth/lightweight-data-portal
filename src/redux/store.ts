@@ -2,12 +2,14 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 
 import appReducer from './app/slice';
 import dataDownloadsReducer from './dataDownloads/slice';
+import dengueGeodataReducer from './dengueGeodata/slice';
 
 
 
 export const rootReducer = combineReducers({
     app: appReducer,
     dataDownloads: dataDownloadsReducer,
+    dengueGeodata: dengueGeodataReducer,
 });
 
 const store = configureStore({

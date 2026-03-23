@@ -11,11 +11,12 @@ import {getUserProfile, logout} from '../../redux/app/thunk';
 // This will ensure we have coverage for all containers and correct menu index passed to Sidebar.
 const containerList = [
     {containerName: 'DataDownloads', path: '/data-downloads', id: 'data-downloads', expectedIndex: '0'},
+    {containerName: 'DengueGeodata', path: '/dengue-geodata', id: 'dengue-geodata', expectedIndex: '1'},
     {
         containerName: 'LocationAdminExplorer',
         path: '/location-admin-explorer',
         id: 'location-admin-explorer',
-        expectedIndex: '1'
+        expectedIndex: '2'
     }
 ];
 
