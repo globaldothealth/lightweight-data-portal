@@ -10,9 +10,9 @@ export const DataAcknowledgementsAccordion = (props: DataAcknowledgementsAccordi
     return (<Accordion expanded={isOpen}>
         <AccordionSummary sx={{
             '& .Mui-expanded': {
-                m: '1rem 0 1rem 0',
+                m: '1.2rem 0 1.2rem 0',
             }, '& span': {
-                m: '1rem 0 1rem 0',
+                m: '1.2rem 0 1.2rem 0',
             }
         }}>
             <Typography sx={{textAlign: 'justify'}}>By accessing or using the datasets, you acknowledge that
