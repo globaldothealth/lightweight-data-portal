@@ -8,6 +8,7 @@ import {selectUserProfile} from "../../redux/app/selectors.ts";
 import {selectS3Folder, selectS3Files, selectIsLoading} from "../../redux/dataDownloads/selectors.ts";
 import {getFilesFromS3Folder, handleDownload} from "../../redux/dataDownloads/thunk.ts";
 import {S3Folder, setS3Folder} from "../../redux/dataDownloads/slice.ts";
+import {DataAcknowledgementsAccordion} from "../../components/DataAcknowledgementsAccordion";
 
 export default function DataDownloads() {
     const dispatch = useAppDispatch();
@@ -31,9 +32,10 @@ export default function DataDownloads() {
     return (
         <Grid container spacing={2}>
             <Grid size={12} sx={{color: 'text.primary'}}>
-                <Typography variant='h2'>Data Downloads</Typography>
-                <Typography sx={{marginTop: '1em'}}>Select a dataset below to download and begin exploring the
-                    data.</Typography>
+                <Typography variant='h2'>Outbreak Data</Typography>
+            </Grid>
+            <Grid size={12}>
+                <DataAcknowledgementsAccordion initialOpen={false}></DataAcknowledgementsAccordion>
             </Grid>
             <Grid size={12}>
                 <Paper>
