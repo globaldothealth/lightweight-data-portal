@@ -158,10 +158,10 @@ export const theme = createTheme({
                     border: 'unset',
                     fontFamily: 'Inter, sans-serif',
                     '& .MuiTablePagination-select': {
-                        fontFamily: 'Inter',
+                        fontFamily: 'Inter, sans-serif',
                     },
                     '&&& .MuiTypography-root': {
-                        fontFamily: 'Inter',
+                        fontFamily: 'Inter, sans-serif',
                     },
                 },
             },
@@ -171,7 +171,7 @@ export const theme = createTheme({
                 root: {
                     fontFamily: 'Inter, sans-serif',
                     '&&& .MuiTypography-root': {
-                        fontFamily: 'Inter',
+                        fontFamily: 'Inter, sans-serif',
                     },
                 },
             },
@@ -181,7 +181,7 @@ export const theme = createTheme({
                 root: {
                     fontFamily: 'Inter, sans-serif',
                     '&&& .MuiTypography-root': {
-                        fontFamily: 'Inter',
+                        fontFamily: 'Inter, sans-serif',
                     },
                 },
             },
