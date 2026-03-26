@@ -53,6 +53,12 @@ export default function DataDownloads() {
                                 filtering: false,
                             },
                             {
+                                title: 'Size',
+                                field: 'size',
+                                align: 'right',
+                                filtering: false,
+                            },
+                            {
                                 title: '',
                                 field: 'filename',
                                 align: 'right',

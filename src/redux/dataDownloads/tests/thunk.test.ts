@@ -32,15 +32,15 @@ describe('DataDownloads thunks', () => {
 
     describe('getFilesFromS3Folder', () => {
         const payload = {s3Folder: 'test-folder'};
-        const testFile1 = {filename: 'public/test-folder/file1.txt', name: 'file1.txt'};
-        const testFile2 = {filename: 'public/test-folder/file2.jpg', name: 'file2.jpg'};
+        const testFile1 = {filename: 'public/test-folder/file1.txt', name: 'file1.txt', size: '1 KB'};
+        const testFile2 = {filename: 'public/test-folder/file2.jpg', name: 'file2.jpg', size: '2 KB'};
         const testFile3 = {filename: 'public/test-folder/'};
 
         it('should fulfill with formatted files list', async () => {
             vi.mocked(list).mockResolvedValue({
                 items: [
-                    {path: testFile1.filename},
-                    {path: testFile2.filename},
+                    {path: testFile1.filename, size: 1000},
+                    {path: testFile2.filename, size: 2000},
                     {path: testFile3.filename},
                 ]
             } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -49,7 +49,7 @@ describe('DataDownloads thunks', () => {
 
             expect(result.meta.requestStatus).toBe('fulfilled');
             expect(result.payload).toEqual([testFile1, testFile2]);
-            expect(list).toHaveBeenCalledWith({path: `public/${payload.s3Folder}/`});
+            expect(list).toHaveBeenCalledWith({path: payload.s3Folder, options: {bucket: 'gh-outbreak-data'}});
         });
 
         it('should reject when no files are found', async () => {
@@ -100,7 +100,7 @@ describe('DataDownloads thunks', () => {
                 filename: payload.s3FileKey,
             }));
 
-            expect(getUrl).toHaveBeenCalledWith({path: payload.s3FileKey});
+            expect(getUrl).toHaveBeenCalledWith({path: payload.s3FileKey, options: {bucket: 'gh-outbreak-data'}});
             expect(window.open).toHaveBeenCalledWith('http://mock.url/file.txt', '_blank');
         });
 

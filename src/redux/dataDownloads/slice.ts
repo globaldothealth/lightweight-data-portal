@@ -14,6 +14,7 @@ export enum S3Folder {
 export type S3File = {
     filename: string;
     name: string;
+    size: string;
 }
 
 interface DataDownloadsState {
