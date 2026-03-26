@@ -156,7 +156,7 @@ export const theme = createTheme({
             styleOverrides: {
                 root: {
                     border: 'unset',
-                    fontFamily: 'Inter',
+                    fontFamily: 'Inter, sans-serif',
                     '& .MuiTablePagination-select': {
                         fontFamily: 'Inter',
                     },
@@ -169,7 +169,7 @@ export const theme = createTheme({
         MuiPaper: {
             styleOverrides: {
                 root: {
-                    fontFamily: 'Inter',
+                    fontFamily: 'Inter, sans-serif',
                     '&&& .MuiTypography-root': {
                         fontFamily: 'Inter',
                     },
@@ -179,7 +179,7 @@ export const theme = createTheme({
         MuiTypography: {
             styleOverrides: {
                 root: {
-                    fontFamily: 'Inter',
+                    fontFamily: 'Inter, sans-serif',
                     '&&& .MuiTypography-root': {
                         fontFamily: 'Inter',
                     },
