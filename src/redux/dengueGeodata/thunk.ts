@@ -29,7 +29,7 @@ export const getFilesFromMetadata = createAsyncThunk<{files: S3File[], available
             const uniqueCountries: string[] = [
                 ...new Set(files.map((row: S3File) => row.country)),
             ] as string[];
-            // Map counties list to dict, this is required for material table filter
+            // Map countries list to dict, this is required for material table filter
             const availableCountries: {[key: string]: string} =
                 uniqueCountries.reduce(
                     (
