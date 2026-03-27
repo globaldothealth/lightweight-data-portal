@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {Button, Accordion, AccordionSummary, Link, Typography} from "@mui/material";
+import {Accordion, AccordionSummary, Link, Typography} from "@mui/material";
 
 interface DataAcknowledgementsAccordionProps {
     initialOpen: boolean;
