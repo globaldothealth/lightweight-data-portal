@@ -36,12 +36,13 @@ describe('DengueGeodata thunks', () => {
         const testFile2Name = 'file2.jpg';
         const testFile1 = {filename: `public/test-folder/${testFile1Name}`, country: 'Barbados'};
         const testFile2 = {filename: `public/test-folder/${testFile2Name}`, country: 'Brazil'};
+        const testFile3 = {filename: `public/test-folder/`, country: 'Brazil'};
 
         it('should fulfill with formatted files list', async () => {
             vi.mocked(downloadData).mockReturnValue({
                 result: Promise.resolve({
                     body: {
-                        text: async () => JSON.stringify([testFile1, testFile2]),
+                        text: async () => JSON.stringify([testFile1, testFile2, testFile3]),
                     },
                 }),
             } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -133,7 +134,7 @@ describe('DengueGeodata thunks', () => {
             }));
 
             expect(getUrl).toHaveBeenCalledWith({path: payload.s3FileKey, options: {bucket: 'gh-data-downloads'}});
-            expect(window.open).toHaveBeenCalledWith('http://mock.url/file.txt', '_blank');
+            expect(window.open).toHaveBeenCalledWith('http://mock.url/file.txt', '_blank', 'noopener,noreferrer');
         });
 
         it('should fulfill on successful download process for global-dengue-forecasting', async () => {
@@ -156,7 +157,7 @@ describe('DengueGeodata thunks', () => {
                 path: payloadOutputBucket.s3FileKey,
                 options: {bucket: 'global-dengue-forecasting'}
             });
-            expect(window.open).toHaveBeenCalledWith('http://mock.url/file.txt', '_blank');
+            expect(window.open).toHaveBeenCalledWith('http://mock.url/file.txt', '_blank', 'noopener,noreferrer');
         });
 
         it('should reject with error message if handleDownload fails with error message', async () => {

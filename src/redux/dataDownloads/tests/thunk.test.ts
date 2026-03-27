@@ -101,7 +101,7 @@ describe('DataDownloads thunks', () => {
             }));
 
             expect(getUrl).toHaveBeenCalledWith({path: payload.s3FileKey, options: {bucket: 'gh-outbreak-data'}});
-            expect(window.open).toHaveBeenCalledWith('http://mock.url/file.txt', '_blank');
+            expect(window.open).toHaveBeenCalledWith('http://mock.url/file.txt', '_blank', 'noopener,noreferrer');
         });
 
         it('should reject with error message if handleDownload fails with error message', async () => {

@@ -48,7 +48,7 @@ export const handleDownload = createAsyncThunk<void,
 
             const link = await getUrl({path: data.s3FileKey, options: {bucket: 'gh-outbreak-data'}});
 
-            window.open(link.url.toString(), '_blank');
+            window.open(link.url.toString(), '_blank', 'noopener,noreferrer');
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : "An unknown error occurred";
             return rejectWithValue(`Error downloading file from S3: ${message}`);

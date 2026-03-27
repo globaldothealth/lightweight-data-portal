@@ -21,7 +21,11 @@ export const getFilesFromMetadata = createAsyncThunk<{files: S3File[], available
                 return rejectWithValue('Error fetching metadata.json.');
             }
             const text = await result.body.text();
-            const files =   (JSON.parse(text)).map((file: S3File) => ({...file, name: file.filename.split('/').pop()}))
+            const rawFiles = JSON.parse(text) as Omit<S3File, 'name'>[];
+            const files: S3File[] = rawFiles.map((file) => {
+                const name = file.filename.split('/').pop() || '';
+                return {...file, name};
+            }).filter(file => file.name);
 
             if (files.length === 0) {
                 return rejectWithValue('No files found in the specified S3 folder.');
@@ -69,7 +73,7 @@ export const handleDownload = createAsyncThunk<void,
                 }
             });
 
-            window.open(link.url.toString(), '_blank');
+            window.open(link.url.toString(), '_blank', 'noopener,noreferrer');
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : "An unknown error occurred";
             return rejectWithValue(`Error downloading file from S3: ${message}`);

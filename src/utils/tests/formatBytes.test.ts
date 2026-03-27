@@ -7,7 +7,7 @@ describe('formatBytes', () => {
   });
 
   it('should format bytes correctly with default decimals logic', () => {
-    expect(formatBytes(1000, 0)).toBe('1 KB');
+    expect(formatBytes(1000)).toBe('1 KB');
     expect(formatBytes(1000, 2)).toBe('1 KB');
   });
 
