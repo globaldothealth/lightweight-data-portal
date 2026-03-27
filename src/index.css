@@ -89,7 +89,8 @@ a {
     --amplify-components-authenticator-router-border-width: 0;
     --amplify-components-button-primary-background-color: #0E7569;
     --amplify-components-button-primary-hover-background-color: #095149;
-    --amplify-components-authenticator-container-width-max: 45em;
+    --amplify-components-authenticator-container-width-max: 45rem;
+    min-height: 100vh;
 }
 
 [data-amplify-authenticator] button {
@@ -108,7 +109,6 @@ a {
 }
 
 [data-amplify-authenticator] .landing-page-header {
-    padding-top: 4em;
     padding-bottom: 1em;
 }
 
@@ -123,21 +123,20 @@ a {
 }
 
 [data-amplify-authenticator] .google-container {
-    margin-left: auto;
-    margin-right: auto;
     padding: 1em 2em 0 2em;
-    width: 100%;
 }
 
 [data-amplify-authenticator] .or-divider {
-    margin-top: 1em;
+    margin-bottom: -1em;
     color: #BAC0BE;
     font-size: 14px;
 }
 
-[data-amplify-form] {
-    width: 100%;
-    max-width: 45em;
-    padding: 0 2em 0 2em !important;
+[data-amplify-authenticator-signin] {
+    padding-bottom: 0 !important;
+}
+
+[data-amplify-authenticator-signup] {
+    padding-bottom: 1rem !important;
 }
 

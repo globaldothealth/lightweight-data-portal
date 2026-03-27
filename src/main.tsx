@@ -14,6 +14,7 @@ import outputs from "../amplify_outputs.json";
 import {Divider, Typography, Grid} from "@mui/material";
 import {theme} from './theme/theme';
 import {ThemeProvider, StyledEngineProvider} from '@mui/material/styles';
+import GHLogo from "./components/GHLogo.tsx";
 
 
 if (import.meta.env.VITE_BUILD_ENV === 'prod') {
@@ -35,11 +36,8 @@ if (import.meta.env.VITE_BUILD_ENV === 'prod') {
 const components = {
     Header() {
         return (
-            <View textAlign="center" className='landing-page-header'>
-                <Typography variant="h1">
-                    The Global.health Data Portal
-                </Typography>
-                <br/>
+            <View className='landing-page-header'>
+                <GHLogo width={200} height={60}></GHLogo>
                 <Typography>
                     The Global.health Data Portal provides access to outbreak data to support researchers, public health teams, and the broader community in understanding and responding to emerging infectious diseases.
                 </Typography>
@@ -58,8 +56,7 @@ const components = {
 
         return (
             <View textAlign="center">
-                <br/>
-                <Grid container spacing={2}>
+                <Grid container spacing={2} sx={{p: '1rem'}}>
                     <Grid size={6}>
                         <a href="https://global.health/privacy/">Privacy Policy</a>
                     </Grid>

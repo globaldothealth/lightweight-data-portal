@@ -7,7 +7,8 @@ interface DataAcknowledgementsAccordionProps {
 
 export const DataAcknowledgementsAccordion = (props: DataAcknowledgementsAccordionProps) => {
     const [isOpen, setIsOpen] = useState(props.initialOpen);
-    return (<Accordion expanded={isOpen}>
+
+    return (<Accordion expanded={isOpen} onChange={() => setIsOpen(!isOpen)}>
         <AccordionSummary sx={{
             '& .Mui-expanded': {
                 m: '1.2rem 0 1.2rem 0',
@@ -17,10 +18,14 @@ export const DataAcknowledgementsAccordion = (props: DataAcknowledgementsAccordi
         }}>
             <Typography sx={{textAlign: 'justify'}}>By accessing or using the datasets, you acknowledge that
                 you have read, understood, and agreed
-                to comply with <Link onClick={(e) => {
-                    e.stopPropagation();
-                    setIsOpen(!isOpen)
-                }}>data handling terms.</Link></Typography>
+                to comply with <Link
+                    component="button"
+                    variant="body1"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setIsOpen(!isOpen)
+                    }}
+                >data handling terms.</Link></Typography>
         </AccordionSummary>
         <Typography sx={{textAlign: 'justify', p: '0 1rem 1rem 1rem', fontStyle: 'italic'}}>
             By accessing or downloading these datasets, you agree to handle the data responsibly and in
