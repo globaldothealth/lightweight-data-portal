@@ -20,7 +20,8 @@ export const DataAcknowledgementsAccordion = (props: DataAcknowledgementsAccordi
                 you have read, understood, and agreed
                 to comply with <Link
                     component="button"
-                    variant="body1"
+                    variant="inherit"
+                    sx={{ verticalAlign: 'baseline' }}
                     onClick={(e) => {
                         e.stopPropagation();
                         setIsOpen(!isOpen)
