@@ -6,7 +6,7 @@ vi.mock('aws-amplify/data', () => ({
     generateClient: vi.fn(),
 }));
 
-describe('DataDownloads Selectors', () => {
+describe('DengueGeodata Selectors', () => {
     const mockState = {
         dengueGeodata: {
             availableCountries: {Barbados: 'Barbados'},

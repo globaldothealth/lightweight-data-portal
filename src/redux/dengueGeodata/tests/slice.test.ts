@@ -7,7 +7,7 @@ vi.mock('aws-amplify/data', () => ({
     generateClient: vi.fn(),
 }));
 
-describe('DataDownloads Slice', () => {
+describe('DengueGeodata Slice', () => {
     const initialState = {
         isLoading: false,
         availableCountries: {},

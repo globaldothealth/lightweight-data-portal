@@ -21,7 +21,7 @@ vi.mock('../../../utils/amplifyClient', () => ({
     },
 }));
 
-describe('DataDownloads thunks', () => {
+describe('DengueGeodata thunks', () => {
     const mockDispatch = vi.fn();
     const mockGetState = vi.fn();
 
