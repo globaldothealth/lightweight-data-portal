@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {Accordion, AccordionSummary, Link, Typography} from "@mui/material";
+import {Button, Accordion, AccordionSummary, Link, Typography} from "@mui/material";
 
 interface DataAcknowledgementsAccordionProps {
     initialOpen: boolean;
@@ -19,9 +19,6 @@ export const DataAcknowledgementsAccordion = (props: DataAcknowledgementsAccordi
             <Typography sx={{textAlign: 'justify'}}>By accessing or using the datasets, you acknowledge that
                 you have read, understood, and agreed
                 to comply with <Link
-                    component="button"
-                    variant="inherit"
-                    sx={{ verticalAlign: 'baseline' }}
                     onClick={(e) => {
                         e.stopPropagation();
                         setIsOpen(!isOpen)
