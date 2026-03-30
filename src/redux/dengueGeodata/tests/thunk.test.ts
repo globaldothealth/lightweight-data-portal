@@ -34,9 +34,9 @@ describe('DengueGeodata thunks', () => {
     describe('getFilesFromMetadata', () => {
         const testFile1Name = 'file1.txt';
         const testFile2Name = 'file2.jpg';
-        const testFile1 = {filename: `public/test-folder/${testFile1Name}`, country: 'Barbados'};
-        const testFile2 = {filename: `public/test-folder/${testFile2Name}`, country: 'Brazil'};
-        const testFile3 = {filename: `public/test-folder/`, country: 'Brazil'};
+        const testFile1 = {filename: `test-folder/${testFile1Name}`, country: 'Barbados'};
+        const testFile2 = {filename: `test-folder/${testFile2Name}`, country: 'Brazil'};
+        const testFile3 = {filename: `test-folder/`, country: 'Brazil'};
 
         it('should fulfill with formatted files list', async () => {
             vi.mocked(downloadData).mockReturnValue({
@@ -116,7 +116,7 @@ describe('DengueGeodata thunks', () => {
 
     describe('handleDownload', () => {
         const mockUser = {email: 'user@example.com', id: '123'};
-        const payload = {s3FileKey: 'public/file.txt', user: mockUser};
+        const payload = {s3FileKey: 'file.txt', user: mockUser};
 
         it('should fulfill on successful download process for gh-data-downloads bucket', async () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

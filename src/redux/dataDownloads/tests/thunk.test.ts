@@ -32,9 +32,9 @@ describe('DataDownloads thunks', () => {
 
     describe('getFilesFromS3Folder', () => {
         const payload = {s3Folder: 'test-folder'};
-        const testFile1 = {filename: 'public/test-folder/file1.txt', name: 'file1.txt', size: '1 KB'};
-        const testFile2 = {filename: 'public/test-folder/file2.jpg', name: 'file2.jpg', size: '2 KB'};
-        const testFile3 = {filename: 'public/test-folder/'};
+        const testFile1 = {filename: 'test-folder/file1.txt', name: 'file1.txt', size: '1 KB'};
+        const testFile2 = {filename: 'test-folder/file2.jpg', name: 'file2.jpg', size: '2 KB'};
+        const testFile3 = {filename: 'test-folder/'};
 
         it('should fulfill with formatted files list', async () => {
             vi.mocked(list).mockResolvedValue({
@@ -83,7 +83,7 @@ describe('DataDownloads thunks', () => {
 
     describe('handleDownload', () => {
         const mockUser = {email: 'user@example.com', id: '123'};
-        const payload = {s3FileKey: 'public/file.txt', user: mockUser};
+        const payload = {s3FileKey: 'file.txt', user: mockUser};
 
         it('should fulfill on successful download process', async () => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

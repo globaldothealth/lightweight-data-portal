@@ -8,7 +8,7 @@ interface DataAcknowledgementsAccordionProps {
 export const DataAcknowledgementsAccordion = (props: DataAcknowledgementsAccordionProps) => {
     const [isOpen, setIsOpen] = useState(props.initialOpen);
 
-    return (<Accordion expanded={isOpen} onChange={() => setIsOpen(!isOpen)}>
+    return (<Accordion expanded={isOpen}>
         <AccordionSummary sx={{
             '& .Mui-expanded': {
                 m: '1.2rem 0 1.2rem 0',
