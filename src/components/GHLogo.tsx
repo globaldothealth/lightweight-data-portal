@@ -1,8 +1,13 @@
 import {JSX} from 'react';
 
-export default function GHLogo(): JSX.Element {
+interface GHLogoProps {
+    width?: number;
+    height?: number;
+}
+
+export default function GHLogo({width=140, height=40}: GHLogoProps): JSX.Element {
     return (
-        <svg width="140" height="40" version="1.1" viewBox="0 0 4324.1 1211" xmlSpace="preserve"
+        <svg width={width} height={height} version="1.1" viewBox="0 0 4324.1 1211" xmlSpace="preserve"
              xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
             <style>{`.st0 {fill:#221F1F; pointer-events: bounding-box;}
                      .st1{fill:#0E766A; pointer-events: bounding-box;}

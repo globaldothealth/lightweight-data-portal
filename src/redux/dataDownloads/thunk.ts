@@ -3,6 +3,7 @@ import {getUrl, list} from "aws-amplify/storage";
 import {S3File} from "./slice";
 import {UserProfile} from "../app/slice";
 import {client} from "../../utils/amplifyClient";
+import {formatBytes} from "../../utils/formatBytes.ts";
 
 export const getFilesFromS3Folder = createAsyncThunk<S3File[],
     { s3Folder: string },
@@ -10,10 +11,16 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
     'dataDownloads/getFilesFromS3Folder',
     async (data, {rejectWithValue}) => {
         try {
-            const result = await list({path: `public/${data.s3Folder}/`});
+            const result = await list({
+                path: data.s3Folder,
+                options: {
+                    bucket: 'gh-outbreak-data'
+                }
+            });
             const files: S3File[] = (result.items.map((file) => ({
                 filename: file.path,
                 name: file.path.split('/').pop() || '',
+                size: formatBytes(file.size || 0, 2),
             })).filter((file: { name: string; filename: string }) => file.name !== ''));
             if (files.length === 0) {
                 return rejectWithValue('No files found in the specified S3 folder.');
@@ -39,9 +46,9 @@ export const handleDownload = createAsyncThunk<void,
                 timestamp: new Date().toISOString(),
             });
 
-            const link = await getUrl({path: data.s3FileKey});
+            const link = await getUrl({path: data.s3FileKey, options: {bucket: 'gh-outbreak-data'}});
 
-            window.open(link.url.toString(), '_blank');
+            window.open(link.url.toString(), '_blank', 'noopener,noreferrer');
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : "An unknown error occurred";
             return rejectWithValue(`Error downloading file from S3: ${message}`);
