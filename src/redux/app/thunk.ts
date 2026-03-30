@@ -1,5 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {fetchUserAttributes, FetchUserAttributesOutput, signOut} from "aws-amplify/auth";
+import {fetchUserAttributes, FetchUserAttributesOutput, fetchAuthSession, signOut} from "aws-amplify/auth";
 import {UserProfile} from "./slice.ts";
 
 
@@ -7,10 +7,14 @@ export const getUserProfile = createAsyncThunk<UserProfile, void, { rejectValue:
     'app/getUserProfile',
     async (_, {rejectWithValue}) => {
         const {email, sub: id}: FetchUserAttributesOutput = await fetchUserAttributes()
+
+        const session = await fetchAuthSession();
+        const groups = (session.tokens?.accessToken?.payload['cognito:groups'] as string[]) || [];
+
         if (!email || !id) {
             return rejectWithValue("User profile data missing")
         }
-        return {email, id};
+        return {email, id, groups};
     },
 );
 

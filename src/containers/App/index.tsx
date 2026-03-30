@@ -12,15 +12,17 @@ import DataDownloads from "../DataDownloads";
 import DengueGeodata from "../DengueGeodata";
 import LocationAdminExplorer from "../LocationAdminExplorer";
 import Sidebar from "../../components/Sidebar";
-import {useAppDispatch} from '../../hooks/redux';
+import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {getUserProfile, logout} from "../../redux/app/thunk.ts";
 import GHLogo from "../../components/GHLogo.tsx";
+import {selectUserProfile} from "../../redux/app/selectors.ts";
 
 
 export default function App() {
     const dispatch = useAppDispatch();
     const [drawerOpen, setDrawerOpen] = useState(true);
     const location = useLocation();
+    const userProfile = useAppSelector(selectUserProfile);
 
     const drawerWidth = 240
 
@@ -42,13 +44,19 @@ export default function App() {
             text: 'Dengue Geodata',
             icon: <DengueGeodataIcon/>,
             to: '/dengue-geodata',
+            groups: ['ADMINS', 'CURATORS', 'JUNIOR-CURATORS', 'RESEARCHERS'],
         },
         {
             text: 'Location Admin Explorer',
             icon: <LocationAdminExplorerIcon/>,
             to: '/location-admin-explorer',
+            groups: ['ADMINS', 'CURATORS', 'JUNIOR-CURATORS', 'RESEARCHERS'],
         },
-    ], []);
+    ].filter(item => {
+        if (!item.groups) return true;
+        if (!userProfile?.groups) return false;
+        return item.groups.some(group => userProfile.groups.includes(group));
+    }), [userProfile]);
 
     const selectedMenuIndex = useMemo(() => menuList.findIndex((menuItem) => (
         menuItem.to === location.pathname
@@ -86,13 +94,19 @@ export default function App() {
                     <Toolbar/>
                     <Box sx={{ flexGrow: 1, p: '1rem', maxWidth: '45rem' }}>
                         <Routes>
-                            <Route path="/data-downloads" element={<DataDownloads/>}/>
-                            <Route path="/dengue-geodata" element={<DengueGeodata/>}/>
-                            <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
+                            {menuList.some(item => item.to === '/data-downloads') && (
+                                <Route path="/data-downloads" element={<DataDownloads/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/dengue-geodata') && (
+                                <Route path="/dengue-geodata" element={<DengueGeodata/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/location-admin-explorer') && (
+                                <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
+                            )}
                             <Route
                                 path="*"
                                 element={
-                                    <Navigate to='/data-downloads' replace/>
+                                    <Navigate to={menuList.length > 0 ? menuList[0].to : '/data-downloads'} replace/>
                                 }
                             />
                         </Routes>

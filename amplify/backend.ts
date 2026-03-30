@@ -22,19 +22,26 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
   })
 );
 
-backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
-    new PolicyStatement({
-      actions: ['s3:GetObject', 's3:ListBucket'],
-      resources: [`arn:aws:s3:::${ghDataDownloadsBucketName}`, `arn:aws:s3:::${ghDataDownloadsBucketName}/*`],
-    })
-);
-
-backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
-  new PolicyStatement({
-    actions: ['s3:GetObject', 's3:ListBucket'],
-    resources: [`arn:aws:s3:::${globalDengueForecastingBucketName}`, `arn:aws:s3:::${globalDengueForecastingBucketName}/*`],
-  })
-);
+["ADMINS", "CURATORS", "JUNIOR-CURATORS", "RESEARCHERS"].forEach(group => {
+    backend.auth.resources.groups[group].role.addToPrincipalPolicy(
+        new PolicyStatement({
+            actions: ['s3:GetObject', 's3:ListBucket'],
+            resources: [`arn:aws:s3:::${ghOutbreakData}`, `arn:aws:s3:::${ghOutbreakData}/*`],
+        })
+    );
+    backend.auth.resources.groups[group].role.addToPrincipalPolicy(
+        new PolicyStatement({
+            actions: ['s3:GetObject', 's3:ListBucket'],
+            resources: [`arn:aws:s3:::${ghDataDownloadsBucketName}`, `arn:aws:s3:::${ghDataDownloadsBucketName}/*`],
+        })
+    );
+    backend.auth.resources.groups[group].role.addToPrincipalPolicy(
+        new PolicyStatement({
+            actions: ['s3:GetObject', 's3:ListBucket'],
+            resources: [`arn:aws:s3:::${globalDengueForecastingBucketName}`, `arn:aws:s3:::${globalDengueForecastingBucketName}/*`],
+        })
+    );
+});
 
 backend.addOutput({
   storage: {

@@ -64,7 +64,7 @@ describe('App Container', () => {
     beforeEach(() => {
         vi.mocked(reduxHooks.useAppDispatch).mockReturnValue(mockDispatch);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        vi.mocked(reduxHooks.useAppSelector).mockReturnValue({id: 'test-id', email: 'test@example.com'} as any);
+        vi.mocked(reduxHooks.useAppSelector).mockReturnValue({id: 'test-id', email: 'test@example.com', groups: ['ADMINS']} as any);
 
         mockDispatch.mockClear();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -131,5 +131,35 @@ describe('App Container', () => {
         expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({type: 'mock-logout'}));
         expect(logout).toHaveBeenCalled();
     });
-});
 
+    describe('when user has no groups', () => {
+        beforeEach(() => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            vi.mocked(reduxHooks.useAppSelector).mockReturnValue({id: 'test-id', email: 'test@example.com', groups: []} as any);
+        });
+
+        it('only renders container with no group requirements and passes correct menu index', () => {
+            render(
+                <MemoryRouter initialEntries={['/data-downloads']}>
+                    <App/>
+                </MemoryRouter>
+            );
+
+            expect(screen.getByTestId('data-downloads')).toBeInTheDocument();
+            expect(screen.getByTestId('selected-menu-index')).toHaveTextContent('0');
+        });
+
+        it('redirects unauthorized paths to the first available allowed menu item', () => {
+            render(
+                <MemoryRouter initialEntries={['/dengue-geodata']}>
+                    <App/>
+                </MemoryRouter>
+            );
+
+            // unauthorized path should redirect to /data-downloads since it's the first available item
+            expect(screen.getByTestId('data-downloads')).toBeInTheDocument();
+            expect(screen.queryByTestId('dengue-geodata')).not.toBeInTheDocument();
+            expect(screen.getByTestId('selected-menu-index')).toHaveTextContent('0');
+        });
+    });
+});

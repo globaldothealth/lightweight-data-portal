@@ -30,5 +30,6 @@ export const auth = defineAuth({
     triggers: {
         postConfirmation,
         postAuthentication
-    }
+    },
+    groups: ["ADMINS", "CURATORS", "JUNIOR-CURATORS", "RESEARCHERS"],
 });

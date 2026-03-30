@@ -4,6 +4,7 @@ import {getUserProfile, logout} from './thunk';
 export interface UserProfile {
     email: string;
     id: string;
+    groups: string[]
 }
 
 interface AppState {
