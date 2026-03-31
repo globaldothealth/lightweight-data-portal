@@ -4,12 +4,14 @@ import {
     Menu as MenuIcon,
     BrowserUpdated as OutbreakDataIcon,
     Public as LocationAdminExplorerIcon,
-    Satellite as DengueGeodataIcon
+    Satellite as DengueGeodataIcon,
+    People as PeopleIcon,
 } from '@mui/icons-material';
 import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography} from '@mui/material';
 
 import DataDownloads from "../DataDownloads";
 import DengueGeodata from "../DengueGeodata";
+import ManageUsers from "../ManageUsers";
 import LocationAdminExplorer from "../LocationAdminExplorer";
 import Sidebar from "../../components/Sidebar";
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
@@ -50,7 +52,13 @@ export default function App() {
             text: 'Location Admin Explorer',
             icon: <LocationAdminExplorerIcon/>,
             to: '/location-admin-explorer',
-            groups: ['ADMINS', 'CURATORS', 'JUNIOR-CURATORS', 'RESEARCHERS'],
+            groups: ['ADMINS', 'CURATORS', 'JUNIOR-CURATORS'],
+        },
+        {
+            text: 'Manage Users',
+            icon: <PeopleIcon/>,
+            to: '/manage-users',
+            groups: ['ADMINS'],
         },
     ].filter(item => {
         if (!item.groups) return true;
@@ -102,6 +110,9 @@ export default function App() {
                             )}
                             {menuList.some(item => item.to === '/location-admin-explorer') && (
                                 <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/manage-users') && (
+                                <Route path="/manage-users" element={<ManageUsers/>}/>
                             )}
                             <Route
                                 path="*"

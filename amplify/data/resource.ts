@@ -1,6 +1,9 @@
 import {type ClientSchema, a, defineData} from "@aws-amplify/backend";
 import {postConfirmation} from "../auth/post-confirmation/resource";
 import {postAuthentication} from "../auth/post-authentication/resource";
+import {addUserToGroup} from "./add-user-to-group/resource";
+import {removeUserFromGroup} from "./remove-user-from-group/resource";
+
 
 const schema = a
     .schema({
@@ -23,6 +26,24 @@ const schema = a
             .authorization((allow) => [
                 allow.ownerDefinedIn("userId"),
             ]),
+        addUserToGroup: a
+            .mutation()
+            .arguments({
+                userId: a.string().required(),
+                groupName: a.string().required(),
+            })
+            .authorization((allow) => [allow.group("ADMINS")])
+            .handler(a.handler.function(addUserToGroup))
+            .returns(a.json()),
+        removeUserFromGroup: a
+            .mutation()
+            .arguments({
+                userId: a.string().required(),
+                groupName: a.string().required(),
+            })
+            .authorization((allow) => [allow.group("ADMINS")])
+            .handler(a.handler.function(removeUserFromGroup))
+            .returns(a.json())
     })
     .authorization((allow) => [allow.resource(postConfirmation), allow.resource(postAuthentication)]);
 export type Schema = ClientSchema<typeof schema>;

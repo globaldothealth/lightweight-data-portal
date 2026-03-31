@@ -22,6 +22,18 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
   })
 );
 
+backend.auth.resources.groups["ADMINS"].role.addToPrincipalPolicy(
+  new PolicyStatement({
+    actions: [
+      'cognito-idp:ListUsers',
+      'cognito-idp:AdminListGroupsForUser',
+      'cognito-idp:AdminAddUserToGroup',
+      'cognito-idp:AdminRemoveUserFromGroup'
+    ],
+    resources: [backend.auth.resources.userPool.userPoolArn],
+  })
+);
+
 ["ADMINS", "CURATORS", "JUNIOR-CURATORS", "RESEARCHERS"].forEach(group => {
     backend.auth.resources.groups[group].role.addToPrincipalPolicy(
         new PolicyStatement({
