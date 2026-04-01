@@ -166,6 +166,8 @@ const ManageUsers = () => {
                                         <Tooltip title={tooltipText}>
                                 <span>
                                 <IconButton
+                                    data-testid={`delete-user-${rowData.id}`}
+                                    aria-label={tooltipText}
                                     onClick={() => setUserSelectedToBeDeleted(rowData)}
                                     disabled={isAdmin || isUserSelf}
                                 >
