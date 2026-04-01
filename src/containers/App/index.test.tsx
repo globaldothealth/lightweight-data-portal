@@ -17,6 +17,12 @@ const containerList = [
         path: '/location-admin-explorer',
         id: 'location-admin-explorer',
         expectedIndex: '2'
+    },
+    {
+        containerName: 'ManageUsers',
+        path: '/manage-users',
+        id: 'manage-users',
+        expectedIndex: '3'
     }
 ];
 
