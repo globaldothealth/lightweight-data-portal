@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {getUsers, addUserToGroup, removeUserFromGroup} from './thunk';
+import {getUsers, addUserToGroup, deleteUser, removeUserFromGroup} from './thunk';
 
 export enum Groups {
     ADMINS = 'ADMINS',
@@ -82,6 +82,18 @@ const manageUsersSlice = createSlice({
         });
         builder.addCase(removeUserFromGroup.rejected, (state, action) => {
             state.error = action.payload;
+            state.isLoading = false;
+        });
+        builder.addCase(deleteUser.pending, (state) => {
+            state.error = undefined;
+            state.isLoading = true;
+        });
+        builder.addCase(deleteUser.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.users =  state.users.filter(user => user.id !== action.payload);
+        });
+        builder.addCase(deleteUser.rejected, (state, action) => {
+            state.error = action.payload as string | undefined;
             state.isLoading = false;
         });
     },

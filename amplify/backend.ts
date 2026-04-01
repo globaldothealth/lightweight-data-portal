@@ -28,7 +28,8 @@ backend.auth.resources.groups["ADMINS"].role.addToPrincipalPolicy(
       'cognito-idp:ListUsers',
       'cognito-idp:AdminListGroupsForUser',
       'cognito-idp:AdminAddUserToGroup',
-      'cognito-idp:AdminRemoveUserFromGroup'
+      'cognito-idp:AdminRemoveUserFromGroup',
+      'cognito-idp:AdminDeleteUser'
     ],
     resources: [backend.auth.resources.userPool.userPoolArn],
   })

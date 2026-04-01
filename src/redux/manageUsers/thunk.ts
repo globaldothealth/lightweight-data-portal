@@ -1,9 +1,10 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {User, Groups} from "./slice";
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { CognitoIdentityProviderClient, ListUsersCommand, AdminListGroupsForUserCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoIdentityProviderClient, ListUsersCommand, AdminListGroupsForUserCommand, AdminDeleteUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import config from '../../../amplify_outputs.json';
 import {client} from "../../utils/amplifyClient";
+import {RootState} from "../store";
 
 export const getUsers = createAsyncThunk<User[],
     undefined,
@@ -29,7 +30,6 @@ export const getUsers = createAsyncThunk<User[],
 
             const usersWithGroups: User[] = [];
             for (const u of Users || []) {
-                console.log(u)
                 const email = u.Attributes?.find(a => a.Name === 'email')?.Value || '';
                 const id = u.Attributes?.find(a => a.Name === 'sub')?.Value || '';
 
@@ -84,5 +84,39 @@ export const removeUserFromGroup = createAsyncThunk<{ userId: string, groupName:
         }
         catch (error: unknown) {
             return rejectWithValue(error instanceof Error ? error.message : 'Failed to remove user from group');
+        }
+    });
+
+export const deleteUser = createAsyncThunk<string,
+    string,
+    { rejectValue: string }>(
+    'manageUsers/deleteUser',
+    async (userId, {getState, rejectWithValue}) => {
+        try {
+            const state = getState() as RootState;
+            const user = state.manageUsers.users.find((u: User) => u.id === userId);
+
+            if (user?.groups.includes(Groups.ADMINS)) {
+                return rejectWithValue('Cannot delete an admin user');
+            }
+
+            const session = await fetchAuthSession();
+            if (!session.credentials) {
+                return rejectWithValue('No credentials');
+            }
+
+            const cognitoClient = new CognitoIdentityProviderClient({
+                region: config.auth.aws_region,
+                credentials: session.credentials
+            });
+
+            await cognitoClient.send(new AdminDeleteUserCommand({
+                UserPoolId: config.auth.user_pool_id,
+                Username: userId,
+            }));
+
+            return userId;
+        } catch (error: unknown) {
+            return rejectWithValue(error instanceof Error ? error.message : 'Failed to delete user');
         }
     });
