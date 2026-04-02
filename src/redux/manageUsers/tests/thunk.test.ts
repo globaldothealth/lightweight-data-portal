@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {vi, describe, it, expect, beforeEach} from 'vitest';
 import {getUsers, addUserToGroup, removeUserFromGroup, deleteUser} from '../thunk';
 import {fetchAuthSession} from 'aws-amplify/auth';
@@ -29,6 +28,7 @@ vi.mock('../../../utils/amplifyClient', () => ({
         mutations: {
             addUserToGroup: vi.fn(),
             removeUserFromGroup: vi.fn(),
+            deleteUser: vi.fn(),
         }
     }
 }));
@@ -54,7 +54,7 @@ describe('ManageUsers thunks', () => {
 
     describe('getUsers', () => {
         it('should fulfill with users on successful fetch', async () => {
-            vi.mocked(fetchAuthSession).mockResolvedValue({credentials: mockCredentials} as any);
+            vi.mocked(fetchAuthSession).mockResolvedValue({credentials: mockCredentials} as never);
 
             mockSend
                 .mockResolvedValueOnce({
@@ -80,7 +80,7 @@ describe('ManageUsers thunks', () => {
         });
 
         it('should reject when no credentials', async () => {
-            vi.mocked(fetchAuthSession).mockResolvedValue({credentials: undefined} as any);
+            vi.mocked(fetchAuthSession).mockResolvedValue({credentials: undefined} as never);
 
             const result = await getUsers()(mockDispatch, vi.fn(), undefined);
 
@@ -91,7 +91,7 @@ describe('ManageUsers thunks', () => {
 
     describe('addUserToGroup', () => {
         it('should fulfill on successful addition', async () => {
-            vi.mocked(client.mutations.addUserToGroup).mockResolvedValue({} as any);
+            vi.mocked(client.mutations.addUserToGroup).mockResolvedValue({} as never);
 
             const data = {userId: user1Id, groupName: Groups.ADMINS};
             const result = await addUserToGroup(data)(mockDispatch, vi.fn(), undefined);
@@ -114,7 +114,7 @@ describe('ManageUsers thunks', () => {
 
     describe('removeUserFromGroup', () => {
         it('should fulfill on successful removal', async () => {
-            vi.mocked(client.mutations.removeUserFromGroup).mockResolvedValue({} as any);
+            vi.mocked(client.mutations.removeUserFromGroup).mockResolvedValue({} as never);
 
             const data = {userId: user1Id, groupName: Groups.ADMINS};
             const result = await removeUserFromGroup(data)(mockDispatch, vi.fn(), undefined);
@@ -143,14 +143,13 @@ describe('ManageUsers thunks', () => {
                 }
             });
 
-            vi.mocked(fetchAuthSession).mockResolvedValue({credentials: mockCredentials} as any);
-
-            mockSend.mockResolvedValueOnce({});
+            vi.mocked(client.mutations.deleteUser).mockResolvedValue({} as never);
 
             const result = await deleteUser(user1Id)(mockDispatch, mockGetState, undefined);
 
             expect(result.meta.requestStatus).toBe('fulfilled');
             expect(result.payload).toBe(user1Id);
+            expect(client.mutations.deleteUser).toHaveBeenCalledWith({userId: user1Id});
         });
 
         it('should reject when deleting admin', async () => {

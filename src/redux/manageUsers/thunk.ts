@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {User, Groups} from "./slice";
 import { fetchAuthSession } from 'aws-amplify/auth';
-import { CognitoIdentityProviderClient, ListUsersCommand, AdminListGroupsForUserCommand, AdminDeleteUserCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoIdentityProviderClient, ListUsersCommand, AdminListGroupsForUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import config from '../../../amplify_outputs.json';
 import {client} from "../../utils/amplifyClient";
 import {RootState} from "../store";
@@ -100,20 +100,9 @@ export const deleteUser = createAsyncThunk<string,
                 return rejectWithValue('Cannot delete an admin user');
             }
 
-            const session = await fetchAuthSession();
-            if (!session.credentials) {
-                return rejectWithValue('No credentials');
-            }
-
-            const cognitoClient = new CognitoIdentityProviderClient({
-                region: config.auth.aws_region,
-                credentials: session.credentials
+            await client.mutations.deleteUser({
+                userId: userId,
             });
-
-            await cognitoClient.send(new AdminDeleteUserCommand({
-                UserPoolId: config.auth.user_pool_id,
-                Username: userId,
-            }));
 
             return userId;
         } catch (error: unknown) {

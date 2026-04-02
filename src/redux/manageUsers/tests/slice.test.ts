@@ -40,9 +40,10 @@ describe('ManageUsers Slice', () => {
     });
 
     describe('addUserToGroup', () => {
+        const user1Id = '1';
         const initialStateWithUsers = {
             isLoading: false,
-            users: [{ id: '1', email: 'test@test.com', groups: [] }],
+            users: [{ id: user1Id, email: 'test1@test.com', groups: [] }, { id: '2', email: 'test2@test.com', groups: [] }],
             error: undefined,
         };
 
@@ -54,7 +55,7 @@ describe('ManageUsers Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const action = { type: addUserToGroup.fulfilled.type, payload: { userId: '1', groupName: Groups.ADMINS } };
+            const action = { type: addUserToGroup.fulfilled.type, payload: { userId: user1Id, groupName: Groups.ADMINS } };
             const state = manageUsersReducer({ ...initialStateWithUsers, isLoading: true }, action);
             expect(state.isLoading).toBe(false);
             expect(state.users[0].groups).toContain(Groups.ADMINS);
@@ -70,9 +71,10 @@ describe('ManageUsers Slice', () => {
     });
 
     describe('removeUserFromGroup', () => {
+        const user1Id = '1';
         const initialStateWithGroup = {
             isLoading: false,
-            users: [{ id: '1', email: 'test@test.com', groups: [Groups.ADMINS] }],
+            users: [{ id: user1Id, email: 'test1@test.com', groups: [Groups.ADMINS] }, { id: '2', email: 'test2@test.com', groups: [Groups.ADMINS] }],
             error: undefined,
         };
 
@@ -84,7 +86,7 @@ describe('ManageUsers Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const action = { type: removeUserFromGroup.fulfilled.type, payload: { userId: '1', groupName: Groups.ADMINS } };
+            const action = { type: removeUserFromGroup.fulfilled.type, payload: { userId: user1Id, groupName: Groups.ADMINS } };
             const state = manageUsersReducer({ ...initialStateWithGroup, isLoading: true }, action);
             expect(state.isLoading).toBe(false);
             expect(state.users[0].groups).not.toContain(Groups.ADMINS);

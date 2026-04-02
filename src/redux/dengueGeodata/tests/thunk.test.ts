@@ -2,6 +2,7 @@ import {vi, describe, it, expect, beforeEach} from 'vitest';
 import {getFilesFromMetadata, handleDownload} from '../thunk.ts';
 import {getUrl, downloadData} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
+import {Groups, User } from "../../manageUsers/slice.ts";
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
@@ -45,7 +46,7 @@ describe('DengueGeodata thunks', () => {
                         text: async () => JSON.stringify([testFile1, testFile2, testFile3]),
                     },
                 }),
-            } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+            } as never);
 
             const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
 
@@ -64,7 +65,7 @@ describe('DengueGeodata thunks', () => {
                         text: async () => JSON.stringify([]),
                     },
                 }),
-            } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+            } as never);
 
             const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
 
@@ -88,7 +89,7 @@ describe('DengueGeodata thunks', () => {
                         text: async () => undefined,
                     },
                 }),
-            } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+            } as never);
 
             const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
 
@@ -103,7 +104,7 @@ describe('DengueGeodata thunks', () => {
                         text: () => Promise.reject('Just a string error'),
                     },
                 }),
-            } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+            } as never);
 
             const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
 
@@ -115,12 +116,11 @@ describe('DengueGeodata thunks', () => {
     });
 
     describe('handleDownload', () => {
-        const mockUser = {email: 'user@example.com', id: '123'};
+        const mockUser: User = {email: 'user@example.com', id: '123', groups: [Groups.RESEARCHERS]};
         const payload = {s3FileKey: 'file.txt', user: mockUser};
 
         it('should fulfill on successful download process for gh-data-downloads bucket', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({data: {}} as any);
+            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({data: {}} as never);
             vi.mocked(getUrl).mockResolvedValue({url: new URL('http://mock.url/file.txt'), expiresAt: new Date()});
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
@@ -138,8 +138,7 @@ describe('DengueGeodata thunks', () => {
         });
 
         it('should fulfill on successful download process for global-dengue-forecasting', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({data: {}} as any);
+            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({data: {}} as never);
             vi.mocked(getUrl).mockResolvedValue({url: new URL('http://mock.url/file.txt'), expiresAt: new Date()});
             const payloadOutputBucket = {s3FileKey: 'output/file.txt', user: mockUser};
 
@@ -181,8 +180,7 @@ describe('DengueGeodata thunks', () => {
         });
 
         it('should reject if getUrl fails', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({data: {}} as any);
+            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({data: {}} as never);
             vi.mocked(getUrl).mockRejectedValue(new Error('URL generation failed'));
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);

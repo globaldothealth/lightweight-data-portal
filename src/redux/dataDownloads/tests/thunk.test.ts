@@ -1,7 +1,8 @@
-import {vi, describe, it, expect, beforeEach} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {getFilesFromS3Folder, handleDownload} from '../thunk.ts';
-import {list, getUrl} from 'aws-amplify/storage';
+import {getUrl, list} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
+import {Groups, User} from "../../manageUsers/slice.ts";
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
@@ -43,7 +44,7 @@ describe('DataDownloads thunks', () => {
                     {path: testFile2.filename, size: 2000},
                     {path: testFile3.filename},
                 ]
-            } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+            } as never);
 
             const result = await getFilesFromS3Folder(payload)(mockDispatch, mockGetState, undefined);
 
@@ -82,12 +83,11 @@ describe('DataDownloads thunks', () => {
     });
 
     describe('handleDownload', () => {
-        const mockUser = {email: 'user@example.com', id: '123'};
+        const mockUser: User = {email: 'user@example.com', id: '123', groups: [Groups.RESEARCHERS]};
         const payload = {s3FileKey: 'file.txt', user: mockUser};
 
         it('should fulfill on successful download process', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({ data: {} } as any);
+            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({ data: {} } as never);
             vi.mocked(getUrl).mockResolvedValue({url: new URL('http://mock.url/file.txt'), expiresAt: new Date()});
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
@@ -125,8 +125,7 @@ describe('DataDownloads thunks', () => {
         });
 
         it('should reject if getUrl fails', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({ data: {} } as any);
+            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({ data: {} } as never);
             vi.mocked(getUrl).mockRejectedValue(new Error('URL generation failed'));
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);

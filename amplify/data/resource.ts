@@ -3,6 +3,7 @@ import {postConfirmation} from "../auth/post-confirmation/resource";
 import {postAuthentication} from "../auth/post-authentication/resource";
 import {addUserToGroup} from "./add-user-to-group/resource";
 import {removeUserFromGroup} from "./remove-user-from-group/resource";
+import {deleteUser} from "./delete-user/resource";
 
 
 const schema = a
@@ -43,7 +44,15 @@ const schema = a
             })
             .authorization((allow) => [allow.group("ADMINS")])
             .handler(a.handler.function(removeUserFromGroup))
-            .returns(a.json())
+            .returns(a.json()),
+        deleteUser: a
+            .mutation()
+            .arguments({
+                userId: a.string().required(),
+            })
+            .authorization((allow) => [allow.group("ADMINS")])
+            .handler(a.handler.function(deleteUser))
+            .returns(a.json()),
     })
     .authorization((allow) => [allow.resource(postConfirmation), allow.resource(postAuthentication)]);
 export type Schema = ClientSchema<typeof schema>;

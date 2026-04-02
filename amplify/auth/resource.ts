@@ -3,6 +3,7 @@ import {postConfirmation} from './post-confirmation/resource';
 import {postAuthentication} from './post-authentication/resource';
 import { addUserToGroup } from "../data/add-user-to-group/resource"
 import { removeUserFromGroup } from "../data/remove-user-from-group/resource"
+import { deleteUser } from "../data/delete-user/resource"
 
 export const auth = defineAuth({
     loginWith: {
@@ -37,6 +38,7 @@ export const auth = defineAuth({
 
     access: (allow) => [
         allow.resource(addUserToGroup).to(["addUserToGroup"]),
-        allow.resource(removeUserFromGroup).to(["removeUserFromGroup"])
+        allow.resource(removeUserFromGroup).to(["removeUserFromGroup"]),
+        allow.resource(deleteUser).to(["deleteUser"])
     ],
 });

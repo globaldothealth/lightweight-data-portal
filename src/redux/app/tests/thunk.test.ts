@@ -38,7 +38,7 @@ describe('App thunks', () => {
                         }
                     }
                 }
-            } as any);
+            } as never);
 
             const result = await getUserProfile()(mockDispatch, mockGetState, undefined);
 
@@ -58,7 +58,7 @@ describe('App thunks', () => {
                         payload: {}
                     }
                 }
-            } as any);
+            } as never);
 
             const result = await getUserProfile()(mockDispatch, mockGetState, undefined);
 
