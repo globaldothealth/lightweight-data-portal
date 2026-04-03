@@ -1,30 +1,14 @@
 import {vi, describe, it, expect, beforeEach} from 'vitest';
 import {getUsers, addUserToGroup, removeUserFromGroup, deleteUser} from '../thunk';
-import {fetchAuthSession} from 'aws-amplify/auth';
 import {client} from '../../../utils/amplifyClient';
 import {Groups} from '../slice';
 
-const mockSend = vi.fn();
-
-// Mock dependencies
-vi.mock('aws-amplify/auth', () => ({
-    fetchAuthSession: vi.fn(),
-}));
-
-vi.mock('@aws-sdk/client-cognito-identity-provider', () => ({
-    CognitoIdentityProviderClient: class {
-        send = mockSend;
-    },
-    ListUsersCommand: class {
-    },
-    AdminListGroupsForUserCommand: class {
-    },
-    AdminDeleteUserCommand: class {
-    },
-}));
 
 vi.mock('../../../utils/amplifyClient', () => ({
     client: {
+        queries: {
+            getUsers: vi.fn(),
+        },
         mutations: {
             addUserToGroup: vi.fn(),
             removeUserFromGroup: vi.fn(),
@@ -46,7 +30,6 @@ describe('ManageUsers thunks', () => {
     const mockDispatch = vi.fn();
     const user1Id = 'id1';
     const user1Email = 'email1@example.com';
-    const mockCredentials = {accessKeyId: 'test', secretAccessKey: 'test'}
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -54,38 +37,26 @@ describe('ManageUsers thunks', () => {
 
     describe('getUsers', () => {
         it('should fulfill with users on successful fetch', async () => {
-            vi.mocked(fetchAuthSession).mockResolvedValue({credentials: mockCredentials} as never);
-
-            mockSend
-                .mockResolvedValueOnce({
-                    Users: [
-                        {
-                            Username: 'user1',
-                            Attributes: [{Name: 'email', Value: user1Email}, {Name: 'sub', Value: user1Id}]
-                        }
-                    ]
-                })
-                .mockResolvedValueOnce({
-                    Groups: [{GroupName: Groups.ADMINS}]
-                });
+            const mockUsers = [{
+                id: user1Id,
+                email: user1Email,
+                groups: [Groups.ADMINS]
+            }];
+            vi.mocked(client.queries.getUsers).mockResolvedValue({data: JSON.stringify(mockUsers)} as never);
 
             const result = await getUsers()(mockDispatch, vi.fn(), undefined);
 
             expect(result.meta.requestStatus).toBe('fulfilled');
-            expect(result.payload).toEqual([{
-                id: user1Id,
-                email: user1Email,
-                groups: [Groups.ADMINS]
-            }]);
+            expect(result.payload).toEqual(mockUsers);
         });
 
-        it('should reject when no credentials', async () => {
-            vi.mocked(fetchAuthSession).mockResolvedValue({credentials: undefined} as never);
+        it('should reject when error occurs', async () => {
+            vi.mocked(client.queries.getUsers).mockRejectedValue(new Error('Failed to fetch users') as never);
 
             const result = await getUsers()(mockDispatch, vi.fn(), undefined);
 
             expect(result.meta.requestStatus).toBe('rejected');
-            expect(result.payload).toBe('No credentials');
+            expect(result.payload).toBe('Failed to fetch users');
         });
     });
 

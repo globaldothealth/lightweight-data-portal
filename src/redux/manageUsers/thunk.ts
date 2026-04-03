@@ -1,8 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {User, Groups} from "./slice";
-import { fetchAuthSession } from 'aws-amplify/auth';
-import { CognitoIdentityProviderClient, ListUsersCommand, AdminListGroupsForUserCommand } from '@aws-sdk/client-cognito-identity-provider';
-import config from '../../../amplify_outputs.json';
 import {client} from "../../utils/amplifyClient";
 import {RootState} from "../store";
 
@@ -12,41 +9,11 @@ export const getUsers = createAsyncThunk<User[],
     'manageUsers/getUsers',
     async (_, {rejectWithValue}) => {
         try {
-            const session = await fetchAuthSession();
-            if (!session.credentials) {
-                return rejectWithValue('No credentials');
-            }
+            const response = await client.queries.getUsers({});
+            const data = response.data;
+            const users = (typeof data === 'string' ? JSON.parse(data) : data) as User[];
 
-            const client = new CognitoIdentityProviderClient({
-                region: config.auth.aws_region,
-                credentials: session.credentials
-            });
-
-            const listUsersCommand = new ListUsersCommand({
-                UserPoolId: config.auth.user_pool_id,
-            });
-
-            const { Users } = await client.send(listUsersCommand);
-
-            const usersWithGroups: User[] = [];
-            for (const u of Users || []) {
-                const email = u.Attributes?.find(a => a.Name === 'email')?.Value || '';
-                const id = u.Attributes?.find(a => a.Name === 'sub')?.Value || '';
-
-                const groupResponse = await client.send(new AdminListGroupsForUserCommand({
-                    UserPoolId: config.auth.user_pool_id,
-                    Username: u.Username!,
-                }));
-                const groups = (groupResponse.Groups || []).map(g => g.GroupName as Groups);
-
-                usersWithGroups.push({
-                    id,
-                    email,
-                    groups
-                });
-            }
-
-            return usersWithGroups;
+            return users || [];
         } catch (error: unknown) {
             return rejectWithValue(error instanceof Error ? error.message : 'Failed to fetch users');
         }

@@ -4,6 +4,7 @@ import {postAuthentication} from "../auth/post-authentication/resource";
 import {addUserToGroup} from "./add-user-to-group/resource";
 import {removeUserFromGroup} from "./remove-user-from-group/resource";
 import {deleteUser} from "./delete-user/resource";
+import {getUsers} from "./get-users/resource";
 
 
 const schema = a
@@ -52,6 +53,12 @@ const schema = a
             })
             .authorization((allow) => [allow.group("ADMINS")])
             .handler(a.handler.function(deleteUser))
+            .returns(a.json()),
+        getUsers: a
+            .query()
+            .arguments({})
+            .authorization((allow) => [allow.group("ADMINS")])
+            .handler(a.handler.function(getUsers))
             .returns(a.json()),
     })
     .authorization((allow) => [allow.resource(postConfirmation), allow.resource(postAuthentication)]);
