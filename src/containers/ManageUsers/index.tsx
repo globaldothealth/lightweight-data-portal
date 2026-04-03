@@ -1,6 +1,7 @@
 import React, {useState, useEffect, JSX} from 'react';
 import {
     Alert,
+    Box,
     Button,
     Dialog,
     DialogActions,
@@ -49,12 +50,13 @@ const ManageUsers = () => {
         const addedGroups = newGroups.filter(g => !previousGroups.includes(g));
         const removedGroups = previousGroups.filter(g => !newGroups.includes(g));
 
-        if (addedGroups.length > 0) {
-            dispatch(addUserToGroup({userId, groupName: addedGroups[0]}));
-        }
-        if (removedGroups.length > 0) {
-            dispatch(removeUserFromGroup({userId, groupName: removedGroups[0]}));
-        }
+        addedGroups.forEach(groupName => {
+            dispatch(addUserToGroup({userId, groupName}));
+        });
+
+        removedGroups.forEach(groupName => {
+            dispatch(removeUserFromGroup({userId, groupName}));
+        });
     };
 
 
@@ -68,7 +70,7 @@ const ManageUsers = () => {
                     <Typography sx={{mb: '.5rem'}}>On this page G.h admins can add users to groups and delete user
                         accounts.</Typography>
                     <Typography>There are three levels of permission available in the app:</Typography>
-                    <Typography component='ul'>
+                    <Box component='ul' sx={{mt: 0}}>
                     <Typography component='li'>
                         <strong>Visitor</strong> - user without any group assigned. This user can only view the Outbreak
                         Data page.
@@ -84,8 +86,8 @@ const ManageUsers = () => {
                     <Typography component='li'>
                         <strong>Admin</strong> - user assigned to <i>ADMINS</i> group. This user can view the all of the pages.
                     </Typography>
-                    </Typography>
-                    <Typography sx={{mt: '.5rem'}}>User cannot remove their own account. Additionally in order to delete
+                    </Box>
+                    <Typography>User cannot remove their own account. Additionally in order to delete
                         user account that belongs to <i>ADMINS</i> they must first be removed from
                         the <i>ADMINS</i> group.</Typography>
                 </Paper>
@@ -115,8 +117,10 @@ const ManageUsers = () => {
                                 Cancel
                             </Button>
                             <Button onClick={() => {
+                                const userIdToDelete = userSelectedToBeDeleted?.id;
+                                if (!userIdToDelete) return;
                                 clearUserSelectedToBeDeleted();
-                                dispatch(deleteUser(userSelectedToBeDeleted?.id || ''))
+                                dispatch(deleteUser(userIdToDelete));
                             }} color="primary" variant='contained'>
                                 Yes
                             </Button>

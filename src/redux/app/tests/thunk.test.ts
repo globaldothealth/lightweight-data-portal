@@ -1,13 +1,20 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { getUserProfile, logout } from '../thunk.ts';
-import { fetchUserAttributes, fetchAuthSession, signOut } from 'aws-amplify/auth';
+import { signOut } from 'aws-amplify/auth';
 import { UserProfile } from "../slice.ts";
+import { client } from "../../../utils/amplifyClient";
 
 // Mock dependencies
 vi.mock('aws-amplify/auth', () => ({
-    fetchUserAttributes: vi.fn(),
-    fetchAuthSession: vi.fn(),
     signOut: vi.fn()
+}));
+
+vi.mock('../../../utils/amplifyClient', () => ({
+    client: {
+        queries: {
+            getUserProfile: vi.fn()
+        }
+    }
 }));
 
 describe('App thunks', () => {
@@ -26,39 +33,19 @@ describe('App thunks', () => {
 
     describe('getUserProfile', () => {
         it('should fulfill with user profile on successful fetch', async () => {
-            const mockAttributes = { email: testUP.email, sub: testUP.id };
-            vi.mocked(fetchUserAttributes).mockResolvedValue(mockAttributes);
-
-            // Mock the auth session containing the cognito groups
-            vi.mocked(fetchAuthSession).mockResolvedValue({
-                tokens: {
-                    accessToken: {
-                        payload: {
-                            'cognito:groups': testUP.groups,
-                        }
-                    }
-                }
+            vi.mocked(client.queries.getUserProfile).mockResolvedValue({
+                data: JSON.stringify(testUP)
             } as never);
 
             const result = await getUserProfile()(mockDispatch, mockGetState, undefined);
 
             expect(result.meta.requestStatus).toBe('fulfilled');
             expect(result.payload).toEqual(testUP);
-            expect(fetchUserAttributes).toHaveBeenCalledTimes(1);
-            expect(fetchAuthSession).toHaveBeenCalledTimes(1);
+            expect(client.queries.getUserProfile).toHaveBeenCalledTimes(1);
         });
 
-        it('should reject with correct error message when email or sub is missing', async () => {
-            vi.mocked(fetchUserAttributes).mockResolvedValue({ email: testUP.email });
-
-            // Allow fetchAuthSession to succeed so the thunk reaches the missing email/sub check
-            vi.mocked(fetchAuthSession).mockResolvedValue({
-                tokens: {
-                    accessToken: {
-                        payload: {}
-                    }
-                }
-            } as never);
+        it('should reject with correct error message when fetch fails', async () => {
+            vi.mocked(client.queries.getUserProfile).mockRejectedValue(new Error('User profile data missing'));
 
             const result = await getUserProfile()(mockDispatch, mockGetState, undefined);
 

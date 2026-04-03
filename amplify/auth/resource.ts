@@ -5,6 +5,7 @@ import { addUserToGroup } from "../data/add-user-to-group/resource"
 import { removeUserFromGroup } from "../data/remove-user-from-group/resource"
 import { deleteUser } from "../data/delete-user/resource"
 import { getUsers } from "../data/get-users/resource"
+import { getUserProfile } from "../data/get-user-profile/resource"
 
 export const auth = defineAuth({
     loginWith: {
@@ -43,5 +44,7 @@ export const auth = defineAuth({
         allow.resource(deleteUser).to(["deleteUser"]),
         allow.resource(getUsers).to(["listUsers"]),
         allow.resource(getUsers).to(["listGroupsForUser"]),
+        allow.resource(getUserProfile).to(["getUser"]),
+        allow.resource(getUserProfile).to(["listGroupsForUser"]),
     ],
 });

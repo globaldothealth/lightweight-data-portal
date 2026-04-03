@@ -5,6 +5,7 @@ import {addUserToGroup} from "./add-user-to-group/resource";
 import {removeUserFromGroup} from "./remove-user-from-group/resource";
 import {deleteUser} from "./delete-user/resource";
 import {getUsers} from "./get-users/resource";
+import {getUserProfile} from "./get-user-profile/resource";
 
 
 const schema = a
@@ -59,6 +60,12 @@ const schema = a
             .arguments({})
             .authorization((allow) => [allow.group("ADMINS")])
             .handler(a.handler.function(getUsers))
+            .returns(a.json()),
+        getUserProfile: a
+            .query()
+            .arguments({})
+            .authorization((allow) => [allow.authenticated()])
+            .handler(a.handler.function(getUserProfile))
             .returns(a.json()),
     })
     .authorization((allow) => [allow.resource(postConfirmation), allow.resource(postAuthentication)]);
