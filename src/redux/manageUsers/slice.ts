@@ -54,7 +54,9 @@ const manageUsersSlice = createSlice({
                 if (user.id === action.payload.userId) {
                     return {
                         ...user,
-                        groups: [...user.groups, action.payload.groupName],
+                        groups: user.groups.includes(action.payload.groupName)
+                            ? user.groups
+                            : [...user.groups, action.payload.groupName],
                     };
                 }
                 return user;
