@@ -4,7 +4,6 @@ import {getUsers, addUserToGroup, deleteUser, removeUserFromGroup} from './thunk
 export enum Groups {
     ADMINS = 'ADMINS',
     CURATORS = 'CURATORS',
-    JUNIOR_CURATORS = 'JUNIOR-CURATORS',
     RESEARCHERS = 'RESEARCHERS',
 }
 

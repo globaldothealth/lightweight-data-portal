@@ -80,7 +80,7 @@ const ManageUsers = () => {
                         Data</i> and <i>Dengue Geodata</i> pages.
                     </Typography>
                     <Typography component='li'>
-                        <strong>Curator/Junior Curator</strong> - user assigned to <i>CURATORS</i> or <i>JUNIOR-CURATORS</i> group. This user can view the <i>Outbreak
+                        <strong>Curator</strong> - user assigned to <i>CURATORS</i> group. This user can view the <i>Outbreak
                         Data</i>, <i>Dengue Geodata</i> and <i>Location Admin Explorer</i> pages.
                     </Typography>
                     <Typography component='li'>

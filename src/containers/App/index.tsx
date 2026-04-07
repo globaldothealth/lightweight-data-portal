@@ -46,13 +46,13 @@ export default function App() {
             text: 'Dengue Geodata',
             icon: <DengueGeodataIcon/>,
             to: '/dengue-geodata',
-            groups: ['ADMINS', 'CURATORS', 'JUNIOR-CURATORS', 'RESEARCHERS'],
+            groups: ['ADMINS', 'CURATORS', 'RESEARCHERS'],
         },
         {
             text: 'Location Admin Explorer',
             icon: <LocationAdminExplorerIcon/>,
             to: '/location-admin-explorer',
-            groups: ['ADMINS', 'CURATORS', 'JUNIOR-CURATORS'],
+            groups: ['ADMINS', 'CURATORS'],
         },
         {
             text: 'Manage Users',

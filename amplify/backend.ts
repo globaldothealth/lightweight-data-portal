@@ -35,7 +35,7 @@ backend.auth.resources.groups["ADMINS"].role.addToPrincipalPolicy(
   })
 );
 
-["ADMINS", "CURATORS", "JUNIOR-CURATORS", "RESEARCHERS"].forEach(group => {
+["ADMINS", "CURATORS", "RESEARCHERS"].forEach(group => {
     backend.auth.resources.groups[group].role.addToPrincipalPolicy(
         new PolicyStatement({
             actions: ['s3:GetObject', 's3:ListBucket'],
