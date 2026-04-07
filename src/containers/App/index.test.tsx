@@ -5,6 +5,7 @@ import {MemoryRouter} from 'react-router-dom';
 
 import * as reduxHooks from '../../hooks/redux';
 import {getUserProfile, logout} from '../../redux/app/thunk';
+import {selectUserProfile, selectIsLoading} from '../../redux/app/selectors';
 
 
 // Update this list with new containers and their expected menu index after adding new containers to App.tsx.
@@ -70,7 +71,11 @@ describe('App Container', () => {
     beforeEach(() => {
         vi.mocked(reduxHooks.useAppDispatch).mockReturnValue(mockDispatch);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        vi.mocked(reduxHooks.useAppSelector).mockReturnValue({id: 'test-id', email: 'test@example.com', groups: ['ADMINS']} as any);
+        vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector: any) => {
+            if (selector === selectUserProfile) return {id: 'test-id', email: 'test@example.com', groups: ['ADMINS']};
+            if (selector === selectIsLoading) return false;
+            return undefined;
+        });
 
         mockDispatch.mockClear();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -141,7 +146,11 @@ describe('App Container', () => {
     describe('when user has no groups', () => {
         beforeEach(() => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            vi.mocked(reduxHooks.useAppSelector).mockReturnValue({id: 'test-id', email: 'test@example.com', groups: []} as any);
+            vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector: any) => {
+                if (selector === selectUserProfile) return {id: 'test-id', email: 'test@example.com', groups: []};
+                if (selector === selectIsLoading) return false;
+                return undefined;
+            });
         });
 
         it('only renders container with no group requirements and passes correct menu index', () => {

@@ -7,7 +7,7 @@ import {
     Satellite as DengueGeodataIcon,
     People as PeopleIcon,
 } from '@mui/icons-material';
-import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography} from '@mui/material';
+import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography, CircularProgress, Paper} from '@mui/material';
 
 import DataDownloads from "../DataDownloads";
 import DengueGeodata from "../DengueGeodata";
@@ -18,6 +18,7 @@ import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {getUserProfile, logout} from "../../redux/app/thunk.ts";
 import GHLogo from "../../components/GHLogo.tsx";
 import {selectUserProfile} from "../../redux/app/selectors.ts";
+import {selectIsLoading} from "../../redux/app/selectors.ts";
 
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
     const [drawerOpen, setDrawerOpen] = useState(true);
     const location = useLocation();
     const userProfile = useAppSelector(selectUserProfile);
+    const isLoading = useAppSelector(selectIsLoading);
 
     const drawerWidth = 240
 
@@ -101,6 +103,7 @@ export default function App() {
                 }}>
                     <Toolbar/>
                     <Box sx={{ flexGrow: 1, p: '1rem', maxWidth: '45rem' }}>
+                        {(isLoading || !userProfile) ? <Paper sx={{p: '20% 0 20% 0', textAlign: 'center'}}><CircularProgress/></Paper> :
                         <Routes>
                             {menuList.some(item => item.to === '/data-downloads') && (
                                 <Route path="/data-downloads" element={<DataDownloads/>}/>
@@ -120,7 +123,7 @@ export default function App() {
                                     <Navigate to={menuList.length > 0 ? menuList[0].to : '/data-downloads'} replace/>
                                 }
                             />
-                        </Routes>
+                        </Routes>}
                     </Box>
                     <Box component="footer" sx={{p: '1rem'}}>
                         <Typography variant="body2" color="secondary.main" align="left">
