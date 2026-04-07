@@ -7,7 +7,7 @@ import * as reduxHooks from '../../hooks/redux';
 import { selectUserProfile } from "../../redux/app/selectors";
 import { selectUsers, selectIsLoading, selectError } from '../../redux/manageUsers/selectors';
 import * as manageUsersThunks from "../../redux/manageUsers/thunk";
-import { Groups } from '../../redux/manageUsers/slice';
+import {Groups} from "../../models/User.ts";
 
 // Mock the thunks
 vi.mock('../../redux/manageUsers/thunk', () => ({

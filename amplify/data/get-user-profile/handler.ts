@@ -12,15 +12,15 @@ export const handler: Handler = async (event) => {
     const client = new CognitoIdentityProviderClient()
 
     const identity = event.identity as any;
-    const userId = identity?.sub;
+    const {username} = identity;
 
-    if (!userId) {
+    if (!username) {
         throw new Error("User profile data missing");
     }
 
     const command = new AdminGetUserCommand({
         UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
-        Username: userId,
+        Username: username,
     })
     const { UserAttributes } = await client.send(command)
 
@@ -28,12 +28,12 @@ export const handler: Handler = async (event) => {
 
     const groupResponse = await client.send(new AdminListGroupsForUserCommand({
         UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
-        Username: userId,
+        Username: username,
     }))
     const groups = (groupResponse.Groups || []).map(g => g.GroupName)
 
     return {
-        id: userId,
+        username,
         email,
         groups
     } as any

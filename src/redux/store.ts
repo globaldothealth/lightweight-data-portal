@@ -5,8 +5,6 @@ import dataDownloadsReducer from './dataDownloads/slice';
 import dengueGeodataReducer from './dengueGeodata/slice';
 import manageUsersReducer from './manageUsers/slice';
 
-
-
 export const rootReducer = combineReducers({
     app: appReducer,
     dataDownloads: dataDownloadsReducer,

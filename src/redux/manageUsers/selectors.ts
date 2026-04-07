@@ -1,5 +1,5 @@
 import {RootState} from '../store';
-import {User} from "./slice.ts";
+import {User} from "../../models/User.ts";
 
 export const selectUsers: (state: RootState) => User[] = (
     state,

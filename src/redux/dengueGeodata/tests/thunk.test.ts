@@ -2,8 +2,7 @@ import {vi, describe, it, expect, beforeEach} from 'vitest';
 import {getFilesFromMetadata, handleDownload} from '../thunk.ts';
 import {getUrl, downloadData} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
-import {Groups} from "../../manageUsers/slice.ts";
-import {UserProfile} from "../../app/slice.ts";
+import {User, Groups} from "../../../models/User.ts";
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
@@ -117,7 +116,7 @@ describe('DengueGeodata thunks', () => {
     });
 
     describe('handleDownload', () => {
-        const mockUser: UserProfile = {email: 'user@example.com', id: '123', groups: [Groups.RESEARCHERS]};
+        const mockUser: User = {email: 'user@example.com', username: '123', groups: [Groups.RESEARCHERS]};
         const payload = {s3FileKey: 'file.txt', user: mockUser};
 
         it('should fulfill on successful download process for gh-data-downloads bucket', async () => {
@@ -129,7 +128,7 @@ describe('DengueGeodata thunks', () => {
             expect(result.meta.requestStatus).toBe('fulfilled');
 
             expect(client.models.DownloadEvent.create).toHaveBeenCalledWith(expect.objectContaining({
-                userId: mockUser.id,
+                userId: mockUser.username,
                 email: mockUser.email,
                 filename: payload.s3FileKey,
             }));
@@ -148,7 +147,7 @@ describe('DengueGeodata thunks', () => {
             expect(result.meta.requestStatus).toBe('fulfilled');
 
             expect(client.models.DownloadEvent.create).toHaveBeenCalledWith(expect.objectContaining({
-                userId: mockUser.id,
+                userId: mockUser.username,
                 email: mockUser.email,
                 filename: payloadOutputBucket.s3FileKey,
             }));

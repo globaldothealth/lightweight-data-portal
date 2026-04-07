@@ -1,16 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {getUserProfile, logout} from './thunk';
-
-export interface UserProfile {
-    email: string;
-    id: string;
-    groups: string[]
-}
+import {User} from "../store.ts";
 
 interface AppState {
     error: string | undefined;
     isLoading: boolean;
-    userProfile: UserProfile | undefined;
+    userProfile: User | undefined;
 }
 
 const initialState: AppState = {

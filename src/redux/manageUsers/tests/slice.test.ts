@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import manageUsersReducer, { Groups } from '../slice';
+import manageUsersReducer from '../slice';
+import {Groups} from "../../../models/User.ts";
 import { getUsers, addUserToGroup, removeUserFromGroup, deleteUser } from '../thunk';
 
 describe('ManageUsers Slice', () => {

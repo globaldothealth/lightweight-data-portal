@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {User, Groups} from "./slice";
 import {client} from "../../utils/amplifyClient";
 import {RootState} from "../store";
+import {User, Groups} from "../../models/User.ts";
 
 export const getUsers = createAsyncThunk<User[],
     undefined,

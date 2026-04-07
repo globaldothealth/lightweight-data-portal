@@ -1,17 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {getUsers, addUserToGroup, deleteUser, removeUserFromGroup} from './thunk';
-
-export enum Groups {
-    ADMINS = 'ADMINS',
-    CURATORS = 'CURATORS',
-    RESEARCHERS = 'RESEARCHERS',
-}
-
-export type User = {
-    username: string;
-    email: string,
-    groups: Groups[],
-}
+import {User} from "../../models/User.ts";
 
 interface ManageUsersState {
     isLoading: boolean;

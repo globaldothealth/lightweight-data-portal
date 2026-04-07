@@ -1,7 +1,7 @@
 import {vi, describe, it, expect, beforeEach} from 'vitest';
 import {getUsers, addUserToGroup, removeUserFromGroup, deleteUser} from '../thunk';
 import {client} from '../../../utils/amplifyClient';
-import {Groups} from '../slice';
+import {Groups} from "../../../models/User.ts";
 
 
 vi.mock('../../../utils/amplifyClient', () => ({

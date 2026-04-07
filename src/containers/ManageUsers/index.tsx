@@ -21,7 +21,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {selectUserProfile} from "../../redux/app/selectors.ts";
 import {selectUsers, selectIsLoading, selectError} from '../../redux/manageUsers/selectors';
-import {Groups, User} from '../../redux/manageUsers/slice';
+import {User, Groups} from "../../models/User.ts";
 import {getUsers, addUserToGroup, removeUserFromGroup, deleteUser} from "../../redux/manageUsers/thunk.ts";
 
 
@@ -162,7 +162,7 @@ const ManageUsers = () => {
                                     padding: '0',
                                 },
                                 render: (rowData: User): JSX.Element => {
-                                    const isUserSelf = userProfile?.id === rowData.username;
+                                    const isUserSelf = userProfile?.username === rowData.username;
                                     const isAdmin = rowData.groups.includes(Groups.ADMINS);
                                     const tooltipText = isUserSelf ? "You can't delete your own account" : isAdmin ? "User that belongs to ADMINS group can't be deleted" : 'Delete user';
 
