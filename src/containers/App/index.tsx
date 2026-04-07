@@ -92,7 +92,7 @@ export default function App() {
                     </Toolbar>
                 </AppBar>
                 <Sidebar drawerOpen={drawerOpen} menuList={menuList} selectedMenuIndex={selectedMenuIndex}
-                         handleLogout={handleLogout} drawerWidth={drawerWidth}/>
+                         handleLogout={handleLogout} drawerWidth={drawerWidth} userProfileLoaded={!!userProfile && !isLoading}/>
                 <Box sx={{
                     flexGrow: 1,
                     ml: !drawerOpen ? `-${drawerWidth}px` : 0,
