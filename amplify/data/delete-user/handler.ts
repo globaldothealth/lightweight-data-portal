@@ -9,12 +9,11 @@ type Handler = Schema["deleteUser"]["functionHandler"]
 const client = new CognitoIdentityProviderClient()
 
 export const handler: Handler = async (event) => {
-    const {userId} = event.arguments
+    const {username} = event.arguments
     const command = new AdminDeleteUserCommand({
-        Username: userId,
+        Username: username,
         UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
     })
-    const response = await client.send(command)
-    return response as any
+    return await client.send(command)
 }
 

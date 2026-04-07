@@ -22,7 +22,7 @@ describe('ManageUsers Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const mockUsers = [{ id: '1', email: 'test@test.com', groups: [] }];
+            const mockUsers = [{ username: '1', email: 'test@test.com', groups: [] }];
             const action = { type: getUsers.fulfilled.type, payload: mockUsers };
             const state = manageUsersReducer(initialState, action);
             expect(state.isLoading).toBe(false);
@@ -43,7 +43,7 @@ describe('ManageUsers Slice', () => {
         const user1Id = '1';
         const initialStateWithUsers = {
             isLoading: false,
-            users: [{ id: user1Id, email: 'test1@test.com', groups: [] }, { id: '2', email: 'test2@test.com', groups: [] }],
+            users: [{ username: user1Id, email: 'test1@test.com', groups: [] }, { username: '2', email: 'test2@test.com', groups: [] }],
             error: undefined,
         };
 
@@ -55,7 +55,7 @@ describe('ManageUsers Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const action = { type: addUserToGroup.fulfilled.type, payload: { userId: user1Id, groupName: Groups.ADMINS } };
+            const action = { type: addUserToGroup.fulfilled.type, payload: { username: user1Id, groupName: Groups.ADMINS } };
             const state = manageUsersReducer({ ...initialStateWithUsers, isLoading: true }, action);
             expect(state.isLoading).toBe(false);
             expect(state.users[0].groups).toContain(Groups.ADMINS);
@@ -74,7 +74,7 @@ describe('ManageUsers Slice', () => {
         const user1Id = '1';
         const initialStateWithGroup = {
             isLoading: false,
-            users: [{ id: user1Id, email: 'test1@test.com', groups: [Groups.ADMINS] }, { id: '2', email: 'test2@test.com', groups: [Groups.ADMINS] }],
+            users: [{ username: user1Id, email: 'test1@test.com', groups: [Groups.ADMINS] }, { username: '2', email: 'test2@test.com', groups: [Groups.ADMINS] }],
             error: undefined,
         };
 
@@ -86,7 +86,7 @@ describe('ManageUsers Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const action = { type: removeUserFromGroup.fulfilled.type, payload: { userId: user1Id, groupName: Groups.ADMINS } };
+            const action = { type: removeUserFromGroup.fulfilled.type, payload: { username: user1Id, groupName: Groups.ADMINS } };
             const state = manageUsersReducer({ ...initialStateWithGroup, isLoading: true }, action);
             expect(state.isLoading).toBe(false);
             expect(state.users[0].groups).not.toContain(Groups.ADMINS);
@@ -104,7 +104,7 @@ describe('ManageUsers Slice', () => {
     describe('deleteUser', () => {
         const initialStateWithUsers = {
             isLoading: false,
-            users: [{ id: '1', email: 'test@test.com', groups: [] }, { id: '2', email: 'test2@test.com', groups: [] }],
+            users: [{ username: '1', email: 'test@test.com', groups: [] }, { username: '2', email: 'test2@test.com', groups: [] }],
             error: undefined,
         };
 
@@ -120,7 +120,7 @@ describe('ManageUsers Slice', () => {
             const state = manageUsersReducer({ ...initialStateWithUsers, isLoading: true }, action);
             expect(state.isLoading).toBe(false);
             expect(state.users.length).toBe(1);
-            expect(state.users.find(u => u.id === '1')).toBeUndefined();
+            expect(state.users.find(u => u.username === '1')).toBeUndefined();
         });
 
         it('should handle rejected', () => {

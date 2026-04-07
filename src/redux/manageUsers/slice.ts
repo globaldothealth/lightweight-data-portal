@@ -9,7 +9,7 @@ export enum Groups {
 }
 
 export type User = {
-    id: string;
+    username: string;
     email: string,
     groups: Groups[],
 }
@@ -51,7 +51,7 @@ const manageUsersSlice = createSlice({
         builder.addCase(addUserToGroup.fulfilled, (state, action) => {
             state.isLoading = false;
             state.users =  state.users.map(user => {
-                if (user.id === action.payload.userId) {
+                if (user.username === action.payload.username) {
                     return {
                         ...user,
                         groups: user.groups.includes(action.payload.groupName)
@@ -73,7 +73,7 @@ const manageUsersSlice = createSlice({
         builder.addCase(removeUserFromGroup.fulfilled, (state, action) => {
             state.isLoading = false;
             state.users =  state.users.map(user => {
-                if (user.id === action.payload.userId) {
+                if (user.username === action.payload.username) {
                     return {
                         ...user,
                         groups: user.groups.filter(group => group !== action.payload.groupName),
@@ -92,7 +92,7 @@ const manageUsersSlice = createSlice({
         });
         builder.addCase(deleteUser.fulfilled, (state, action) => {
             state.isLoading = false;
-            state.users =  state.users.filter(user => user.id !== action.payload);
+            state.users =  state.users.filter(user => user.username !== action.payload);
         });
         builder.addCase(deleteUser.rejected, (state, action) => {
             state.error = action.payload as string | undefined;

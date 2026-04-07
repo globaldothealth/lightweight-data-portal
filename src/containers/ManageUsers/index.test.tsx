@@ -43,9 +43,9 @@ describe('ManageUsers Container', () => {
     const testUserEmail = 'user3@example.com'
 
     const mockUsers = [
-        { id: user1Id, email: user1Email, groups: [Groups.RESEARCHERS] },
-        { id: '2', email: user2Email, groups: [Groups.ADMINS] },
-        { id: 'Test User', email: testUserEmail, groups: [] }
+        { username: user1Id, email: user1Email, groups: [Groups.RESEARCHERS] },
+        { username: '2', email: user2Email, groups: [Groups.ADMINS] },
+        { username: 'Test User', email: testUserEmail, groups: [] }
     ];
 
     beforeEach(() => {
@@ -107,7 +107,7 @@ describe('ManageUsers Container', () => {
         // Click ADMINS option
         await user.click(adminsOption);
 
-        expect(manageUsersThunks.addUserToGroup).toHaveBeenCalledWith({ userId: user1Id, groupName: Groups.ADMINS });
+        expect(manageUsersThunks.addUserToGroup).toHaveBeenCalledWith({ username: user1Id, groupName: Groups.ADMINS });
     });
 
     it('opens delete dialog and dispatches deleteUser', async () => {

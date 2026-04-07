@@ -9,13 +9,12 @@ type Handler = Schema["removeUserFromGroup"]["functionHandler"]
 const client = new CognitoIdentityProviderClient()
 
 export const handler: Handler = async (event) => {
-    const {userId, groupName} = event.arguments
+    const {username, groupName} = event.arguments
     const command = new AdminRemoveUserFromGroupCommand({
-        Username: userId,
+        Username: username,
         GroupName: groupName,
         UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
     })
-    const response = await client.send(command)
-    return response
+    return await client.send(command)
 }
 

@@ -32,7 +32,7 @@ const schema = a
         addUserToGroup: a
             .mutation()
             .arguments({
-                userId: a.string().required(),
+                username: a.string().required(),
                 groupName: a.string().required(),
             })
             .authorization((allow) => [allow.group("ADMINS")])
@@ -41,7 +41,7 @@ const schema = a
         removeUserFromGroup: a
             .mutation()
             .arguments({
-                userId: a.string().required(),
+                username: a.string().required(),
                 groupName: a.string().required(),
             })
             .authorization((allow) => [allow.group("ADMINS")])
@@ -50,7 +50,7 @@ const schema = a
         deleteUser: a
             .mutation()
             .arguments({
-                userId: a.string().required(),
+                username: a.string().required(),
             })
             .authorization((allow) => [allow.group("ADMINS")])
             .handler(a.handler.function(deleteUser))

@@ -7,8 +7,8 @@ vi.mock('aws-amplify/data', () => ({
 }));
 
 describe('ManageUsers Selectors', () => {
-    const user1 = { id: '1', email: '1@1.1', groups: ['ADMINS'] };
-    const user2 = { id: '2', email: '2@2.2', groups: ['RESEARCHER'] };
+    const user1 = { username: '1', email: '1@1.1', groups: ['ADMINS'] };
+    const user2 = { username: '2', email: '2@2.2', groups: ['RESEARCHER'] };
     const errorMessage = 'error message';
     const mockState = {
         manageUsers: {

@@ -43,7 +43,7 @@ const ManageUsers = () => {
 
     const updateGroups = (
         event: SelectChangeEvent<string[]>,
-        userId: string,
+        username: string,
         previousGroups: Groups[],
     ): void => {
         const newGroups = event.target.value as Groups[];
@@ -51,11 +51,11 @@ const ManageUsers = () => {
         const removedGroups = previousGroups.filter(g => !newGroups.includes(g));
 
         addedGroups.forEach(groupName => {
-            dispatch(addUserToGroup({userId, groupName}));
+            dispatch(addUserToGroup({username, groupName}));
         });
 
         removedGroups.forEach(groupName => {
-            dispatch(removeUserFromGroup({userId, groupName}));
+            dispatch(removeUserFromGroup({username, groupName}));
         });
     };
 
@@ -117,7 +117,7 @@ const ManageUsers = () => {
                                 Cancel
                             </Button>
                             <Button onClick={() => {
-                                const userIdToDelete = userSelectedToBeDeleted?.id;
+                                const userIdToDelete = userSelectedToBeDeleted?.username;
                                 if (!userIdToDelete) return;
                                 clearUserSelectedToBeDeleted();
                                 dispatch(deleteUser(userIdToDelete));
@@ -142,10 +142,10 @@ const ManageUsers = () => {
                                     (
                                         <FormControl sx={{width: '100%'}}>
                                             <Select
-                                                data-testid={`${rowData.id}-select-roles`}
+                                                data-testid={`${rowData.username}-select-roles`}
                                                 multiple
                                                 value={rowData.groups}
-                                                onChange={(event) => updateGroups(event, rowData.id, rowData.groups)}
+                                                onChange={(event) => updateGroups(event, rowData.username, rowData.groups)}
                                             >
                                                 {Object.values(Groups).map((role) => (
                                                     <MenuItem key={role} value={role}>
@@ -162,7 +162,7 @@ const ManageUsers = () => {
                                     padding: '0',
                                 },
                                 render: (rowData: User): JSX.Element => {
-                                    const isUserSelf = userProfile?.id === rowData.id;
+                                    const isUserSelf = userProfile?.id === rowData.username;
                                     const isAdmin = rowData.groups.includes(Groups.ADMINS);
                                     const tooltipText = isUserSelf ? "You can't delete your own account" : isAdmin ? "User that belongs to ADMINS group can't be deleted" : 'Delete user';
 
@@ -170,7 +170,7 @@ const ManageUsers = () => {
                                         <Tooltip title={tooltipText}>
                                 <span>
                                 <IconButton
-                                    data-testid={`delete-user-${rowData.id}`}
+                                    data-testid={`delete-user-${rowData.username}`}
                                     onClick={() => setUserSelectedToBeDeleted(rowData)}
                                     disabled={isAdmin || isUserSelf}
                                 >

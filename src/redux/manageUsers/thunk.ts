@@ -20,36 +20,30 @@ export const getUsers = createAsyncThunk<User[],
     },
 );
 
-export const addUserToGroup = createAsyncThunk<{ userId: string, groupName: Groups },
-    { userId: string, groupName: Groups },
+export const addUserToGroup = createAsyncThunk<{ username: string, groupName: Groups },
+    { username: string, groupName: Groups },
     { rejectValue: string }>(
     'manageUsers/addUserToGroup',
     async (data, {rejectWithValue}) => {
+        const {username, groupName} = data;
         try {
-            await client.mutations.addUserToGroup({
-                groupName: data.groupName,
-                userId: data.userId,
-            })
-            return { userId: data.userId, groupName: data.groupName };
-        }
-        catch (error: unknown) {
+            await client.mutations.addUserToGroup({groupName, username})
+            return {username, groupName};
+        } catch (error: unknown) {
             return rejectWithValue(error instanceof Error ? error.message : 'Failed to add user to group');
         }
     });
 
-export const removeUserFromGroup = createAsyncThunk<{ userId: string, groupName: Groups },
-    { userId: string, groupName: Groups },
+export const removeUserFromGroup = createAsyncThunk<{ username: string, groupName: Groups },
+    { username: string, groupName: Groups },
     { rejectValue: string }>(
     'manageUsers/removeUserFromGroup',
     async (data, {rejectWithValue}) => {
+        const {username, groupName} = data;
         try {
-            await client.mutations.removeUserFromGroup({
-                groupName: data.groupName,
-                userId: data.userId,
-            })
-            return { userId: data.userId, groupName: data.groupName };
-        }
-        catch (error: unknown) {
+            await client.mutations.removeUserFromGroup({groupName, username})
+            return {username, groupName};
+        } catch (error: unknown) {
             return rejectWithValue(error instanceof Error ? error.message : 'Failed to remove user from group');
         }
     });
@@ -58,20 +52,18 @@ export const deleteUser = createAsyncThunk<string,
     string,
     { rejectValue: string }>(
     'manageUsers/deleteUser',
-    async (userId, {getState, rejectWithValue}) => {
+    async (username, {getState, rejectWithValue}) => {
         try {
             const state = getState() as RootState;
-            const user = state.manageUsers.users.find((u: User) => u.id === userId);
+            const user = state.manageUsers.users.find((u: User) => u.username === username);
 
             if (user?.groups.includes(Groups.ADMINS)) {
                 return rejectWithValue('Cannot delete an admin user');
             }
 
-            await client.mutations.deleteUser({
-                userId: userId,
-            });
+            await client.mutations.deleteUser({username});
 
-            return userId;
+            return username;
         } catch (error: unknown) {
             return rejectWithValue(error instanceof Error ? error.message : 'Failed to delete user');
         }
