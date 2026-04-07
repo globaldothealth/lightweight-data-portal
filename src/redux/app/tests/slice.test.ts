@@ -48,7 +48,7 @@ describe('App Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const startState = { ...initialState, userProfile: { email: 'a', id: '1' } };
+            const startState = { ...initialState, userProfile: { email: 'a', id: '1', groups: ['ADMINS'] } };
             const action = { type: logout.fulfilled.type };
             const state = appReducer(startState, action);
             expect(state.isLoading).toBe(false);

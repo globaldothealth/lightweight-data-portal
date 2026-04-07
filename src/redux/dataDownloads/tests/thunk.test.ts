@@ -2,7 +2,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {getFilesFromS3Folder, handleDownload} from '../thunk.ts';
 import {getUrl, list} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
-import {Groups, User} from "../../manageUsers/slice.ts";
+import {Groups} from "../../manageUsers/slice.ts";
+import {UserProfile} from "../../app/slice.ts";
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
@@ -83,7 +84,7 @@ describe('DataDownloads thunks', () => {
     });
 
     describe('handleDownload', () => {
-        const mockUser: User = {email: 'user@example.com', id: '123', groups: [Groups.RESEARCHERS]};
+        const mockUser: UserProfile = {email: 'user@example.com', id: '123', groups: [Groups.RESEARCHERS]};
         const payload = {s3FileKey: 'file.txt', user: mockUser};
 
         it('should fulfill on successful download process', async () => {
