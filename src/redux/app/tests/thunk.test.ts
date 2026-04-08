@@ -1,8 +1,8 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { getUserProfile, logout } from '../thunk.ts';
 import { signOut } from 'aws-amplify/auth';
-import { UserProfile } from "../slice.ts";
 import { client } from "../../../utils/amplifyClient";
+import { User, Group } from "../../../models/User.ts";
 
 // Mock dependencies
 vi.mock('aws-amplify/auth', () => ({
@@ -21,10 +21,10 @@ describe('App thunks', () => {
     const mockDispatch = vi.fn();
     const mockGetState = vi.fn();
 
-    const testUP: UserProfile = {
+    const testUP: User = {
         email: 'test@example.com',
-        id: 'user-123',
-        groups: ['admin']
+        username: 'user-123',
+        groups: [Group.ADMINS]
     };
 
     beforeEach(() => {

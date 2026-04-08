@@ -7,7 +7,7 @@ import * as reduxHooks from '../../hooks/redux';
 import { selectUserProfile } from "../../redux/app/selectors";
 import { selectUsers, selectIsLoading, selectError } from '../../redux/manageUsers/selectors';
 import * as manageUsersThunks from "../../redux/manageUsers/thunk";
-import {Groups} from "../../models/User.ts";
+import {Group} from "../../models/User.ts";
 
 // Mock the thunks
 vi.mock('../../redux/manageUsers/thunk', () => ({
@@ -43,8 +43,8 @@ describe('ManageUsers Container', () => {
     const testUserEmail = 'user3@example.com'
 
     const mockUsers = [
-        { username: user1Id, email: user1Email, groups: [Groups.RESEARCHERS] },
-        { username: '2', email: user2Email, groups: [Groups.ADMINS] },
+        { username: user1Id, email: user1Email, groups: [Group.RESEARCHERS] },
+        { username: '2', email: user2Email, groups: [Group.ADMINS] },
         { username: 'Test User', email: testUserEmail, groups: [] }
     ];
 
@@ -100,14 +100,14 @@ describe('ManageUsers Container', () => {
 
         const listbox = await screen.findByRole('listbox');
         const options = within(listbox).getAllByRole('option');
-        const adminsOption = options.find(opt => opt.textContent?.includes(Groups.ADMINS));
+        const adminsOption = options.find(opt => opt.textContent?.includes(Group.ADMINS));
 
         if (!adminsOption) throw new Error('Admins option not found');
 
         // Click ADMINS option
         await user.click(adminsOption);
 
-        expect(manageUsersThunks.addUserToGroup).toHaveBeenCalledWith({ username: user1Id, groupName: Groups.ADMINS });
+        expect(manageUsersThunks.addUserToGroup).toHaveBeenCalledWith({ username: user1Id, groupName: Group.ADMINS });
     });
 
     it('opens delete dialog and dispatches deleteUser', async () => {

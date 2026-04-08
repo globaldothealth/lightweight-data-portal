@@ -19,6 +19,7 @@ import {getUserProfile, logout} from "../../redux/app/thunk.ts";
 import GHLogo from "../../components/GHLogo.tsx";
 import {selectUserProfile} from "../../redux/app/selectors.ts";
 import {selectIsLoading} from "../../redux/app/selectors.ts";
+import {Group} from "../../models/User.ts";
 
 
 export default function App() {
@@ -48,19 +49,19 @@ export default function App() {
             text: 'Dengue Geodata',
             icon: <DengueGeodataIcon/>,
             to: '/dengue-geodata',
-            groups: ['ADMINS', 'CURATORS', 'RESEARCHERS'],
+            groups: [Group.ADMINS, Group.CURATORS, Group.RESEARCHERS],
         },
         {
             text: 'Location Admin Explorer',
             icon: <LocationAdminExplorerIcon/>,
             to: '/location-admin-explorer',
-            groups: ['ADMINS', 'CURATORS'],
+            groups: [Group.ADMINS, Group.CURATORS],
         },
         {
             text: 'Manage Users',
             icon: <PeopleIcon/>,
             to: '/manage-users',
-            groups: ['ADMINS'],
+            groups: [Group.ADMINS],
         },
     ].filter(item => {
         if (!item.groups) return true;

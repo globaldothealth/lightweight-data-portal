@@ -6,6 +6,7 @@ import {MemoryRouter} from 'react-router-dom';
 import * as reduxHooks from '../../hooks/redux';
 import {getUserProfile, logout} from '../../redux/app/thunk';
 import {selectUserProfile, selectIsLoading} from '../../redux/app/selectors';
+import {Group} from "../../models/User.ts";
 
 
 // Update this list with new containers and their expected menu index after adding new containers to App.tsx.
@@ -72,7 +73,7 @@ describe('App Container', () => {
         vi.mocked(reduxHooks.useAppDispatch).mockReturnValue(mockDispatch);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector: any) => {
-            if (selector === selectUserProfile) return {id: 'test-id', email: 'test@example.com', groups: ['ADMINS']};
+            if (selector === selectUserProfile) return {id: 'test-id', email: 'test@example.com', groups: [Group.ADMINS]};
             if (selector === selectIsLoading) return false;
             return undefined;
         });

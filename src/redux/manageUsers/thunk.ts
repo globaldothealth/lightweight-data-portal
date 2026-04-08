@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {client} from "../../utils/amplifyClient";
 import {RootState} from "../store";
-import {User, Groups} from "../../models/User.ts";
+import {User, Group} from "../../models/User.ts";
 
 export const getUsers = createAsyncThunk<User[],
     undefined,
@@ -20,8 +20,8 @@ export const getUsers = createAsyncThunk<User[],
     },
 );
 
-export const addUserToGroup = createAsyncThunk<{ username: string, groupName: Groups },
-    { username: string, groupName: Groups },
+export const addUserToGroup = createAsyncThunk<{ username: string, groupName: Group },
+    { username: string, groupName: Group },
     { rejectValue: string }>(
     'manageUsers/addUserToGroup',
     async (data, {rejectWithValue}) => {
@@ -34,8 +34,8 @@ export const addUserToGroup = createAsyncThunk<{ username: string, groupName: Gr
         }
     });
 
-export const removeUserFromGroup = createAsyncThunk<{ username: string, groupName: Groups },
-    { username: string, groupName: Groups },
+export const removeUserFromGroup = createAsyncThunk<{ username: string, groupName: Group },
+    { username: string, groupName: Group },
     { rejectValue: string }>(
     'manageUsers/removeUserFromGroup',
     async (data, {rejectWithValue}) => {
@@ -57,7 +57,7 @@ export const deleteUser = createAsyncThunk<string,
             const state = getState() as RootState;
             const user = state.manageUsers.users.find((u: User) => u.username === username);
 
-            if (user?.groups.includes(Groups.ADMINS)) {
+            if (user?.groups.includes(Group.ADMINS)) {
                 return rejectWithValue('Cannot delete an admin user');
             }
 

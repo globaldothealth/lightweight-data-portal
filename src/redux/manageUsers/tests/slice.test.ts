@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import manageUsersReducer from '../slice';
-import {Groups} from "../../../models/User.ts";
+import {Group} from "../../../models/User.ts";
 import { getUsers, addUserToGroup, removeUserFromGroup, deleteUser } from '../thunk';
 
 describe('ManageUsers Slice', () => {
@@ -56,10 +56,10 @@ describe('ManageUsers Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const action = { type: addUserToGroup.fulfilled.type, payload: { username: user1Id, groupName: Groups.ADMINS } };
+            const action = { type: addUserToGroup.fulfilled.type, payload: { username: user1Id, groupName: Group.ADMINS } };
             const state = manageUsersReducer({ ...initialStateWithUsers, isLoading: true }, action);
             expect(state.isLoading).toBe(false);
-            expect(state.users[0].groups).toContain(Groups.ADMINS);
+            expect(state.users[0].groups).toContain(Group.ADMINS);
         });
 
         it('should handle rejected', () => {
@@ -75,7 +75,7 @@ describe('ManageUsers Slice', () => {
         const user1Id = '1';
         const initialStateWithGroup = {
             isLoading: false,
-            users: [{ username: user1Id, email: 'test1@test.com', groups: [Groups.ADMINS] }, { username: '2', email: 'test2@test.com', groups: [Groups.ADMINS] }],
+            users: [{ username: user1Id, email: 'test1@test.com', groups: [Group.ADMINS] }, { username: '2', email: 'test2@test.com', groups: [Group.ADMINS] }],
             error: undefined,
         };
 
@@ -87,10 +87,10 @@ describe('ManageUsers Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const action = { type: removeUserFromGroup.fulfilled.type, payload: { username: user1Id, groupName: Groups.ADMINS } };
+            const action = { type: removeUserFromGroup.fulfilled.type, payload: { username: user1Id, groupName: Group.ADMINS } };
             const state = manageUsersReducer({ ...initialStateWithGroup, isLoading: true }, action);
             expect(state.isLoading).toBe(false);
-            expect(state.users[0].groups).not.toContain(Groups.ADMINS);
+            expect(state.users[0].groups).not.toContain(Group.ADMINS);
         });
 
         it('should handle rejected', () => {

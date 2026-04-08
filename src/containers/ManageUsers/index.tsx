@@ -21,7 +21,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {selectUserProfile} from "../../redux/app/selectors.ts";
 import {selectUsers, selectIsLoading, selectError} from '../../redux/manageUsers/selectors';
-import {User, Groups} from "../../models/User.ts";
+import {User, Group} from "../../models/User.ts";
 import {getUsers, addUserToGroup, removeUserFromGroup, deleteUser} from "../../redux/manageUsers/thunk.ts";
 
 
@@ -44,9 +44,9 @@ const ManageUsers = () => {
     const updateGroups = (
         event: SelectChangeEvent<string[]>,
         username: string,
-        previousGroups: Groups[],
+        previousGroups: Group[],
     ): void => {
-        const newGroups = event.target.value as Groups[];
+        const newGroups = event.target.value as Group[];
         const addedGroups = newGroups.filter(g => !previousGroups.includes(g));
         const removedGroups = previousGroups.filter(g => !newGroups.includes(g));
 
@@ -147,7 +147,7 @@ const ManageUsers = () => {
                                                 value={rowData.groups}
                                                 onChange={(event) => updateGroups(event, rowData.username, rowData.groups)}
                                             >
-                                                {Object.values(Groups).map((role) => (
+                                                {Object.values(Group).map((role) => (
                                                     <MenuItem key={role} value={role}>
                                                         {role}
                                                     </MenuItem>
@@ -163,7 +163,7 @@ const ManageUsers = () => {
                                 },
                                 render: (rowData: User): JSX.Element => {
                                     const isUserSelf = userProfile?.username === rowData.username;
-                                    const isAdmin = rowData.groups.includes(Groups.ADMINS);
+                                    const isAdmin = rowData.groups.includes(Group.ADMINS);
                                     const tooltipText = isUserSelf ? "You can't delete your own account" : isAdmin ? "User that belongs to ADMINS group can't be deleted" : 'Delete user';
 
                                     return (

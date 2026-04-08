@@ -1,7 +1,7 @@
 import {vi, describe, it, expect, beforeEach} from 'vitest';
 import {getUsers, addUserToGroup, removeUserFromGroup, deleteUser} from '../thunk';
 import {client} from '../../../utils/amplifyClient';
-import {Groups} from "../../../models/User.ts";
+import {Group} from "../../../models/User.ts";
 
 
 vi.mock('../../../utils/amplifyClient', () => ({
@@ -40,7 +40,7 @@ describe('ManageUsers thunks', () => {
             const mockUsers = [{
                 username: user1Id,
                 email: user1Email,
-                groups: [Groups.ADMINS]
+                groups: [Group.ADMINS]
             }];
             vi.mocked(client.queries.getUsers).mockResolvedValue({data: JSON.stringify(mockUsers)} as never);
 
@@ -64,7 +64,7 @@ describe('ManageUsers thunks', () => {
         it('should fulfill on successful addition', async () => {
             vi.mocked(client.mutations.addUserToGroup).mockResolvedValue({} as never);
 
-            const data = {username: user1Id, groupName: Groups.ADMINS};
+            const data = {username: user1Id, groupName: Group.ADMINS};
             const result = await addUserToGroup(data)(mockDispatch, vi.fn(), undefined);
 
             expect(result.meta.requestStatus).toBe('fulfilled');
@@ -75,7 +75,7 @@ describe('ManageUsers thunks', () => {
         it('should reject on error', async () => {
             vi.mocked(client.mutations.addUserToGroup).mockRejectedValue(new Error('failed'));
 
-            const data = {username: user1Id, groupName: Groups.ADMINS};
+            const data = {username: user1Id, groupName: Group.ADMINS};
             const result = await addUserToGroup(data)(mockDispatch, vi.fn(), undefined);
 
             expect(result.meta.requestStatus).toBe('rejected');
@@ -87,7 +87,7 @@ describe('ManageUsers thunks', () => {
         it('should fulfill on successful removal', async () => {
             vi.mocked(client.mutations.removeUserFromGroup).mockResolvedValue({} as never);
 
-            const data = {username: user1Id, groupName: Groups.ADMINS};
+            const data = {username: user1Id, groupName: Group.ADMINS};
             const result = await removeUserFromGroup(data)(mockDispatch, vi.fn(), undefined);
 
             expect(result.meta.requestStatus).toBe('fulfilled');
@@ -98,7 +98,7 @@ describe('ManageUsers thunks', () => {
         it('should reject on error', async () => {
             vi.mocked(client.mutations.removeUserFromGroup).mockRejectedValue(new Error('failed'));
 
-            const data = {username: user1Id, groupName: Groups.ADMINS};
+            const data = {username: user1Id, groupName: Group.ADMINS};
             const result = await removeUserFromGroup(data)(mockDispatch, vi.fn(), undefined);
 
             expect(result.meta.requestStatus).toBe('rejected');
@@ -126,7 +126,7 @@ describe('ManageUsers thunks', () => {
         it('should reject when deleting admin', async () => {
             const mockGetState = vi.fn().mockReturnValue({
                 manageUsers: {
-                    users: [{username: user1Id, email: user1Email, groups: [Groups.ADMINS]}]
+                    users: [{username: user1Id, email: user1Email, groups: [Group.ADMINS]}]
                 }
             });
 

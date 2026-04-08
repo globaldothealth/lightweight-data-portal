@@ -1,4 +1,4 @@
-export enum Groups {
+export enum Group {
     ADMINS = 'ADMINS',
     CURATORS = 'CURATORS',
     RESEARCHERS = 'RESEARCHERS',
@@ -7,5 +7,5 @@ export enum Groups {
 export interface User {
     username: string;
     email: string,
-    groups: Groups[],
+    groups: Group[],
 }

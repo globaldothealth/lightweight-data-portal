@@ -2,7 +2,7 @@ import {vi, describe, it, expect, beforeEach} from 'vitest';
 import {getFilesFromMetadata, handleDownload} from '../thunk.ts';
 import {getUrl, downloadData} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
-import {User, Groups} from "../../../models/User.ts";
+import {User, Group} from "../../../models/User.ts";
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
@@ -116,7 +116,7 @@ describe('DengueGeodata thunks', () => {
     });
 
     describe('handleDownload', () => {
-        const mockUser: User = {email: 'user@example.com', username: '123', groups: [Groups.RESEARCHERS]};
+        const mockUser: User = {email: 'user@example.com', username: '123', groups: [Group.RESEARCHERS]};
         const payload = {s3FileKey: 'file.txt', user: mockUser};
 
         it('should fulfill on successful download process for gh-data-downloads bucket', async () => {
