@@ -24,13 +24,13 @@ export const handler: Handler = async (event) => {
     })
     const { UserAttributes } = await client.send(command)
 
-    const email = UserAttributes?.find(a => a.Name === 'email')?.Value || ''
+    const email = UserAttributes?.find(attribute => attribute.Name === 'email')?.Value || ''
 
     const groupResponse = await client.send(new AdminListGroupsForUserCommand({
         UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
         Username: username,
     }))
-    const groups = (groupResponse.Groups || []).map(g => g.GroupName)
+    const groups = (groupResponse.Groups || []).map(group => group.GroupName)
 
     return {
         username,
