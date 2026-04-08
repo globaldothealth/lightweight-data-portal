@@ -1,18 +1,13 @@
 import React, {useState, useEffect, JSX} from 'react';
 import {
     Alert,
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Paper,
-    Typography,
     FormControl,
+    Grid,
+    IconButton,
     MenuItem,
-    IconButton, Tooltip, Grid,
+    Paper,
+    Tooltip,
+    Typography,
 } from '@mui/material';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import MaterialTable from '@material-table/core';
@@ -23,6 +18,8 @@ import {selectUserProfile} from "../../redux/app/selectors.ts";
 import {selectUsers, selectIsLoading, selectError} from '../../redux/manageUsers/selectors';
 import {User, Group} from "../../models/User.ts";
 import {getUsers, addUserToGroup, removeUserFromGroup, deleteUser} from "../../redux/manageUsers/thunk.ts";
+import {RemoveUserDialog} from "./RemoveUserDialog.tsx";
+import {ManageUserActionsDescription} from "./ManageUserActionsDescription.tsx";
 
 
 const ManageUsers = () => {
@@ -59,73 +56,20 @@ const ManageUsers = () => {
         });
     };
 
-
     return (
         <Grid container spacing={2}>
             <Grid size={12} sx={{color: 'text.primary'}}>
                 <Typography variant='h2'>Manage Users</Typography>
             </Grid>
             <Grid size={12}>
-                <Paper sx={{p: '1rem'}}>
-                    <Typography sx={{mb: '.5rem'}}>On this page G.h admins can add users to groups and delete user
-                        accounts.</Typography>
-                    <Typography>There are four levels of permission available in the app:</Typography>
-                    <Box component='ul' sx={{mt: 0}}>
-                    <Typography component='li'>
-                        <strong>Visitor</strong> - user without any group assigned. This user can only view the Outbreak
-                        Data page.
-                    </Typography>
-                    <Typography component='li'>
-                        <strong>Researcher</strong> - user assigned to <i>RESEARCHERS</i> group. This user can view the <i>Outbreak
-                        Data</i> and <i>Dengue Geodata</i> pages.
-                    </Typography>
-                    <Typography component='li'>
-                        <strong>Curator</strong> - user assigned to <i>CURATORS</i> group. This user can view the <i>Outbreak
-                        Data</i>, <i>Dengue Geodata</i> and <i>Location Admin Explorer</i> pages.
-                    </Typography>
-                    <Typography component='li'>
-                        <strong>Admin</strong> - user assigned to <i>ADMINS</i> group. This user can view the all of the pages.
-                    </Typography>
-                    </Box>
-                    <Typography>User cannot remove their own account. Additionally in order to delete
-                        user account that belongs to <i>ADMINS</i> they must first be removed from
-                        the <i>ADMINS</i> group.</Typography>
-                </Paper>
+                <ManageUserActionsDescription/>
             </Grid>
             <Grid size={12}>
                 <Paper>
                     {error && (<Alert variant="filled" severity="error"> {error} </Alert>)}
-                    <Dialog
-                        open={userSelectedToBeDeleted !== null}
-                        onClose={clearUserSelectedToBeDeleted}
-                        onClick={(e): void => e.stopPropagation()}
-                    >
-                        <DialogTitle>
-                            Are you sure you want to delete this user?
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>
-                                User {userSelectedToBeDeleted?.email} will be permanently deleted.
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button
-                                onClick={clearUserSelectedToBeDeleted}
-                                color="primary"
-                                autoFocus
-                            >
-                                Cancel
-                            </Button>
-                            <Button onClick={() => {
-                                const userIdToDelete = userSelectedToBeDeleted?.username;
-                                if (!userIdToDelete) return;
-                                clearUserSelectedToBeDeleted();
-                                dispatch(deleteUser(userIdToDelete));
-                            }} color="primary" variant='contained'>
-                                Yes
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                    <RemoveUserDialog clearUserSelectedToBeDeleted={clearUserSelectedToBeDeleted}
+                                      userSelectedToBeDeleted={userSelectedToBeDeleted}
+                                      deleteUser={(username) => dispatch(deleteUser(username))}/>
                     <MaterialTable
                         title={<Typography>Users</Typography>}
                         columns={[
@@ -148,9 +92,7 @@ const ManageUsers = () => {
                                                 onChange={(event) => updateGroups(event, rowData.username, rowData.groups)}
                                             >
                                                 {Object.values(Group).map((role) => (
-                                                    <MenuItem key={role} value={role}>
-                                                        {role}
-                                                    </MenuItem>
+                                                    <MenuItem key={role} value={role}> {role} </MenuItem>
                                                 ))}
                                             </Select>
                                         </FormControl>
@@ -158,9 +100,7 @@ const ManageUsers = () => {
                             },
                             {
                                 width: '1%',
-                                cellStyle: {
-                                    padding: '0',
-                                },
+                                cellStyle: {padding: '0'},
                                 render: (rowData: User): JSX.Element => {
                                     const isUserSelf = userProfile?.username === rowData.username;
                                     const isAdmin = rowData.groups.includes(Group.ADMINS);
@@ -168,17 +108,16 @@ const ManageUsers = () => {
 
                                     return (
                                         <Tooltip title={tooltipText}>
-                                <span>
-                                <IconButton
-                                    data-testid={`delete-user-${rowData.username}`}
-                                    onClick={() => setUserSelectedToBeDeleted(rowData)}
-                                    disabled={isAdmin || isUserSelf}
-                                >
-                                    <DeleteIcon/>
-                                </IconButton>
-                                    </span>
+                                            <span>
+                                                <IconButton
+                                                    data-testid={`delete-user-${rowData.username}`}
+                                                    onClick={() => setUserSelectedToBeDeleted(rowData)}
+                                                    disabled={isAdmin || isUserSelf}
+                                                >
+                                                    <DeleteIcon/>
+                                                </IconButton>
+                                            </span>
                                         </Tooltip>
-
                                     )
                                 },
                             },
@@ -205,7 +144,8 @@ const ManageUsers = () => {
                         isLoading={isLoading}
                     />
                 </Paper>
-            </Grid></Grid>
+            </Grid>
+        </Grid>
     );
 };
 
