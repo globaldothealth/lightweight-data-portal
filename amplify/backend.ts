@@ -1,5 +1,6 @@
 import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
+import { Group } from './auth/groups';
 import { data } from './data/resource';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
@@ -22,7 +23,7 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
   })
 );
 
-backend.auth.resources.groups["ADMINS"].role.addToPrincipalPolicy(
+backend.auth.resources.groups[Group.ADMINS].role.addToPrincipalPolicy(
   new PolicyStatement({
     actions: [
       'cognito-idp:ListUsers',
@@ -35,7 +36,7 @@ backend.auth.resources.groups["ADMINS"].role.addToPrincipalPolicy(
   })
 );
 
-["ADMINS", "CURATORS", "RESEARCHERS"].forEach(group => {
+[Group.ADMINS, Group.CURATORS, Group.RESEARCHERS].forEach(group => {
     backend.auth.resources.groups[group].role.addToPrincipalPolicy(
         new PolicyStatement({
             actions: ['s3:GetObject', 's3:ListBucket'],

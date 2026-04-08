@@ -5,6 +5,7 @@ import {
     AdminListGroupsForUserCommand,
     CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider"
+import {Group} from "../../auth/groups";
 
 type Handler = Schema["deleteUser"]["functionHandler"]
 const client = new CognitoIdentityProviderClient()
@@ -17,7 +18,7 @@ export const handler: Handler = async (event) => {
         UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
     })
     const groupsResponse = await client.send(listGroupsCommand)
-    const isAdmin = groupsResponse.Groups?.some((group) => group.GroupName === "ADMINS")
+    const isAdmin = groupsResponse.Groups?.some((group) => group.GroupName === Group.ADMINS)
 
     if (isAdmin) {
         throw new Error("User cannot be deleted because they are in the ADMINS group.")

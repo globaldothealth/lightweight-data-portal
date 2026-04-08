@@ -6,6 +6,7 @@ import { removeUserFromGroup } from "../data/remove-user-from-group/resource"
 import { deleteUser } from "../data/delete-user/resource"
 import { getUsers } from "../data/get-users/resource"
 import { getUserProfile } from "../data/get-user-profile/resource"
+import { Group } from "./groups"
 
 export const auth = defineAuth({
     loginWith: {
@@ -36,7 +37,7 @@ export const auth = defineAuth({
         postConfirmation,
         postAuthentication
     },
-    groups: ["ADMINS", "CURATORS", "RESEARCHERS"],
+    groups: [Group.ADMINS, Group.CURATORS, Group.RESEARCHERS],
 
     access: (allow) => [
         allow.resource(addUserToGroup).to(["addUserToGroup"]),

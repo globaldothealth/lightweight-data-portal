@@ -69,7 +69,7 @@ const ManageUsers = () => {
                 <Paper sx={{p: '1rem'}}>
                     <Typography sx={{mb: '.5rem'}}>On this page G.h admins can add users to groups and delete user
                         accounts.</Typography>
-                    <Typography>There are three levels of permission available in the app:</Typography>
+                    <Typography>There are four levels of permission available in the app:</Typography>
                     <Box component='ul' sx={{mt: 0}}>
                     <Typography component='li'>
                         <strong>Visitor</strong> - user without any group assigned. This user can only view the Outbreak
