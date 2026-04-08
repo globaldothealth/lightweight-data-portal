@@ -2,6 +2,7 @@ import {vi, describe, it, expect, beforeEach} from 'vitest';
 import {getUsers, addUserToGroup, removeUserFromGroup, deleteUser} from '../thunk';
 import {client} from '../../../utils/amplifyClient';
 import {Group} from "../../../models/User.ts";
+import {REQUEST_STATUS} from "../../../utils/tests/testConstants.ts";
 
 
 vi.mock('../../../utils/amplifyClient', () => ({
@@ -46,7 +47,7 @@ describe('ManageUsers thunks', () => {
 
             const result = await getUsers()(mockDispatch, vi.fn(), undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toEqual(mockUsers);
         });
 
@@ -55,7 +56,7 @@ describe('ManageUsers thunks', () => {
 
             const result = await getUsers()(mockDispatch, vi.fn(), undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Failed to fetch users');
         });
     });
@@ -67,7 +68,7 @@ describe('ManageUsers thunks', () => {
             const data = {username: user1Id, groupName: Group.ADMINS};
             const result = await addUserToGroup(data)(mockDispatch, vi.fn(), undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toEqual(data);
             expect(client.mutations.addUserToGroup).toHaveBeenCalledWith(data);
         });
@@ -78,7 +79,7 @@ describe('ManageUsers thunks', () => {
             const data = {username: user1Id, groupName: Group.ADMINS};
             const result = await addUserToGroup(data)(mockDispatch, vi.fn(), undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('failed');
         });
     });
@@ -90,7 +91,7 @@ describe('ManageUsers thunks', () => {
             const data = {username: user1Id, groupName: Group.ADMINS};
             const result = await removeUserFromGroup(data)(mockDispatch, vi.fn(), undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toEqual(data);
             expect(client.mutations.removeUserFromGroup).toHaveBeenCalledWith(data);
         });
@@ -101,7 +102,7 @@ describe('ManageUsers thunks', () => {
             const data = {username: user1Id, groupName: Group.ADMINS};
             const result = await removeUserFromGroup(data)(mockDispatch, vi.fn(), undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('failed');
         });
     });
@@ -118,7 +119,7 @@ describe('ManageUsers thunks', () => {
 
             const result = await deleteUser(user1Id)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toBe(user1Id);
             expect(client.mutations.deleteUser).toHaveBeenCalledWith({username: user1Id});
         });
@@ -132,7 +133,7 @@ describe('ManageUsers thunks', () => {
 
             const result = await deleteUser(user1Id)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Cannot delete an admin user');
         });
     });

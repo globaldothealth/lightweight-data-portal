@@ -3,6 +3,7 @@ import { getUserProfile, logout } from '../thunk.ts';
 import { signOut } from 'aws-amplify/auth';
 import { client } from "../../../utils/amplifyClient";
 import { User, Group } from "../../../models/User.ts";
+import { REQUEST_STATUS } from "../../../utils/tests/testConstants.ts";
 
 // Mock dependencies
 vi.mock('aws-amplify/auth', () => ({
@@ -39,7 +40,7 @@ describe('App thunks', () => {
 
             const result = await getUserProfile()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toEqual(testUP);
             expect(client.queries.getUserProfile).toHaveBeenCalledTimes(1);
         });
@@ -49,7 +50,7 @@ describe('App thunks', () => {
 
             const result = await getUserProfile()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('User profile data missing');
         });
     });
@@ -60,7 +61,7 @@ describe('App thunks', () => {
 
             const result = await logout()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(signOut).toHaveBeenCalled();
         });
 
@@ -70,7 +71,7 @@ describe('App thunks', () => {
 
             const result = await logout()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe(`Logout failed: ${errorMessage}`);
         });
     });

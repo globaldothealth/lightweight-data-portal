@@ -3,6 +3,7 @@ import {getFilesFromMetadata, handleDownload} from '../thunk.ts';
 import {getUrl, downloadData} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
 import {User, Group} from "../../../models/User.ts";
+import { REQUEST_STATUS } from "../../../utils/tests/testConstants.ts";
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
@@ -50,7 +51,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toEqual({
                 availableCountries: {Barbados: 'Barbados', Brazil: 'Brazil'},
                 files: [{...testFile1, name: testFile1Name}, {...testFile2, name: testFile2Name}]
@@ -69,7 +70,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('No files found in the specified S3 folder.');
         });
 
@@ -78,7 +79,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe(`Error fetching metadata.json.`);
         });
 
@@ -93,7 +94,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Error fetching files from S3: "undefined" is not valid JSON');
         });
 
@@ -108,7 +109,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await getFilesFromMetadata()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Error fetching files from S3: An unknown error occurred');
         });
 
@@ -125,7 +126,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
 
             expect(client.models.DownloadEvent.create).toHaveBeenCalledWith(expect.objectContaining({
                 userId: mockUser.username,
@@ -144,7 +145,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await handleDownload(payloadOutputBucket)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
 
             expect(client.models.DownloadEvent.create).toHaveBeenCalledWith(expect.objectContaining({
                 userId: mockUser.username,
@@ -164,7 +165,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Error downloading file from S3: DB Error');
             expect(getUrl).not.toHaveBeenCalled();
         });
@@ -174,7 +175,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Error downloading file from S3: An unknown error occurred');
             expect(getUrl).not.toHaveBeenCalled();
         });
@@ -185,7 +186,7 @@ describe('DengueGeodata thunks', () => {
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Error downloading file from S3: URL generation failed');
         });
     });
