@@ -4,23 +4,30 @@ import {
     Menu as MenuIcon,
     BrowserUpdated as OutbreakDataIcon,
     Public as LocationAdminExplorerIcon,
-    Satellite as DengueGeodataIcon
+    Satellite as DengueGeodataIcon,
+    People as PeopleIcon,
 } from '@mui/icons-material';
-import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography} from '@mui/material';
+import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography, CircularProgress, Paper} from '@mui/material';
 
 import DataDownloads from "../DataDownloads";
 import DengueGeodata from "../DengueGeodata";
+import ManageUsers from "../ManageUsers";
 import LocationAdminExplorer from "../LocationAdminExplorer";
 import Sidebar from "../../components/Sidebar";
-import {useAppDispatch} from '../../hooks/redux';
+import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {getUserProfile, logout} from "../../redux/app/thunk.ts";
 import GHLogo from "../../components/GHLogo.tsx";
+import {selectUserProfile} from "../../redux/app/selectors.ts";
+import {selectIsLoading} from "../../redux/app/selectors.ts";
+import {Group} from "../../models/User.ts";
 
 
 export default function App() {
     const dispatch = useAppDispatch();
     const [drawerOpen, setDrawerOpen] = useState(true);
     const location = useLocation();
+    const userProfile = useAppSelector(selectUserProfile);
+    const isLoading = useAppSelector(selectIsLoading);
 
     const drawerWidth = 240
 
@@ -42,13 +49,25 @@ export default function App() {
             text: 'Dengue Geodata',
             icon: <DengueGeodataIcon/>,
             to: '/dengue-geodata',
+            groups: [Group.ADMINS, Group.CURATORS, Group.RESEARCHERS],
         },
         {
             text: 'Location Admin Explorer',
             icon: <LocationAdminExplorerIcon/>,
             to: '/location-admin-explorer',
+            groups: [Group.ADMINS, Group.CURATORS],
         },
-    ], []);
+        {
+            text: 'Manage Users',
+            icon: <PeopleIcon/>,
+            to: '/manage-users',
+            groups: [Group.ADMINS],
+        },
+    ].filter(item => {
+        if (!item.groups) return true;
+        if (!userProfile?.groups) return false;
+        return item.groups.some(group => userProfile.groups.includes(group));
+    }), [userProfile]);
 
     const selectedMenuIndex = useMemo(() => menuList.findIndex((menuItem) => (
         menuItem.to === location.pathname
@@ -74,7 +93,7 @@ export default function App() {
                     </Toolbar>
                 </AppBar>
                 <Sidebar drawerOpen={drawerOpen} menuList={menuList} selectedMenuIndex={selectedMenuIndex}
-                         handleLogout={handleLogout} drawerWidth={drawerWidth}/>
+                         handleLogout={handleLogout} drawerWidth={drawerWidth} userProfileLoaded={!!userProfile && !isLoading}/>
                 <Box sx={{
                     flexGrow: 1,
                     ml: !drawerOpen ? `-${drawerWidth}px` : 0,
@@ -85,17 +104,27 @@ export default function App() {
                 }}>
                     <Toolbar/>
                     <Box sx={{ flexGrow: 1, p: '1rem', maxWidth: '45rem' }}>
+                        {(isLoading || !userProfile) ? <Paper sx={{p: '20% 0 20% 0', textAlign: 'center'}}><CircularProgress/></Paper> :
                         <Routes>
-                            <Route path="/data-downloads" element={<DataDownloads/>}/>
-                            <Route path="/dengue-geodata" element={<DengueGeodata/>}/>
-                            <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
+                            {menuList.some(item => item.to === '/data-downloads') && (
+                                <Route path="/data-downloads" element={<DataDownloads/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/dengue-geodata') && (
+                                <Route path="/dengue-geodata" element={<DengueGeodata/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/location-admin-explorer') && (
+                                <Route path="/location-admin-explorer" element={<LocationAdminExplorer/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/manage-users') && (
+                                <Route path="/manage-users" element={<ManageUsers/>}/>
+                            )}
                             <Route
                                 path="*"
                                 element={
-                                    <Navigate to='/data-downloads' replace/>
+                                    <Navigate to={menuList.length > 0 ? menuList[0].to : '/data-downloads'} replace/>
                                 }
                             />
-                        </Routes>
+                        </Routes>}
                     </Box>
                     <Box component="footer" sx={{p: '1rem'}}>
                         <Typography variant="body2" color="secondary.main" align="left">

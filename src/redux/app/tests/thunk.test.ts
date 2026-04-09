@@ -1,20 +1,32 @@
-
-import {vi, describe, it, expect, beforeEach} from 'vitest';
-import {getUserProfile, logout} from '../thunk.ts';
-import {fetchUserAttributes, signOut} from 'aws-amplify/auth';
-import {UserProfile} from "../slice.ts";
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { getUserProfile, logout } from '../thunk.ts';
+import { signOut } from 'aws-amplify/auth';
+import { client } from "../../../utils/amplifyClient";
+import { User, Group } from "../../../models/User.ts";
+import { REQUEST_STATUS } from "../../../utils/tests/testConstants.ts";
 
 // Mock dependencies
 vi.mock('aws-amplify/auth', () => ({
-    fetchUserAttributes: vi.fn(),
     signOut: vi.fn()
+}));
+
+vi.mock('../../../utils/amplifyClient', () => ({
+    client: {
+        queries: {
+            getUserProfile: vi.fn()
+        }
+    }
 }));
 
 describe('App thunks', () => {
     const mockDispatch = vi.fn();
     const mockGetState = vi.fn();
 
-    const testUP: UserProfile = {email: 'test@example.com', id: 'user-123'}
+    const testUP: User = {
+        email: 'test@example.com',
+        username: 'user-123',
+        groups: [Group.ADMINS]
+    };
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -22,22 +34,23 @@ describe('App thunks', () => {
 
     describe('getUserProfile', () => {
         it('should fulfill with user profile on successful fetch', async () => {
-            const mockAttributes = {email: testUP.email, sub: testUP.id};
-            vi.mocked(fetchUserAttributes).mockResolvedValue(mockAttributes);
+            vi.mocked(client.queries.getUserProfile).mockResolvedValue({
+                data: JSON.stringify(testUP)
+            } as never);
 
             const result = await getUserProfile()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toEqual(testUP);
-            expect(fetchUserAttributes).toHaveBeenCalledTimes(1);
+            expect(client.queries.getUserProfile).toHaveBeenCalledTimes(1);
         });
 
-        it('should reject with correct error message when email or sub is missing', async () => {
-            vi.mocked(fetchUserAttributes).mockResolvedValue({email: testUP.email});
+        it('should reject with correct error message when fetch fails', async () => {
+            vi.mocked(client.queries.getUserProfile).mockRejectedValue(new Error('User profile data missing'));
 
             const result = await getUserProfile()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('User profile data missing');
         });
     });
@@ -48,7 +61,7 @@ describe('App thunks', () => {
 
             const result = await logout()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(signOut).toHaveBeenCalled();
         });
 
@@ -58,9 +71,8 @@ describe('App thunks', () => {
 
             const result = await logout()(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe(`Logout failed: ${errorMessage}`);
         });
     });
 });
-

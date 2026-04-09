@@ -35,5 +35,8 @@ export const DataAcknowledgementsAccordion = (props: DataAcknowledgementsAccordi
             disclaims liability for any use of, or reliance on, the information. Users are responsible for
             the interpretation, analysis, and use of the data and any outputs derived from it.
         </Typography>
+        <Typography sx={{textAlign: 'justify', p: '0 1rem 1rem 1rem', fontStyle: 'italic'}}>
+            Please cite as: "Global.health Data [Outbreak] (accessed on YYYY-MM-DD)"
+        </Typography>
     </Accordion>)
 }

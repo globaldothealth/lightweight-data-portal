@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {getUrl, list} from "aws-amplify/storage";
 import {S3File} from "./slice";
-import {UserProfile} from "../app/slice";
+import {User} from "../../models/User.ts";
 import {client} from "../../utils/amplifyClient";
 import {formatBytes} from "../../utils/formatBytes.ts";
 
@@ -34,13 +34,13 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
 );
 
 export const handleDownload = createAsyncThunk<void,
-    { s3FileKey: string, user: UserProfile },
+    { s3FileKey: string, user: User },
     { rejectValue: string }>(
     'dataDownloads/handleDownload',
     async (data, {rejectWithValue}) => {
         try {
             await client.models.DownloadEvent.create({
-                userId: data.user.id,
+                userId: data.user.username,
                 email: data.user.email,
                 filename: data.s3FileKey,
                 timestamp: new Date().toISOString(),

@@ -1,5 +1,6 @@
 import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
+import { Group } from './auth/groups';
 import { data } from './data/resource';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
@@ -22,19 +23,39 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
   })
 );
 
-backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
-    new PolicyStatement({
-      actions: ['s3:GetObject', 's3:ListBucket'],
-      resources: [`arn:aws:s3:::${ghDataDownloadsBucketName}`, `arn:aws:s3:::${ghDataDownloadsBucketName}/*`],
-    })
-);
-
-backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
+backend.auth.resources.groups[Group.ADMINS].role.addToPrincipalPolicy(
   new PolicyStatement({
-    actions: ['s3:GetObject', 's3:ListBucket'],
-    resources: [`arn:aws:s3:::${globalDengueForecastingBucketName}`, `arn:aws:s3:::${globalDengueForecastingBucketName}/*`],
+    actions: [
+      'cognito-idp:ListUsers',
+      'cognito-idp:AdminListGroupsForUser',
+      'cognito-idp:AdminAddUserToGroup',
+      'cognito-idp:AdminRemoveUserFromGroup',
+      'cognito-idp:AdminDeleteUser',
+    ],
+    resources: [backend.auth.resources.userPool.userPoolArn],
   })
 );
+
+[Group.ADMINS, Group.CURATORS, Group.RESEARCHERS].forEach(group => {
+    backend.auth.resources.groups[group].role.addToPrincipalPolicy(
+        new PolicyStatement({
+            actions: ['s3:GetObject', 's3:ListBucket'],
+            resources: [`arn:aws:s3:::${ghOutbreakData}`, `arn:aws:s3:::${ghOutbreakData}/*`],
+        })
+    );
+    backend.auth.resources.groups[group].role.addToPrincipalPolicy(
+        new PolicyStatement({
+            actions: ['s3:GetObject', 's3:ListBucket'],
+            resources: [`arn:aws:s3:::${ghDataDownloadsBucketName}`, `arn:aws:s3:::${ghDataDownloadsBucketName}/*`],
+        })
+    );
+    backend.auth.resources.groups[group].role.addToPrincipalPolicy(
+        new PolicyStatement({
+            actions: ['s3:GetObject', 's3:ListBucket'],
+            resources: [`arn:aws:s3:::${globalDengueForecastingBucketName}`, `arn:aws:s3:::${globalDengueForecastingBucketName}/*`],
+        })
+    );
+});
 
 backend.addOutput({
   storage: {

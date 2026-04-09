@@ -28,6 +28,7 @@ describe('Sidebar Component', () => {
                 selectedMenuIndex={0}
                 handleLogout={mockHandleLogout}
                 drawerWidth={drawerWidth}
+                userProfileLoaded={true}
             />
         );
 
@@ -49,6 +50,7 @@ describe('Sidebar Component', () => {
                 selectedMenuIndex={1}
                 handleLogout={mockHandleLogout}
                 drawerWidth={drawerWidth}
+                userProfileLoaded={true}
             />
         );
 
@@ -68,6 +70,7 @@ describe('Sidebar Component', () => {
                 selectedMenuIndex={0}
                 handleLogout={mockHandleLogout}
                 drawerWidth={drawerWidth}
+                userProfileLoaded={true}
             />
         );
 
@@ -85,6 +88,7 @@ describe('Sidebar Component', () => {
                 selectedMenuIndex={0}
                 handleLogout={mockHandleLogout}
                 drawerWidth={drawerWidth}
+                userProfileLoaded={true}
             />
         );
 
@@ -102,6 +106,7 @@ describe('Sidebar Component', () => {
                 selectedMenuIndex={0}
                 handleLogout={mockHandleLogout}
                 drawerWidth={drawerWidth}
+                userProfileLoaded={true}
             />
         );
 
@@ -109,5 +114,21 @@ describe('Sidebar Component', () => {
         const renderedItem1 = screen.getByText(item1.text);
         expect(renderedItem1).toBeInTheDocument();
         expect(renderedItem1).not.toBeVisible();
+    });
+
+    it('shows loading state when user profile is not loaded', () => {
+        render(
+            <Sidebar
+                drawerOpen={true}
+                menuList={menuList}
+                selectedMenuIndex={0}
+                handleLogout={mockHandleLogout}
+                drawerWidth={drawerWidth}
+                userProfileLoaded={false}
+            />
+        );
+
+        // Check if loading indicator is shown
+        expect(screen.getByRole('progressbar')).toBeInTheDocument();
     });
 });

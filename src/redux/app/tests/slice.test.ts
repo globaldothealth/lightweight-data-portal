@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import appReducer from '../slice.ts';
 import { getUserProfile, logout } from '../thunk.ts';
+import { Group } from '../../../models/User.ts';
 
 describe('App Slice', () => {
     const initialState = {
@@ -48,7 +49,7 @@ describe('App Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const startState = { ...initialState, userProfile: { email: 'a', id: '1' } };
+            const startState = { ...initialState, userProfile: { email: 'a', id: '1', groups: [Group.ADMINS] } };
             const action = { type: logout.fulfilled.type };
             const state = appReducer(startState, action);
             expect(state.isLoading).toBe(false);

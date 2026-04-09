@@ -1,16 +1,19 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {fetchUserAttributes, FetchUserAttributesOutput, signOut} from "aws-amplify/auth";
-import {UserProfile} from "./slice.ts";
+import {signOut} from "aws-amplify/auth";
+import {User} from "../../models/User.ts";
+import {client} from "../../utils/amplifyClient";
 
 
-export const getUserProfile = createAsyncThunk<UserProfile, void, { rejectValue: string }>(
+export const getUserProfile = createAsyncThunk<User, void, { rejectValue: string }>(
     'app/getUserProfile',
     async (_, {rejectWithValue}) => {
-        const {email, sub: id}: FetchUserAttributesOutput = await fetchUserAttributes()
-        if (!email || !id) {
-            return rejectWithValue("User profile data missing")
+        try {
+            const response = await client.queries.getUserProfile({});
+            const data = response.data;
+            return (typeof data === 'string' ? JSON.parse(data) : data) as User;
+        } catch (error: unknown) {
+            return rejectWithValue(error instanceof Error ? error.message : 'Failed to fetch user profile');
         }
-        return {email, id};
     },
 );
 
