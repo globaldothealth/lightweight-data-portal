@@ -13,18 +13,19 @@ import {Group} from "../../models/User.ts";
 // This will ensure we have coverage for all containers and correct menu index passed to Sidebar.
 const containerList = [
     {containerName: 'DataDownloads', path: '/data-downloads', id: 'data-downloads', expectedIndex: '0'},
-    {containerName: 'DengueGeodata', path: '/dengue-geodata', id: 'dengue-geodata', expectedIndex: '1'},
+    {containerName: 'Tools', path: '/tools', id: 'tools', expectedIndex: '1'},
+    {containerName: 'DengueGeodata', path: '/dengue-geodata', id: 'dengue-geodata', expectedIndex: '2'},
     {
         containerName: 'LocationAdminExplorer',
         path: '/location-admin-explorer',
         id: 'location-admin-explorer',
-        expectedIndex: '2'
+        expectedIndex: '3'
     },
     {
         containerName: 'ManageUsers',
         path: '/manage-users',
         id: 'manage-users',
-        expectedIndex: '3'
+        expectedIndex: '4'
     }
 ];
 
