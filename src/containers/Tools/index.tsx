@@ -6,20 +6,20 @@ export default function Tools() {
     const tools = useMemo(() => [
         {
             name: 'Grapevne',
-            link: 'https://dev-globalhealth.pantheonsite.io/tools/grapevne/',
-            logo: '../../../public/grapevne-logo.jpg',
+            link: 'https://global.health/tools/grapevne/',
+            logo: '/grapevne-logo.jpg',
             description: 'A graphical platform for building and validating infectious disease pipelines.'
         },
         {
             name: 'DART',
-            link: 'https://dev-globalhealth.pantheonsite.io/tools/dart/',
-            logo: '../../../public/dart-square-logo.png',
+            link: 'https://global.health/tools/dart/',
+            logo: '/dart-square-logo.png',
             description: 'Scalable, open-access and multidisciplinary data integration pipeline for climate-sensitive diseases.'
         },
         {
             name: 'Insight Board',
-            link: 'https://dev-globalhealth.pantheonsite.io/tools/insightboard/',
-            logo: '../../../public/insight-board-logo.png',
+            link: 'https://global.health/insightboard/',
+            logo: '/insight-board-logo.png',
             description: 'Open-source AI-assisted tool for integrating, cleaning, and visualizing infectious disease outbreak data.'
         }
     ], []);
