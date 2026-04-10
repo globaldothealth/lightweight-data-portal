@@ -21,17 +21,17 @@ describe('Tools Component', () => {
         const toolsData = [
             {
                 name: 'Grapevne',
-                link: 'https://dev-globalhealth.pantheonsite.io/tools/grapevne/',
+                link: 'https://global.health/tools/grapevne/',
                 description: /A graphical platform for building and validating/i
             },
             {
                 name: 'DART',
-                link: 'https://dev-globalhealth.pantheonsite.io/tools/dart/',
+                link: 'https://global.health/tools/dart/',
                 description: /Scalable, open-access and multidisciplinary/i
             },
             {
                 name: 'Insight Board',
-                link: 'https://dev-globalhealth.pantheonsite.io/tools/insightboard/',
+                link: 'https://global.health/tools/insightboard/',
                 description: /Open-source AI-assisted tool for integrating/i
             }
         ];

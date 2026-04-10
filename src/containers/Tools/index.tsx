@@ -18,7 +18,7 @@ export default function Tools() {
         },
         {
             name: 'Insight Board',
-            link: 'https://global.health/insightboard/',
+            link: 'https://global.health/tools/insightboard/',
             logo: '/insight-board-logo.png',
             description: 'Open-source AI-assisted tool for integrating, cleaning, and visualizing infectious disease outbreak data.'
         }
@@ -38,7 +38,7 @@ export default function Tools() {
                 </Paper>
             </Grid>
             {tools.map(tool =>
-                <Grid size={{sm: 12, md: 6}} key={tool.name}>
+                <Grid size={{xs: 12, sm: 12, md: 6}} key={tool.name}>
                     <Paper sx={{height: '100%'}}>
                         <a target="_blank" rel="noopener noreferrer" href={tool.link}>
                             <img style={{width: '100%'}} src={tool.logo} alt={tool.name}/>
