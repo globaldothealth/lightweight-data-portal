@@ -6,10 +6,12 @@ import {
     Public as LocationAdminExplorerIcon,
     Satellite as DengueGeodataIcon,
     People as PeopleIcon,
+    Construction as ConstructionIcon,
 } from '@mui/icons-material';
 import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography, CircularProgress, Paper} from '@mui/material';
 
 import DataDownloads from "../DataDownloads";
+import Tools from "../Tools";
 import DengueGeodata from "../DengueGeodata";
 import ManageUsers from "../ManageUsers";
 import LocationAdminExplorer from "../LocationAdminExplorer";
@@ -44,6 +46,11 @@ export default function App() {
             text: 'Outbreak Data',
             icon: <OutbreakDataIcon/>,
             to: '/data-downloads',
+        },
+        {
+            text: 'Tools',
+            icon: <ConstructionIcon/>,
+            to: '/tools',
         },
         {
             text: 'Dengue Geodata',
@@ -108,6 +115,9 @@ export default function App() {
                         <Routes>
                             {menuList.some(item => item.to === '/data-downloads') && (
                                 <Route path="/data-downloads" element={<DataDownloads/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/tools') && (
+                                <Route path="/tools" element={<Tools/>}/>
                             )}
                             {menuList.some(item => item.to === '/dengue-geodata') && (
                                 <Route path="/dengue-geodata" element={<DengueGeodata/>}/>
