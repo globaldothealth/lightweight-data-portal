@@ -11,17 +11,17 @@ export const ManageUserActionsDescription = () => (
                 Outbreak Data page.
             </Typography>
             <Typography component='li'>
-                <strong>Researcher</strong> - user assigned to <i>RESEARCHERS</i> group. This user can view
+                <strong>Researcher</strong> - user assigned to <i>Reasercher</i> group. This user can view
                 the <i>Outbreak
                 Data</i> and <i>Dengue Geodata</i> pages.
             </Typography>
             <Typography component='li'>
-                <strong>Curator</strong> - user assigned to <i>CURATORS</i> group. This user can view
+                <strong>Curator</strong> - user assigned to <i>Curator</i> group. This user can view
                 the <i>Outbreak
                 Data</i>, <i>Dengue Geodata</i> and <i>Location Admin Explorer</i> pages.
             </Typography>
             <Typography component='li'>
-                <strong>Admin</strong> - user assigned to <i>ADMINS</i> group. This user can view the all of
+                <strong>Admin</strong> - user assigned to <i>Admin</i> group. This user can view the all of
                 the pages.
             </Typography>
         </Box>

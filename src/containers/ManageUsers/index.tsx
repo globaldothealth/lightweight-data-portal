@@ -92,7 +92,7 @@ const ManageUsers = () => {
                                                 onChange={(event) => updateGroups(event, rowData.username, rowData.groups)}
                                             >
                                                 {Object.values(Group).map((role) => (
-                                                    <MenuItem key={role} value={role}> {role} </MenuItem>
+                                                    <MenuItem key={role} value={role}>{role}</MenuItem>
                                                 ))}
                                             </Select>
                                         </FormControl>
