@@ -18,7 +18,7 @@ export const handler: Handler = async (event) => {
         UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
     })
     const groupsResponse = await client.send(listGroupsCommand)
-    const isAdmin = groupsResponse.Groups?.some((group) => group.GroupName === Group.ADMINS)
+    const isAdmin = groupsResponse.Groups?.some((group) => group.GroupName === Group.Admin)
 
     if (isAdmin) {
         throw new Error("User cannot be deleted because they are in the ADMINS group.")

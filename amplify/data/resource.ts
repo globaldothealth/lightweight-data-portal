@@ -36,7 +36,7 @@ const schema = a
                 username: a.string().required(),
                 groupName: a.string().required(),
             })
-            .authorization((allow) => [allow.group(Group.ADMINS)])
+            .authorization((allow) => [allow.group(Group.Admin)])
             .handler(a.handler.function(addUserToGroup))
             .returns(a.json()),
         removeUserFromGroup: a
@@ -45,7 +45,7 @@ const schema = a
                 username: a.string().required(),
                 groupName: a.string().required(),
             })
-            .authorization((allow) => [allow.group(Group.ADMINS)])
+            .authorization((allow) => [allow.group(Group.Admin)])
             .handler(a.handler.function(removeUserFromGroup))
             .returns(a.json()),
         deleteUser: a
@@ -53,13 +53,13 @@ const schema = a
             .arguments({
                 username: a.string().required(),
             })
-            .authorization((allow) => [allow.group(Group.ADMINS)])
+            .authorization((allow) => [allow.group(Group.Admin)])
             .handler(a.handler.function(deleteUser))
             .returns(a.json()),
         getUsers: a
             .query()
             .arguments({})
-            .authorization((allow) => [allow.group(Group.ADMINS)])
+            .authorization((allow) => [allow.group(Group.Admin)])
             .handler(a.handler.function(getUsers))
             .returns(a.json()),
         getUserProfile: a

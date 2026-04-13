@@ -1,7 +1,7 @@
 export enum Group {
-    ADMINS = 'ADMINS',
-    CURATORS = 'CURATORS',
-    RESEARCHERS = 'RESEARCHERS',
+    ADMINS = 'Admin',
+    CURATORS = 'Curator',
+    RESEARCHERS = 'Researcher',
 }
 
 export interface User {

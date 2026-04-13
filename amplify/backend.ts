@@ -23,7 +23,7 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
   })
 );
 
-backend.auth.resources.groups[Group.ADMINS].role.addToPrincipalPolicy(
+backend.auth.resources.groups[Group.Admin].role.addToPrincipalPolicy(
   new PolicyStatement({
     actions: [
       'cognito-idp:ListUsers',
@@ -36,7 +36,7 @@ backend.auth.resources.groups[Group.ADMINS].role.addToPrincipalPolicy(
   })
 );
 
-[Group.ADMINS, Group.CURATORS, Group.RESEARCHERS].forEach(group => {
+[Group.Admin, Group.Curator, Group.Researcher].forEach(group => {
     backend.auth.resources.groups[group].role.addToPrincipalPolicy(
         new PolicyStatement({
             actions: ['s3:GetObject', 's3:ListBucket'],
