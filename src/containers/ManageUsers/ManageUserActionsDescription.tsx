@@ -26,7 +26,7 @@ export const ManageUserActionsDescription = () => (
             </Typography>
         </Box>
         <Typography>User cannot remove their own account. Additionally in order to delete
-            user account that belongs to <i>ADMINS</i> they must first be removed from
-            the <i>ADMINS</i> group.</Typography>
+            user account that belongs to <i>Admin</i> they must first be removed from
+            the <i>Admin</i> group.</Typography>
     </Paper>
 )
