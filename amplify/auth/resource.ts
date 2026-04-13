@@ -37,7 +37,7 @@ export const auth = defineAuth({
         postConfirmation,
         postAuthentication
     },
-    groups: [Group.ADMINS, Group.CURATORS, Group.RESEARCHERS],
+    groups: [Group.ADMINS, Group.CURATORS, Group.RESEARCHERS, Group.Admin, Group.Curator, Group.Researcher],
 
     access: (allow) => [
         allow.resource(addUserToGroup).to(["addUserToGroup"]),

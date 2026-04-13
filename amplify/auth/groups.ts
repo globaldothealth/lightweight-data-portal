@@ -1,6 +1,9 @@
 export enum Group {
     ADMINS = "ADMINS",
+    Admin = "Admin",
     CURATORS = "CURATORS",
-    RESEARCHERS = "RESEARCHERS"
+    Curator = "Curator",
+    RESEARCHERS = "RESEARCHERS",
+    Researcher = "Researcher"
 }
 
