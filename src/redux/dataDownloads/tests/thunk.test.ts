@@ -54,6 +54,21 @@ describe('DataDownloads thunks', () => {
             expect(list).toHaveBeenCalledWith({path: payload.s3Folder, options: {bucket: 'gh-outbreak-data'}});
         });
 
+        it('should use an empty path when s3Folder is "All Outbreaks"', async () => {
+            vi.mocked(list).mockResolvedValue({
+                items: [
+                    {path: testFile1.filename, size: 1000},
+                ]
+            } as never);
+
+            const allOutbreaksPayload = { s3Folder: 'All Outbreaks' };
+            const result = await getFilesFromS3Folder(allOutbreaksPayload)(mockDispatch, mockGetState, undefined);
+
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
+            expect(list).toHaveBeenCalledWith({path: '', options: {bucket: 'gh-outbreak-data'}});
+        });
+
+
         it('should reject when no files are found', async () => {
             vi.mocked(list).mockResolvedValue({items: []});
 

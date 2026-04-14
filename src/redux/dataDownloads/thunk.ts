@@ -11,8 +11,9 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
     'dataDownloads/getFilesFromS3Folder',
     async (data, {rejectWithValue}) => {
         try {
+            const dataPath = data.s3Folder === 'All Outbreaks' ? '' : data.s3Folder;
             const result = await list({
-                path: data.s3Folder,
+                path: dataPath,
                 options: {
                     bucket: 'gh-outbreak-data'
                 }

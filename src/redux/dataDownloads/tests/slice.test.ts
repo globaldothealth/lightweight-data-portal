@@ -10,7 +10,7 @@ vi.mock('aws-amplify/data', () => ({
 describe('DataDownloads Slice', () => {
     const initialState = {
         isLoading: false,
-        s3Folder: S3Folder.Mpox2024,
+        s3Folder: S3Folder.All,
         s3Files: [],
         error: undefined,
     };
