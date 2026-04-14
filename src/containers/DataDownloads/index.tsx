@@ -34,6 +34,11 @@ export default function DataDownloads() {
             <Grid size={12} sx={{color: 'text.primary'}}>
                 <Typography variant='h2'>Outbreak Data</Typography>
             </Grid>
+            <Grid size={12} sx={{color: 'text.primary'}}>
+                <Paper sx={{p: '1rem'}}>
+                    <Typography>Explore data from the Global.health team to support outbreak response.</Typography>
+                </Paper>
+            </Grid>
             <Grid size={12}>
                 <DataAcknowledgementsAccordion initialOpen={false}></DataAcknowledgementsAccordion>
             </Grid>
