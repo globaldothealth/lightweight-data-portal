@@ -4,6 +4,7 @@ import {getUrl, list} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
 import {User, Group} from "../../../models/User.ts";
 import { REQUEST_STATUS } from "../../../utils/tests/testConstants.ts";
+import { S3Folder } from "../slice.ts";
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
@@ -53,6 +54,21 @@ describe('DataDownloads thunks', () => {
             expect(result.payload).toEqual([testFile1, testFile2]);
             expect(list).toHaveBeenCalledWith({path: payload.s3Folder, options: {bucket: 'gh-outbreak-data'}});
         });
+
+        it('should use an empty path when s3Folder is "All Outbreaks"', async () => {
+            vi.mocked(list).mockResolvedValue({
+                items: [
+                    {path: testFile1.filename, size: 1000},
+                ]
+            } as never);
+
+            const allOutbreaksPayload = { s3Folder: S3Folder.All};
+            const result = await getFilesFromS3Folder(allOutbreaksPayload)(mockDispatch, mockGetState, undefined);
+
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
+            expect(list).toHaveBeenCalledWith({path: '', options: {bucket: 'gh-outbreak-data'}});
+        });
+
 
         it('should reject when no files are found', async () => {
             vi.mocked(list).mockResolvedValue({items: []});
