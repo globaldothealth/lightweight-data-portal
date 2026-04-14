@@ -4,6 +4,7 @@ import {getUrl, list} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
 import {User, Group} from "../../../models/User.ts";
 import { REQUEST_STATUS } from "../../../utils/tests/testConstants.ts";
+import { S3Folder } from "../slice.ts";
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
@@ -61,7 +62,7 @@ describe('DataDownloads thunks', () => {
                 ]
             } as never);
 
-            const allOutbreaksPayload = { s3Folder: 'All Outbreaks' };
+            const allOutbreaksPayload = { s3Folder: S3Folder.All};
             const result = await getFilesFromS3Folder(allOutbreaksPayload)(mockDispatch, mockGetState, undefined);
 
             expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);

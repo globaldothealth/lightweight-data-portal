@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {getUrl, list} from "aws-amplify/storage";
-import {S3File} from "./slice";
+import {S3File, S3Folder} from "./slice";
 import {User} from "../../models/User.ts";
 import {client} from "../../utils/amplifyClient";
 import {formatBytes} from "../../utils/formatBytes.ts";
@@ -11,7 +11,7 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
     'dataDownloads/getFilesFromS3Folder',
     async (data, {rejectWithValue}) => {
         try {
-            const dataPath = data.s3Folder === 'All Outbreaks' ? '' : data.s3Folder;
+            const dataPath = data.s3Folder === S3Folder.All ? '' : data.s3Folder;
             const result = await list({
                 path: dataPath,
                 options: {
