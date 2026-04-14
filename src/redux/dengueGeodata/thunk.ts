@@ -1,8 +1,8 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {getUrl, downloadData} from "aws-amplify/storage";
 import {S3File} from "./slice";
-import {UserProfile} from "../app/slice";
 import {client} from "../../utils/amplifyClient";
+import {User} from "../../models/User.ts";
 
 export const getFilesFromMetadata = createAsyncThunk<{files: S3File[], availableCountries: {[key: string]: string}},
     undefined,
@@ -54,13 +54,13 @@ export const getFilesFromMetadata = createAsyncThunk<{files: S3File[], available
 );
 
 export const handleDownload = createAsyncThunk<void,
-    { s3FileKey: string, user: UserProfile },
+    { s3FileKey: string, user: User },
     { rejectValue: string }>(
     'dengueGeodata/handleDownload',
     async (data, {rejectWithValue}) => {
         try {
             await client.models.DownloadEvent.create({
-                userId: data.user.id,
+                userId: data.user.username,
                 email: data.user.email,
                 filename: data.s3FileKey,
                 timestamp: new Date().toISOString(),

@@ -8,7 +8,6 @@ export enum S3Folder {
     Marburg = 'Marburg',
     Mpox2022 = 'Mpox 2022',
     Mpox2024 ='Mpox 2024'
-
 }
 
 export type S3File = {

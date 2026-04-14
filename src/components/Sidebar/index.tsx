@@ -2,7 +2,7 @@ import {JSX} from "react";
 import {useLocation, useNavigate} from 'react-router-dom';
 import {Logout as LogoutIcon} from '@mui/icons-material';
 import {
-    Box,
+    Box, CircularProgress,
     Divider,
     Drawer,
     List,
@@ -19,10 +19,11 @@ interface SidebarProps {
     menuList: { text: string; icon: JSX.Element; to: string }[];
     selectedMenuIndex: number | undefined;
     handleLogout: () => void;
-    drawerWidth: number
+    drawerWidth: number,
+    userProfileLoaded: boolean,
 }
 
-export default function Sidebar({drawerOpen, menuList, selectedMenuIndex, handleLogout, drawerWidth}: SidebarProps) {
+export default function Sidebar({drawerOpen, menuList, selectedMenuIndex, handleLogout, drawerWidth, userProfileLoaded}: SidebarProps) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -38,7 +39,7 @@ export default function Sidebar({drawerOpen, menuList, selectedMenuIndex, handle
         <Toolbar/>
         <Box sx={{overflow: 'auto'}}>
             <List>
-                {menuList.map(
+                {userProfileLoaded ? menuList.map(
                     (item, index) =>
                         <ListItem
                             key={item.text}
@@ -50,7 +51,9 @@ export default function Sidebar({drawerOpen, menuList, selectedMenuIndex, handle
                                 <ListItemText primary={item.text}/>
                             </ListItemButton>
                         </ListItem>
-                )}
+                ) : <ListItem sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <CircularProgress/>
+                </ListItem>}
             </List>
             <Divider/>
             <List>

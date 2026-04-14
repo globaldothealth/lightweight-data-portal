@@ -5,18 +5,27 @@ import {MemoryRouter} from 'react-router-dom';
 
 import * as reduxHooks from '../../hooks/redux';
 import {getUserProfile, logout} from '../../redux/app/thunk';
+import {selectUserProfile, selectIsLoading} from '../../redux/app/selectors';
+import {Group} from "../../models/User.ts";
 
 
 // Update this list with new containers and their expected menu index after adding new containers to App.tsx.
 // This will ensure we have coverage for all containers and correct menu index passed to Sidebar.
 const containerList = [
     {containerName: 'DataDownloads', path: '/data-downloads', id: 'data-downloads', expectedIndex: '0'},
-    {containerName: 'DengueGeodata', path: '/dengue-geodata', id: 'dengue-geodata', expectedIndex: '1'},
+    {containerName: 'Tools', path: '/tools', id: 'tools', expectedIndex: '1'},
+    {containerName: 'DengueGeodata', path: '/dengue-geodata', id: 'dengue-geodata', expectedIndex: '2'},
     {
         containerName: 'LocationAdminExplorer',
         path: '/location-admin-explorer',
         id: 'location-admin-explorer',
-        expectedIndex: '2'
+        expectedIndex: '3'
+    },
+    {
+        containerName: 'ManageUsers',
+        path: '/manage-users',
+        id: 'manage-users',
+        expectedIndex: '4'
     }
 ];
 
@@ -64,7 +73,11 @@ describe('App Container', () => {
     beforeEach(() => {
         vi.mocked(reduxHooks.useAppDispatch).mockReturnValue(mockDispatch);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        vi.mocked(reduxHooks.useAppSelector).mockReturnValue({id: 'test-id', email: 'test@example.com'} as any);
+        vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector: any) => {
+            if (selector === selectUserProfile) return {id: 'test-id', email: 'test@example.com', groups: [Group.ADMINS]};
+            if (selector === selectIsLoading) return false;
+            return undefined;
+        });
 
         mockDispatch.mockClear();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -131,5 +144,39 @@ describe('App Container', () => {
         expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({type: 'mock-logout'}));
         expect(logout).toHaveBeenCalled();
     });
-});
 
+    describe('when user has no groups', () => {
+        beforeEach(() => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            vi.mocked(reduxHooks.useAppSelector).mockImplementation((selector: any) => {
+                if (selector === selectUserProfile) return {id: 'test-id', email: 'test@example.com', groups: []};
+                if (selector === selectIsLoading) return false;
+                return undefined;
+            });
+        });
+
+        it('only renders container with no group requirements and passes correct menu index', () => {
+            render(
+                <MemoryRouter initialEntries={['/data-downloads']}>
+                    <App/>
+                </MemoryRouter>
+            );
+
+            expect(screen.getByTestId('data-downloads')).toBeInTheDocument();
+            expect(screen.getByTestId('selected-menu-index')).toHaveTextContent('0');
+        });
+
+        it('redirects unauthorized paths to the first available allowed menu item', () => {
+            render(
+                <MemoryRouter initialEntries={['/dengue-geodata']}>
+                    <App/>
+                </MemoryRouter>
+            );
+
+            // unauthorized path should redirect to /data-downloads since it's the first available item
+            expect(screen.getByTestId('data-downloads')).toBeInTheDocument();
+            expect(screen.queryByTestId('dengue-geodata')).not.toBeInTheDocument();
+            expect(screen.getByTestId('selected-menu-index')).toHaveTextContent('0');
+        });
+    });
+});

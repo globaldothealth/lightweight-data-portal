@@ -1,7 +1,9 @@
-import {vi, describe, it, expect, beforeEach} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {getFilesFromS3Folder, handleDownload} from '../thunk.ts';
-import {list, getUrl} from 'aws-amplify/storage';
+import {getUrl, list} from 'aws-amplify/storage';
 import {client} from '../../../utils/amplifyClient.ts';
+import {User, Group} from "../../../models/User.ts";
+import { REQUEST_STATUS } from "../../../utils/tests/testConstants.ts";
 
 // Mock Amplify Storage
 vi.mock('aws-amplify/storage', () => ({
@@ -43,11 +45,11 @@ describe('DataDownloads thunks', () => {
                     {path: testFile2.filename, size: 2000},
                     {path: testFile3.filename},
                 ]
-            } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+            } as never);
 
             const result = await getFilesFromS3Folder(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toEqual([testFile1, testFile2]);
             expect(list).toHaveBeenCalledWith({path: payload.s3Folder, options: {bucket: 'gh-outbreak-data'}});
         });
@@ -57,7 +59,7 @@ describe('DataDownloads thunks', () => {
 
             const result = await getFilesFromS3Folder(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('No files found in the specified S3 folder.');
         });
 
@@ -67,7 +69,7 @@ describe('DataDownloads thunks', () => {
 
             const result = await getFilesFromS3Folder(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe(`Error fetching files from S3: ${errorMessage}`);
         });
 
@@ -76,26 +78,25 @@ describe('DataDownloads thunks', () => {
 
             const result = await getFilesFromS3Folder(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe(`Error fetching files from S3: An unknown error occurred`);
         });
     });
 
     describe('handleDownload', () => {
-        const mockUser = {email: 'user@example.com', id: '123'};
+        const mockUser: User = {email: 'user@example.com', username: '123', groups: [Group.RESEARCHERS]};
         const payload = {s3FileKey: 'file.txt', user: mockUser};
 
         it('should fulfill on successful download process', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({ data: {} } as any);
+            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({ data: {} } as never);
             vi.mocked(getUrl).mockResolvedValue({url: new URL('http://mock.url/file.txt'), expiresAt: new Date()});
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('fulfilled');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
 
             expect(client.models.DownloadEvent.create).toHaveBeenCalledWith(expect.objectContaining({
-                userId: mockUser.id,
+                userId: mockUser.username,
                 email: mockUser.email,
                 filename: payload.s3FileKey,
             }));
@@ -109,7 +110,7 @@ describe('DataDownloads thunks', () => {
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Error downloading file from S3: DB Error');
             expect(getUrl).not.toHaveBeenCalled();
         });
@@ -119,19 +120,18 @@ describe('DataDownloads thunks', () => {
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Error downloading file from S3: An unknown error occurred');
             expect(getUrl).not.toHaveBeenCalled();
         });
 
         it('should reject if getUrl fails', async () => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({ data: {} } as any);
+            vi.mocked(client.models.DownloadEvent.create).mockResolvedValue({ data: {} } as never);
             vi.mocked(getUrl).mockRejectedValue(new Error('URL generation failed'));
 
             const result = await handleDownload(payload)(mockDispatch, mockGetState, undefined);
 
-            expect(result.meta.requestStatus).toBe('rejected');
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Error downloading file from S3: URL generation failed');
         });
     });
