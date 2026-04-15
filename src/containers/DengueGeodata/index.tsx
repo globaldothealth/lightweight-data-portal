@@ -29,6 +29,11 @@ export default function DengueGeodata() {
                 <Typography variant='h2'>Dengue Geodata</Typography>
             </Grid>
             <Grid size={12}>
+                <Paper sx={{p: '1rem'}}>
+                    <Typography>Access comprehensive global dengue datasets to explore transmission dynamics and model key drivers of spread.</Typography>
+                </Paper>
+            </Grid>
+            <Grid size={12}>
                 <DataAcknowledgementsAccordion initialOpen={false}></DataAcknowledgementsAccordion>
             </Grid>
             <Grid size={12}>

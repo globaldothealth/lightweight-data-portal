@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {getFilesFromS3Folder, handleDownload} from './thunk';
 
 export enum S3Folder {
+    All = 'All Outbreaks',
     AvianInfluenza = 'Avian Influenza',
     COVID19 = 'COVID-19',
     Ebola = 'Ebola',
@@ -25,7 +26,7 @@ interface DataDownloadsState {
 
 const initialState: DataDownloadsState = {
     isLoading: false,
-    s3Folder: S3Folder.Mpox2024,
+    s3Folder: S3Folder.All,
     s3Files: [],
     error: undefined,
 };
