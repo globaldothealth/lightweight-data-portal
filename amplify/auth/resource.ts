@@ -44,7 +44,7 @@ export const auth = defineAuth({
         allow.resource(removeUserFromGroup).to(["removeUserFromGroup"]),
         allow.resource(deleteUser).to(["deleteUser"]),
         allow.resource(getUsers).to(["listUsers"]),
-        allow.resource(getUsers).to(["listGroupsForUser"]),
+        allow.resource(getUsers).to(["listUsersInGroup"]),
         allow.resource(getUserProfile).to(["getUser"]),
         allow.resource(getUserProfile).to(["listGroupsForUser"]),
     ],
