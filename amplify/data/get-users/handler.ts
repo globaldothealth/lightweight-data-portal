@@ -27,7 +27,7 @@ export const handler: Handler = async () => {
     const userGroupsMap = new Map<string, string[]>()
 
     // For each group, fetch its users and populate the userGroupsMap, handle pagination for users in group
-    for (const groupName in Group) {
+    for (const groupName in Object.values(Group)) {
         let groupUsersNextToken: string | undefined = undefined
         do {
             const listUsersInGroupCommand: any  = new ListUsersInGroupCommand({
