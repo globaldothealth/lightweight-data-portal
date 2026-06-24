@@ -36,7 +36,10 @@ import {
     deleteScheduleConfig,
 } from '../../redux/mapDataAggregation/thunk';
 
+import {OUTBREAK_OPTIONS, OutbreakName} from '../../config/outbreaks';
+
 type ScheduleType = 'rate' | 'cron';
+
 
 const MapDataAggregation = () => {
     const dispatch = useAppDispatch();
@@ -44,9 +47,7 @@ const MapDataAggregation = () => {
     const isLoading = useAppSelector(selectIsLoading);
     const error = useAppSelector(selectError);
 
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [targetFileKey, setTargetFileKey] = useState('');
+    const [outbreakName, setOutbreakName] = useState<OutbreakName | ''>('');
     const [enabled, setEnabled] = useState(true);
     const [scheduleType, setScheduleType] = useState<ScheduleType>('rate');
     const [rateValue, setRateValue] = useState('30');
@@ -68,16 +69,12 @@ const MapDataAggregation = () => {
         e.preventDefault();
         dispatch(
             createScheduleConfig({
-                name,
-                description: description || undefined,
                 scheduleExpression: buildScheduleExpression(),
-                targetFileKey,
+                outbreakName,
                 enabled,
             }),
         );
-        setName('');
-        setDescription('');
-        setTargetFileKey('');
+        setOutbreakName('');
         setEnabled(true);
         setRateValue('30');
         setRateUnit('minutes');
@@ -87,6 +84,8 @@ const MapDataAggregation = () => {
     const handleDelete = (id: string) => {
         dispatch(deleteScheduleConfig(id));
     };
+
+    const usedOutbreakNames = new Set(scheduleConfigs.map((c) => c.outbreakName));
 
     return (
         <Grid container spacing={2}>
@@ -141,7 +140,7 @@ const MapDataAggregation = () => {
                                     primary={
                                         <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                                             <Typography fontWeight="bold">
-                                                {config.name}
+                                                {config.outbreakName}
                                             </Typography>
                                             <Chip
                                                 label={config.enabled ? 'Enabled' : 'Disabled'}
@@ -151,19 +150,9 @@ const MapDataAggregation = () => {
                                         </Box>
                                     }
                                     secondary={
-                                        <>
-                                            {config.description && (
-                                                <Typography variant="body2" component="span" display="block">
-                                                    {config.description}
-                                                </Typography>
-                                            )}
-                                            <Typography variant="body2" component="span" display="block">
-                                                Schedule: {config.scheduleExpression}
-                                            </Typography>
-                                            <Typography variant="body2" component="span" display="block">
-                                                Target: {config.targetFileKey}
-                                            </Typography>
-                                        </>
+                                        <Typography variant="body2" component="span" display="block">
+                                            Schedule: {config.scheduleExpression}
+                                        </Typography>
                                     }
                                 />
                             </ListItem>
@@ -179,27 +168,30 @@ const MapDataAggregation = () => {
                         Add New Schedule Configuration
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-                        <TextField
-                            label="Name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                            fullWidth
-                        />
-                        <TextField
-                            label="Description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            fullWidth
-                        />
-                        <TextField
-                            label="Target File Key (S3 path)"
-                            value={targetFileKey}
-                            onChange={(e) => setTargetFileKey(e.target.value)}
-                            required
-                            fullWidth
-                            placeholder="e.g. aggregation.json"
-                        />
+                        <FormControl fullWidth required>
+                            <InputLabel>Outbreak Name</InputLabel>
+                            <Select
+                                value={outbreakName}
+                                label="Outbreak Name"
+                                onChange={(e: SelectChangeEvent) =>
+                                    setOutbreakName(e.target.value as OutbreakName)
+                                }
+                            >
+                                {OUTBREAK_OPTIONS.map((opt) => {
+                                    const alreadyUsed = usedOutbreakNames.has(opt);
+                                    return (
+                                        <MenuItem key={opt} value={opt} disabled={alreadyUsed}>
+                                            {opt}{alreadyUsed ? ' (already scheduled)' : ''}
+                                        </MenuItem>
+                                    );
+                                })}
+                            </Select>
+                            {OUTBREAK_OPTIONS.every((opt) => usedOutbreakNames.has(opt)) && (
+                                <Typography variant="caption" color="text.secondary" sx={{mt: 0.5, ml: 1.75}}>
+                                    All outbreaks already have an active schedule.
+                                </Typography>
+                            )}
+                        </FormControl>
 
                         <FormControl fullWidth>
                             <InputLabel>Schedule Type</InputLabel>
@@ -262,7 +254,7 @@ const MapDataAggregation = () => {
                         <Button
                             type="submit"
                             variant="contained"
-                            disabled={isLoading || !name || !targetFileKey}
+                            disabled={isLoading || !outbreakName || usedOutbreakNames.has(outbreakName as OutbreakName)}
                         >
                             Add Configuration
                         </Button>

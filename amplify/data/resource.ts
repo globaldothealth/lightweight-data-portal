@@ -32,10 +32,8 @@ const schema = a
             ]),
         ScheduleConfig: a
             .model({
-                name: a.string().required(),
-                description: a.string(),
                 scheduleExpression: a.string().required(),
-                targetFileKey: a.string().required(),
+                outbreakName: a.string().required(),
                 enabled: a.boolean().required(),
             })
             .authorization((allow) => [

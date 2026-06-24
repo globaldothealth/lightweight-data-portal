@@ -2,14 +2,21 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { Group } from './auth/groups';
 import { data } from './data/resource';
-import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { DockerImageFunction, DockerImageCode } from 'aws-cdk-lib/aws-lambda';
+import { PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import {
+  DockerImageFunction,
+  DockerImageCode,
+  Runtime,
+  StartingPosition,
+  EventSourceMapping,
+} from 'aws-cdk-lib/aws-lambda';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { StreamViewType } from 'aws-cdk-lib/aws-dynamodb';
 import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
-import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
-import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { Duration } from 'aws-cdk-lib';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { OUTBREAK_CONFIGS } from '../src/config/outbreaks';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -107,9 +114,7 @@ const mapDataAggregationFn = new DockerImageFunction(mapDataAggregationStack, 'M
   timeout: Duration.minutes(5),
   environment: {
     BUCKET_NAME: aggregatedMapDataBucketName,
-    TARGET_FILE_KEY: 'parsed_data.json',
-    MISSING_FILE_KEY: 'missing_data.json',
-    DATA_URL: 'https://raw.githubusercontent.com/globaldothealth/outbreak-data/refs/heads/main/Ebola%20BVD/Data/Ebola%20BVD%202026%20linelist%20-%20PUBLIC%20VIEW.csv',
+    OUTBREAK_CONFIGS: JSON.stringify(OUTBREAK_CONFIGS),
   },
 });
 
@@ -124,9 +129,74 @@ mapDataAggregationFn.addToRolePolicy(
   })
 );
 
-// Schedule: every 12 hours
-new Rule(mapDataAggregationStack, 'Every12HoursAggregationRule', {
-  schedule: Schedule.rate(Duration.hours(12)),
-  targets: [new LambdaFunction(mapDataAggregationFn)],
+// --- Dynamic, user-driven schedules ---
+// Schedules are no longer hard-coded here. Instead, EventBridge Scheduler
+// schedules are created/updated/deleted at runtime from the `ScheduleConfig`
+// records that admins manage through the UI. A DynamoDB stream on that table
+// invokes the `schedule-manager` Lambda, which provisions the actual schedules.
+
+// Role that EventBridge Scheduler assumes to invoke the aggregation Lambda.
+const aggregationSchedulerRole = new Role(mapDataAggregationStack, 'AggregationSchedulerInvokeRole', {
+  assumedBy: new ServicePrincipal('scheduler.amazonaws.com'),
+  description: 'Assumed by EventBridge Scheduler to invoke the map data aggregation Lambda',
+});
+mapDataAggregationFn.grantInvoke(aggregationSchedulerRole);
+
+// Lambda that reconciles ScheduleConfig records with EventBridge Scheduler schedules.
+const scheduleManagerFn = new NodejsFunction(mapDataAggregationStack, 'ScheduleManagerFn', {
+  entry: path.join(__dirname, 'functions/schedule-manager/handler.ts'),
+  runtime: Runtime.NODEJS_20_X,
+  timeout: Duration.seconds(60),
+  environment: {
+    AGGREGATION_FUNCTION_ARN: mapDataAggregationFn.functionArn,
+    SCHEDULER_ROLE_ARN: aggregationSchedulerRole.roleArn,
+  },
+});
+
+// Allow the manager to create/update/delete the per-config schedules and to pass
+// the scheduler role to EventBridge Scheduler.
+scheduleManagerFn.addToRolePolicy(
+  new PolicyStatement({
+    actions: [
+      'scheduler:CreateSchedule',
+      'scheduler:UpdateSchedule',
+      'scheduler:DeleteSchedule',
+      'scheduler:GetSchedule',
+    ],
+    resources: ['arn:aws:scheduler:*:*:schedule/default/aggregation-*'],
+  })
+);
+scheduleManagerFn.addToRolePolicy(
+  new PolicyStatement({
+    actions: ['iam:PassRole'],
+    resources: [aggregationSchedulerRole.roleArn],
+    conditions: { StringEquals: { 'iam:PassedToService': 'scheduler.amazonaws.com' } },
+  })
+);
+
+// Enable a DynamoDB stream on the ScheduleConfig table and feed it to the manager.
+backend.data.resources.cfnResources.amplifyDynamoDbTables['ScheduleConfig'].streamSpecification = {
+  streamViewType: StreamViewType.NEW_AND_OLD_IMAGES,
+};
+const scheduleConfigTable = backend.data.resources.tables['ScheduleConfig'];
+
+scheduleManagerFn.addToRolePolicy(
+  new PolicyStatement({
+    actions: [
+      'dynamodb:DescribeStream',
+      'dynamodb:GetRecords',
+      'dynamodb:GetShardIterator',
+      'dynamodb:ListStreams',
+    ],
+    resources: [scheduleConfigTable.tableStreamArn!],
+  })
+);
+
+new EventSourceMapping(mapDataAggregationStack, 'ScheduleManagerStreamMapping', {
+  target: scheduleManagerFn,
+  eventSourceArn: scheduleConfigTable.tableStreamArn!,
+  startingPosition: StartingPosition.LATEST,
+  batchSize: 5,
+  retryAttempts: 3,
 });
 
