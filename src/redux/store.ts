@@ -4,12 +4,14 @@ import appReducer from './app/slice';
 import dataDownloadsReducer from './dataDownloads/slice';
 import dengueGeodataReducer from './dengueGeodata/slice';
 import manageUsersReducer from './manageUsers/slice';
+import mapDataAggregationReducer from './mapDataAggregation/slice';
 
 export const rootReducer = combineReducers({
     app: appReducer,
     dataDownloads: dataDownloadsReducer,
     dengueGeodata: dengueGeodataReducer,
     manageUsers: manageUsersReducer,
+    mapDataAggregation: mapDataAggregationReducer,
 });
 
 const store = configureStore({

@@ -1,0 +1,277 @@
+import {useEffect, useState} from 'react';
+import {
+    Alert,
+    Box,
+    Button,
+    Chip,
+    FormControl,
+    Grid,
+    IconButton,
+    InputLabel,
+    List,
+    ListItem,
+    ListItemText,
+    MenuItem,
+    Paper,
+    Select,
+    SelectChangeEvent,
+    Switch,
+    TextField,
+    Tooltip,
+    Typography,
+    CircularProgress,
+    FormControlLabel,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+
+import {useAppDispatch, useAppSelector} from '../../hooks/redux';
+import {
+    selectScheduleConfigs,
+    selectIsLoading,
+    selectError,
+} from '../../redux/mapDataAggregation/selectors';
+import {
+    getScheduleConfigs,
+    createScheduleConfig,
+    deleteScheduleConfig,
+} from '../../redux/mapDataAggregation/thunk';
+
+type ScheduleType = 'rate' | 'cron';
+
+const MapDataAggregation = () => {
+    const dispatch = useAppDispatch();
+    const scheduleConfigs = useAppSelector(selectScheduleConfigs);
+    const isLoading = useAppSelector(selectIsLoading);
+    const error = useAppSelector(selectError);
+
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    const [targetFileKey, setTargetFileKey] = useState('');
+    const [enabled, setEnabled] = useState(true);
+    const [scheduleType, setScheduleType] = useState<ScheduleType>('rate');
+    const [rateValue, setRateValue] = useState('30');
+    const [rateUnit, setRateUnit] = useState('minutes');
+    const [cronExpression, setCronExpression] = useState('0 0 * * ? *');
+
+    useEffect(() => {
+        dispatch(getScheduleConfigs());
+    }, [dispatch]);
+
+    const buildScheduleExpression = (): string => {
+        if (scheduleType === 'rate') {
+            return `rate(${rateValue} ${rateUnit})`;
+        }
+        return `cron(${cronExpression})`;
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        dispatch(
+            createScheduleConfig({
+                name,
+                description: description || undefined,
+                scheduleExpression: buildScheduleExpression(),
+                targetFileKey,
+                enabled,
+            }),
+        );
+        setName('');
+        setDescription('');
+        setTargetFileKey('');
+        setEnabled(true);
+        setRateValue('30');
+        setRateUnit('minutes');
+        setCronExpression('0 0 * * ? *');
+    };
+
+    const handleDelete = (id: string) => {
+        dispatch(deleteScheduleConfig(id));
+    };
+
+    return (
+        <Grid container spacing={2}>
+            <Grid size={12}>
+                <Typography variant="h2" sx={{color: 'text.primary'}}>
+                    Map Data Aggregation
+                </Typography>
+            </Grid>
+
+            {error && (
+                <Grid size={12}>
+                    <Alert severity="error">{error}</Alert>
+                </Grid>
+            )}
+
+            {/* Existing configurations list */}
+            <Grid size={12}>
+                <Paper sx={{p: '1rem'}}>
+                    <Typography variant="h6" gutterBottom>
+                        Active Schedule Configurations
+                    </Typography>
+                    {isLoading && <CircularProgress size={24} />}
+                    {scheduleConfigs.length === 0 && !isLoading && (
+                        <Typography color="text.secondary">
+                            No schedule configurations found.
+                        </Typography>
+                    )}
+                    <List>
+                        {scheduleConfigs.map((config) => (
+                            <ListItem
+                                key={config.id}
+                                secondaryAction={
+                                    <Tooltip title="Remove configuration">
+                                        <IconButton
+                                            edge="end"
+                                            aria-label="delete"
+                                            onClick={() => handleDelete(config.id)}
+                                            color="error"
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                }
+                                sx={{
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 1,
+                                    mb: 1,
+                                }}
+                            >
+                                <ListItemText
+                                    primary={
+                                        <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                            <Typography fontWeight="bold">
+                                                {config.name}
+                                            </Typography>
+                                            <Chip
+                                                label={config.enabled ? 'Enabled' : 'Disabled'}
+                                                color={config.enabled ? 'success' : 'default'}
+                                                size="small"
+                                            />
+                                        </Box>
+                                    }
+                                    secondary={
+                                        <>
+                                            {config.description && (
+                                                <Typography variant="body2" component="span" display="block">
+                                                    {config.description}
+                                                </Typography>
+                                            )}
+                                            <Typography variant="body2" component="span" display="block">
+                                                Schedule: {config.scheduleExpression}
+                                            </Typography>
+                                            <Typography variant="body2" component="span" display="block">
+                                                Target: {config.targetFileKey}
+                                            </Typography>
+                                        </>
+                                    }
+                                />
+                            </ListItem>
+                        ))}
+                    </List>
+                </Paper>
+            </Grid>
+
+            {/* Add new configuration form */}
+            <Grid size={12}>
+                <Paper sx={{p: '1rem'}}>
+                    <Typography variant="h6" gutterBottom>
+                        Add New Schedule Configuration
+                    </Typography>
+                    <Box component="form" onSubmit={handleSubmit} sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                        <TextField
+                            label="Name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                            fullWidth
+                        />
+                        <TextField
+                            label="Description"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            fullWidth
+                        />
+                        <TextField
+                            label="Target File Key (S3 path)"
+                            value={targetFileKey}
+                            onChange={(e) => setTargetFileKey(e.target.value)}
+                            required
+                            fullWidth
+                            placeholder="e.g. aggregation.json"
+                        />
+
+                        <FormControl fullWidth>
+                            <InputLabel>Schedule Type</InputLabel>
+                            <Select
+                                value={scheduleType}
+                                label="Schedule Type"
+                                onChange={(e: SelectChangeEvent) => setScheduleType(e.target.value as ScheduleType)}
+                            >
+                                <MenuItem value="rate">Rate</MenuItem>
+                                <MenuItem value="cron">Cron</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        {scheduleType === 'rate' && (
+                            <Box sx={{display: 'flex', gap: 2}}>
+                                <TextField
+                                    label="Value"
+                                    type="number"
+                                    value={rateValue}
+                                    onChange={(e) => setRateValue(e.target.value)}
+                                    required
+                                    sx={{flex: 1}}
+                                />
+                                <FormControl sx={{flex: 1}}>
+                                    <InputLabel>Unit</InputLabel>
+                                    <Select
+                                        value={rateUnit}
+                                        label="Unit"
+                                        onChange={(e: SelectChangeEvent) => setRateUnit(e.target.value)}
+                                    >
+                                        <MenuItem value="minutes">Minutes</MenuItem>
+                                        <MenuItem value="hours">Hours</MenuItem>
+                                        <MenuItem value="days">Days</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                        )}
+
+                        {scheduleType === 'cron' && (
+                            <TextField
+                                label="Cron Expression"
+                                value={cronExpression}
+                                onChange={(e) => setCronExpression(e.target.value)}
+                                required
+                                fullWidth
+                                helperText="Format: minute hour day-of-month month day-of-week year (e.g. 0 0 * * ? *)"
+                            />
+                        )}
+
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={enabled}
+                                    onChange={(e) => setEnabled(e.target.checked)}
+                                />
+                            }
+                            label="Enabled"
+                        />
+
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={isLoading || !name || !targetFileKey}
+                        >
+                            Add Configuration
+                        </Button>
+                    </Box>
+                </Paper>
+            </Grid>
+        </Grid>
+    );
+};
+
+export default MapDataAggregation;
+

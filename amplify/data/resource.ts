@@ -30,6 +30,17 @@ const schema = a
             .authorization((allow) => [
                 allow.ownerDefinedIn("userId"),
             ]),
+        ScheduleConfig: a
+            .model({
+                name: a.string().required(),
+                description: a.string(),
+                scheduleExpression: a.string().required(),
+                targetFileKey: a.string().required(),
+                enabled: a.boolean().required(),
+            })
+            .authorization((allow) => [
+                allow.group(Group.Admin),
+            ]),
         addUserToGroup: a
             .mutation()
             .arguments({
