@@ -15,10 +15,10 @@ def match_admin1_entries_to_geoBoundary_features(entries, s3, bucket, name_match
         geo_data = json.loads(response["Body"].read().decode("utf-8"))
     except ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchKey":
-            data = {}
+            geo_data = {"features": []}
         else:
             raise
-    geo_data = geo_data['features']
+    geo_data = geo_data.get("features", [])
     for feature in geo_data:
         props = feature['properties']
         if 'shapeName' in props:
