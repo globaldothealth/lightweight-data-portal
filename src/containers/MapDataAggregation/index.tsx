@@ -60,7 +60,9 @@ const MapDataAggregation = () => {
 
     const buildScheduleExpression = (): string => {
         if (scheduleType === 'rate') {
-            return `rate(${rateValue} ${rateUnit})`;
+            const value = Math.max(1, Number.parseInt(rateValue, 10) || 1);
+            const unit = value === 1 ? rateUnit.replace(/s$/, '') : rateUnit;
+            return `rate(${value} ${unit})`;
         }
         return `cron(${cronExpression})`;
     };
