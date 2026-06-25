@@ -1,5 +1,5 @@
 import json
-
+from botocore.exceptions import ClientError
 def simplify_missing_entries(missing_entries):
     for iso3 in missing_entries:
         missing_entries[iso3]['missing'] =  list(map(lambda m: m['name'], missing_entries[iso3]['missing']))
