@@ -1,9 +1,9 @@
-import json
 import country_converter as coco
 import pandas as pd
 
 from match_admin0_entries_to_geoBoundary_features import match_admin0_entries_to_geoBoundary_features
 from prepare_geometry import prepare_geometry
+from parsing_utils import save_json, build_feature
 
 
 def ebola_bvd_parse_admin0_data(s3, bucket, data_url, parsed_data_key, missing_data_key):
@@ -23,32 +23,16 @@ def ebola_bvd_parse_admin0_data(s3, bucket, data_url, parsed_data_key, missing_d
         try:
             properties = feature["properties"]
             geometry, centroid, bounds = prepare_geometry(feature['geometry'], properties["shapeGroup"])
-            parsed_data.append({
-                "lat": centroid.y,
-                "long": centroid.x,
-                "name": properties["shapeName"],
-                "bounds": bounds,
-                "case_count": entry['caseCount'],
-                "last_updated": entry['lastUpdated'],
-                "country_code": entry['countryCode'],
-                "geometry": geometry,
-                "id": properties["shapeGroup"],
-            })
+            parsed_data.append(build_feature(
+                geometry, centroid, bounds,
+                name=properties["shapeName"],
+                case_count=entry['caseCount'],
+                last_updated=entry['lastUpdated'],
+                country_code=entry['countryCode'],
+                feature_id=properties["shapeGroup"],
+            ))
         except Exception as e:
             print(f"Error processing {entry['countryCode']}: {e}")
 
-    # Save parsed_data to S3
-    s3.put_object(
-        Bucket=bucket,
-        Key=parsed_data_key,
-        Body=json.dumps(parsed_data, indent=2),
-        ContentType="application/json",
-    )
-
-    # Save missing_data to S3
-    s3.put_object(
-        Bucket=bucket,
-        Key=missing_data_key,
-        Body=json.dumps(missing_data, indent=2),
-        ContentType="application/json",
-    )
+    save_json(s3, bucket, parsed_data_key, parsed_data)
+    save_json(s3, bucket, missing_data_key, missing_data)
