@@ -26,7 +26,6 @@ def match_admin1_entries_to_geoBoundary_features(entries, s3, bucket, name_match
                 props['shapeName'] = props['shapeName'].encode('latin-1').decode('utf-8')
             except (UnicodeEncodeError, UnicodeDecodeError):
                 pass  # Already correct encoding, skip
-    chl_data = list(filter(lambda x: x['properties']['shapeGroup'] == "CHL", geo_data))
 
     matched_entries = []
     missing_entries = {}
