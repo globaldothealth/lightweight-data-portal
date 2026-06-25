@@ -7,7 +7,7 @@ def match_admin0_entries_to_geoBoundary_features(entries, s3, bucket, name_match
         geo_data = json.loads(response["Body"].read().decode("utf-8"))
     except ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchKey":
-            data = {}
+            geo_data = {"features": []}
         else:
             raise
 
