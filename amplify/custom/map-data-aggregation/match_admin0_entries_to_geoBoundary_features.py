@@ -73,7 +73,6 @@ def match_admin0_entries_to_geoBoundary_features(entries, s3, bucket, name_match
 
     matched_entries = []
     missing_entries = {}
-    a = list(map(lambda x: x['properties']['shapeName'], geo_data))
 
     for entry in entries:
         iso3 = entry['countryCode']
