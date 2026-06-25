@@ -11,7 +11,7 @@ def match_admin0_entries_to_geoBoundary_features(entries, s3, bucket, name_match
         else:
             raise
 
-    geo_data = geo_data['features']
+    geo_data = geo_data.get('features', [])
     # Remove CHN from geoBoundaries and source from Natural Earth instead
     geo_data = [feature for feature in geo_data if feature['properties']['shapeGroup'] not in ["CHN", "HKG"]]
 
