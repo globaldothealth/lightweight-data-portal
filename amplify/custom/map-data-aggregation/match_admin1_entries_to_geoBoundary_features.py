@@ -65,8 +65,6 @@ def match_admin1_entries_to_geoBoundary_features(entries, s3, bucket, name_match
         matching_entry = next((entry for entry in entries if entry['countryCode'] == iso3 and entry['name'] == name), None)
         if matching_entry:
             matched_entries.append((matching_entry, feature))
-        if iso3 == 'IRN' and matching_entry is not None:
-            print(matching_entry['name'], feature['properties'])
         if iso3 not in country_features:
             country_features[iso3] = []
         country_features[iso3].append(feature)
