@@ -69,6 +69,7 @@ const MapDataAggregation = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!outbreakName) return;
         dispatch(
             createScheduleConfig({
                 scheduleExpression: buildScheduleExpression(),
