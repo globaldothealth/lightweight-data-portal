@@ -188,9 +188,15 @@ scheduleManagerFn.addToRolePolicy(
       'dynamodb:DescribeStream',
       'dynamodb:GetRecords',
       'dynamodb:GetShardIterator',
-      'dynamodb:ListStreams',
     ],
     resources: [scheduleConfigStreamArn],
+  })
+);
+
+scheduleManagerFn.addToRolePolicy(
+  new PolicyStatement({
+    actions: ['dynamodb:ListStreams'],
+    resources: ['*'],
   })
 );
 
