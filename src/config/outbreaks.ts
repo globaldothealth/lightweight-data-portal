@@ -9,11 +9,9 @@ export interface OutbreakConfig {
  * This object is consumed by:
  *  - The UI dropdown  (OUTBREAK_OPTIONS / OutbreakName)
  *  - amplify/backend.ts, which serialises it as the Lambda env var OUTBREAK_CONFIGS
- *  - The Python aggregation Lambda, which parses OUTBREAK_CONFIGS at runtime to
- *    look up each outbreak's data URL and S3 path prefix.
+ *  - The Python aggregation Lambda, which reads OUTBREAK_CONFIGS at runtime to look up each outbreak's data URL.
  *
- * To add a new outbreak, append an entry here — no other file needs to change.
- */
+ * To add a new outbreak, append an entry here and implement the corresponding parser in the aggregation Lambda.
 export const OUTBREAK_CONFIGS = {
     'Ebola BVD': {
         dataUrl:
