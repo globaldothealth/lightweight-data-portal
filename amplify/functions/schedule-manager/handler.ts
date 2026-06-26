@@ -48,7 +48,7 @@ const toConfig = (
 
 const buildScheduleParams = (config: ScheduleConfigRecord) => ({
     Name: scheduleNameFor(config.id),
-    Description: `Map data aggregation schedule for config "${config.name}" (${config.id})`,
+    Description: `Map data aggregation schedule for outbreak "${config.outbreakName}" (${config.id})`, 
     ScheduleExpression: config.scheduleExpression,
     FlexibleTimeWindow: { Mode: 'OFF' as const },
     State: (config.enabled ? 'ENABLED' : 'DISABLED') as 'ENABLED' | 'DISABLED',
