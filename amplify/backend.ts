@@ -175,10 +175,12 @@ scheduleManagerFn.addToRolePolicy(
 );
 
 // Enable a DynamoDB stream on the ScheduleConfig table and feed it to the manager.
-backend.data.resources.cfnResources.amplifyDynamoDbTables['ScheduleConfig'].streamSpecification = {
+const scheduleConfigCfnTable = backend.data.resources.cfnResources.amplifyDynamoDbTables['ScheduleConfig'];
+scheduleConfigCfnTable.streamSpecification = {
   streamViewType: StreamViewType.NEW_AND_OLD_IMAGES,
 };
-const scheduleConfigTable = backend.data.resources.tables['ScheduleConfig'];
+
+const scheduleConfigStreamArn = scheduleConfigCfnTable.attrStreamArn;
 
 scheduleManagerFn.addToRolePolicy(
   new PolicyStatement({
@@ -188,13 +190,13 @@ scheduleManagerFn.addToRolePolicy(
       'dynamodb:GetShardIterator',
       'dynamodb:ListStreams',
     ],
-    resources: [scheduleConfigTable.tableStreamArn!],
+    resources: [scheduleConfigStreamArn],
   })
 );
 
 new EventSourceMapping(mapDataAggregationStack, 'ScheduleManagerStreamMapping', {
   target: scheduleManagerFn,
-  eventSourceArn: scheduleConfigTable.tableStreamArn!,
+  eventSourceArn: scheduleConfigStreamArn,
   startingPosition: StartingPosition.LATEST,
   batchSize: 5,
   retryAttempts: 3,
