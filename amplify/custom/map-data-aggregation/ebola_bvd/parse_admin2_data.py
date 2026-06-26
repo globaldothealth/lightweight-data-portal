@@ -41,6 +41,19 @@ def ebola_bvd_parse_admin2_data(s3, bucket, data_url, outbreak_name, parsed_data
             if data_entry['countryCode'] in name_matching_adm1 and data_entry['Location Admin1'] in name_matching_adm1[data_entry['countryCode']]:
                 location_admin1 = name_matching_adm1[data_entry['countryCode']][location_admin1]
             matching_feature = next((feature for feature in geo_data2 if feature['properties']['shapeGroup'] == data_entry['countryCode'] and feature['properties']['shapeName'] == location_admin1), None)
+            if matching_feature is None:
+                # No ADM1 geometry to anchor this "Other" bucket to; record it as
+                # missing data instead of crashing the whole aggregation run.
+                possible_matches = [feature['properties']['shapeName'] for feature in geo_data2
+                                    if feature['properties']['shapeGroup'] == data_entry['countryCode']]
+                if data_entry['countryCode'] not in missing_data:
+                    missing_data[data_entry['countryCode']] = {
+                        "entries": [location_admin1],
+                        "possible_matches": possible_matches,
+                    }
+                else:
+                    missing_data[data_entry['countryCode']]['entries'].append(location_admin1)
+                continue
             geometry, centroid, bounds = prepare_geometry(matching_feature["geometry"])
             parsed_data.append(build_feature(
                 geometry, centroid, bounds,
