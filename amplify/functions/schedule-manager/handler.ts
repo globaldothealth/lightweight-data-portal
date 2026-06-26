@@ -9,8 +9,11 @@ import {
 
 const scheduler = new SchedulerClient();
 
-const AGGREGATION_FUNCTION_ARN = process.env.AGGREGATION_FUNCTION_ARN as string;
-const SCHEDULER_ROLE_ARN = process.env.SCHEDULER_ROLE_ARN as string;
+const AGGREGATION_FUNCTION_ARN = process.env.AGGREGATION_FUNCTION_ARN;
+if (!AGGREGATION_FUNCTION_ARN) throw new Error('AGGREGATION_FUNCTION_ARN is required');
+
+const SCHEDULER_ROLE_ARN = process.env.SCHEDULER_ROLE_ARN;
+if (!SCHEDULER_ROLE_ARN) throw new Error('SCHEDULER_ROLE_ARN is required');
 
 interface ScheduleConfigRecord {
     id: string;
