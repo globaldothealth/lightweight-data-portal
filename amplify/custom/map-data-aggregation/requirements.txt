@@ -1,0 +1,6 @@
+boto3
+country_converter
+geopandas
+pandas
+shapely
+

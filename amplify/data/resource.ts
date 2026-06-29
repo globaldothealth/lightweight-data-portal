@@ -30,6 +30,15 @@ const schema = a
             .authorization((allow) => [
                 allow.ownerDefinedIn("userId"),
             ]),
+        ScheduleConfig: a
+            .model({
+                scheduleExpression: a.string().required(),
+                outbreakName: a.string().required(),
+                enabled: a.boolean().required(),
+            })
+            .authorization((allow) => [
+                allow.group(Group.Admin),
+            ]),
         addUserToGroup: a
             .mutation()
             .arguments({
