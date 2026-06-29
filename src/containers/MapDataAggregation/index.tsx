@@ -15,12 +15,10 @@ import {
     Paper,
     Select,
     SelectChangeEvent,
-    Switch,
     TextField,
     Tooltip,
     Typography,
     CircularProgress,
-    FormControlLabel,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -48,7 +46,6 @@ const MapDataAggregation = () => {
     const error = useAppSelector(selectError);
 
     const [outbreakName, setOutbreakName] = useState<OutbreakName | ''>('');
-    const [enabled, setEnabled] = useState(true);
     const [scheduleType, setScheduleType] = useState<ScheduleType>('rate');
     const [rateValue, setRateValue] = useState('30');
     const [rateUnit, setRateUnit] = useState('minutes');
@@ -73,11 +70,10 @@ const MapDataAggregation = () => {
             createScheduleConfig({
                 scheduleExpression: buildScheduleExpression(),
                 outbreakName,
-                enabled,
+                enabled: true,
             }),
         );
         setOutbreakName('');
-        setEnabled(true);
         setRateValue('30');
         setRateUnit('minutes');
         setCronExpression('0 0 * * ? *');
@@ -242,16 +238,6 @@ const MapDataAggregation = () => {
                                 helperText="Format: minute hour day-of-month month day-of-week year (e.g. 0 0 * * ? *)"
                             />
                         )}
-
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    checked={enabled}
-                                    onChange={(e) => setEnabled(e.target.checked)}
-                                />
-                            }
-                            label="Enabled"
-                        />
 
                         <Button
                             type="submit"
