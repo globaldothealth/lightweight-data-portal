@@ -59,7 +59,7 @@ describe('MapDataAggregation thunks', () => {
         const scheduleConfigParams = { scheduleExpression: "0 0 * * *", outbreakName: 'Ebola BVD', enabled: true };
 
         it('should fulfill on successful creation', async () => {
-            vi.mocked(client.models.ScheduleConfig.create).mockResolvedValue({} as never);
+            vi.mocked(client.models.ScheduleConfig.create).mockResolvedValue({data: []} as never);
 
             const result = await createScheduleConfig(scheduleConfigParams)(mockDispatch, vi.fn(), undefined);
 
