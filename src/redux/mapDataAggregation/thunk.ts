@@ -35,7 +35,10 @@ export const createScheduleConfig = createAsyncThunk<
                 return rejectWithValue('ScheduleConfig model is not yet deployed. Run amplify sandbox to deploy the backend.');
             }
             const response = await client.models.ScheduleConfig.create(data);
-            return response.data as unknown as ScheduleConfig;
+            if (!response.data) {
+                return rejectWithValue('Failed to create schedule configuration');
+            }
+            return response.data as ScheduleConfig;
         } catch (error: unknown) {
             return rejectWithValue(
                 error instanceof Error ? error.message : 'Failed to create schedule configuration',
