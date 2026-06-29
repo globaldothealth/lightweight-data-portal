@@ -37,12 +37,12 @@ describe('MapDataAggregation thunks', () => {
 
         it('should fulfill with schedule configs on successful fetch', async () => {
             const mockedScheduleConfigs = [scheduleConfig];
-            vi.mocked(client.models.ScheduleConfig.list).mockResolvedValue({data: JSON.stringify(mockedScheduleConfigs)} as never);
+            vi.mocked(client.models.ScheduleConfig.list).mockResolvedValue({data: mockedScheduleConfigs} as never);
 
             const result = await getScheduleConfigs()(mockDispatch, vi.fn(), undefined);
 
             expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
-            expect(result.payload).toEqual(JSON.stringify(mockedScheduleConfigs));
+            expect(result.payload).toEqual(mockedScheduleConfigs);
         });
 
         it('should reject when error occurs', async () => {
