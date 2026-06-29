@@ -142,8 +142,8 @@ const MapDataAggregation = () => {
                                                 {config.outbreakName}
                                             </Typography>
                                             <Chip
-                                                label='Enabled'
-                                                color='success'
+                                                label={config.enabled ? 'Enabled' : 'Disabled'}
+                                                color={config.enabled ? 'success' : 'default'}
                                                 size="small"
                                             />
                                         </Box>
