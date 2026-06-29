@@ -195,8 +195,10 @@ const MapDataAggregation = () => {
                         </FormControl>
 
                         <FormControl fullWidth>
-                            <InputLabel>Schedule Type</InputLabel>
+                            <InputLabel id="schedule-type-label">Schedule Type</InputLabel>
                             <Select
+                                labelId="schedule-type-label"
+                                id="schedule-type"
                                 value={scheduleType}
                                 label="Schedule Type"
                                 onChange={(e: SelectChangeEvent) => setScheduleType(e.target.value as ScheduleType)}
@@ -217,8 +219,10 @@ const MapDataAggregation = () => {
                                     sx={{flex: 1}}
                                 />
                                 <FormControl sx={{flex: 1}}>
-                                    <InputLabel>Unit</InputLabel>
+                                    <InputLabel id="rate-unit-label">Unit</InputLabel>
                                     <Select
+                                        labelId="rate-unit-label"
+                                        id="rate-unit"
                                         value={rateUnit}
                                         label="Unit"
                                         onChange={(e: SelectChangeEvent) => setRateUnit(e.target.value)}

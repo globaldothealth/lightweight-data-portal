@@ -109,6 +109,18 @@ const deleteSchedule = async (id: string): Promise<void> => {
     }
 };
 
+const isNonRetriableSchedulerError = (error: unknown): boolean => {
+    const name = (error as { name?: string } | undefined)?.name;
+
+    // Permanent input/config/state issues should not block the stream shard forever.
+    return (
+        name === 'ValidationException' ||
+        name === 'AccessDeniedException' ||
+        name === 'ResourceNotFoundException' ||
+        name === 'ConflictException'
+    );
+};
+
 const processRecord = async (record: DynamoDBRecord): Promise<void> => {
     switch (record.eventName) {
         case 'INSERT': {
@@ -136,13 +148,19 @@ export const handler: DynamoDBStreamHandler = async (event) => {
         try {
             await processRecord(record);
         } catch (error) {
+            if (isNonRetriableSchedulerError(error)) {
+                console.error(
+                    `Non-retriable failure for ${record.eventName} record; skipping`,
+                    error,
+                );
+                continue;
+            }
+
             console.error(
-                `Failed to process ${record.eventName} record:`,
+                `Retriable failure for ${record.eventName} record; rethrowing`,
                 error,
             );
-            // Re-throw so the stream retries; an unhandled schedule is worse than a retry.
             throw error;
         }
     }
 };
-
