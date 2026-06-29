@@ -11,7 +11,9 @@ export const getScheduleConfigs = createAsyncThunk<
     async (_, {rejectWithValue}) => {
         try {
             if (!client.models.ScheduleConfig) {
-                return [];
+                return rejectWithValue(
+                    'ScheduleConfig model is not yet deployed. Run amplify sandbox to deploy the backend.',
+                );
             }
             const response = await client.models.ScheduleConfig.list();
             return (response.data ?? []) as ScheduleConfig[];

@@ -12,7 +12,7 @@ export interface OutbreakConfig {
  *  - The Python aggregation Lambda, which parses OUTBREAK_CONFIGS at runtime to
  *    look up each outbreak's data URL and S3 path prefix.
  *
- * To add a new outbreak, append an entry here — no other file needs to change.
+ * To add a new outbreak, append an entry here and implement/enable its parsing logic in the map-data-aggregation Lambda.
  */
 export const OUTBREAK_CONFIGS = {
     'Ebola BVD': {

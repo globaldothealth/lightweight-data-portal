@@ -9,8 +9,14 @@ import {
 
 const scheduler = new SchedulerClient();
 
-const AGGREGATION_FUNCTION_ARN = process.env.AGGREGATION_FUNCTION_ARN as string;
-const SCHEDULER_ROLE_ARN = process.env.SCHEDULER_ROLE_ARN as string;
+const AGGREGATION_FUNCTION_ARN = process.env.AGGREGATION_FUNCTION_ARN;
+const SCHEDULER_ROLE_ARN = process.env.SCHEDULER_ROLE_ARN;
+if (!AGGREGATION_FUNCTION_ARN) {
+    throw new Error('Missing required env var: AGGREGATION_FUNCTION_ARN');
+}
+if (!SCHEDULER_ROLE_ARN) {
+    throw new Error('Missing required env var: SCHEDULER_ROLE_ARN');
+}
 
 interface ScheduleConfigRecord {
     id: string;
@@ -45,7 +51,7 @@ const toConfig = (
 
 const buildScheduleParams = (config: ScheduleConfigRecord) => ({
     Name: scheduleNameFor(config.id),
-    Description: `Map data aggregation schedule for config "${config.name}" (${config.id})`,
+    Description: `Map data aggregation schedule for outbreak "${config.outbreakName}" (${config.id})`,
     ScheduleExpression: config.scheduleExpression,
     FlexibleTimeWindow: { Mode: 'OFF' as const },
     State: (config.enabled ? 'ENABLED' : 'DISABLED') as 'ENABLED' | 'DISABLED',

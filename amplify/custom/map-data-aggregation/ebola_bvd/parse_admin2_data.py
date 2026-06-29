@@ -8,7 +8,10 @@ from parsing_utils import load_json, save_json, build_feature, read_shapefile
 def ebola_bvd_parse_admin2_data(s3, bucket, data_url, outbreak_name, parsed_data_key, missing_data_key):
     # A shapefile is multiple files (.shp, .shx, .dbf, .prj, .cpg); download them all and read from disk.
     geo_data = read_shapefile(s3, bucket, 'parsing/other/DRC_Health_zones/DRC_Health_zones')
-
+    if geo_data.empty or 'Nom' not in geo_data.columns:
+        raise ValueError(
+            'DRC health zones shapefile not found or missing "Nom" column at parsing/other/DRC_Health_zones/DRC_Health_zones'
+        )
     df = pd.read_csv(data_url)
     country_counts = df[df['Case_status'] == 'confirmed'].groupby(
         ['Location_Admin0', 'Location Admin1', 'Health zone']).agg(
@@ -41,6 +44,9 @@ def ebola_bvd_parse_admin2_data(s3, bucket, data_url, outbreak_name, parsed_data
             if data_entry['countryCode'] in name_matching_adm1 and data_entry['Location Admin1'] in name_matching_adm1[data_entry['countryCode']]:
                 location_admin1 = name_matching_adm1[data_entry['countryCode']][location_admin1]
             matching_feature = next((feature for feature in geo_data2 if feature['properties']['shapeGroup'] == data_entry['countryCode'] and feature['properties']['shapeName'] == location_admin1), None)
+            if not matching_feature:
+                print(f'No admin1 geometry found for "Other" bucket: {location_admin1} ({data_entry["countryCode"]})')
+                continue
             geometry, centroid, bounds = prepare_geometry(matching_feature["geometry"])
             parsed_data.append(build_feature(
                 geometry, centroid, bounds,
