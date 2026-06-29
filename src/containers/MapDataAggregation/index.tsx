@@ -168,8 +168,10 @@ const MapDataAggregation = () => {
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
                         <FormControl fullWidth required>
-                            <InputLabel>Outbreak Name</InputLabel>
+                            <InputLabel id="outbreak-name-label">Outbreak Name</InputLabel>
                             <Select
+                                labelId="outbreak-name-label"
+                                id="outbreak-name"
                                 value={outbreakName}
                                 label="Outbreak Name"
                                 onChange={(e: SelectChangeEvent) =>
