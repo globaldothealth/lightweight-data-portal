@@ -167,8 +167,10 @@ const MapDataAggregation = () => {
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
                         <FormControl fullWidth required>
-                            <InputLabel>Outbreak Name</InputLabel>
+                            <InputLabel id="outbreak-name-label">Outbreak Name</InputLabel>
                             <Select
+                                labelId="outbreak-name-label"
+                                id="outbreak-name"
                                 value={outbreakName}
                                 label="Outbreak Name"
                                 onChange={(e: SelectChangeEvent) =>
@@ -192,8 +194,10 @@ const MapDataAggregation = () => {
                         </FormControl>
 
                         <FormControl fullWidth>
-                            <InputLabel>Schedule Type</InputLabel>
+                            <InputLabel id="schedule-type-label">Schedule Type</InputLabel>
                             <Select
+                                labelId="schedule-type-label"
+                                id="schedule-type"
                                 value={scheduleType}
                                 label="Schedule Type"
                                 onChange={(e: SelectChangeEvent) => setScheduleType(e.target.value as ScheduleType)}
@@ -214,9 +218,10 @@ const MapDataAggregation = () => {
                                     sx={{flex: 1}}
                                 />
                                 <FormControl sx={{flex: 1}}>
-                                    <InputLabel>Unit</InputLabel>
+                                    <InputLabel id="rate-unit-label">Unit</InputLabel>
                                     <Select
-                                        value={rateUnit}
+                                        labelId="rate-unit-label"
+                                        id="rate-unit"
                                         label="Unit"
                                         onChange={(e: SelectChangeEvent) => setRateUnit(e.target.value)}
                                     >

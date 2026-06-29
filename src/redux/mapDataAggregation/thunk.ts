@@ -4,7 +4,7 @@ import {ScheduleConfig} from '../../models/ScheduleConfig';
 
 export const getScheduleConfigs = createAsyncThunk<
     ScheduleConfig[],
-    undefined,
+    void,
     {rejectValue: string}
 >(
     'mapDataAggregation/getScheduleConfigs',
