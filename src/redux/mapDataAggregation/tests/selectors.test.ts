@@ -8,7 +8,7 @@ vi.mock('aws-amplify/data', () => ({
 
 describe('MapDataAggregation Selectors', () => {
     const scheduleConfig1 = { id: '1', scheduledExpression: "0 0 * * *", outbreakName: 'Ebola BVD', enabled: true };
-    const scheduleConfig2 = { id: '1', scheduledExpression: "0 0 * * *", outbreakName: 'Ebola BVD', enabled: true };
+    const scheduleConfig2 = { id: '2', scheduledExpression: "0 1 * * *", outbreakName: 'Avian Influenza 2024', enabled: true };
     const errorMessage = 'error message';
     const mockState = {
         mapDataAggregation: {
