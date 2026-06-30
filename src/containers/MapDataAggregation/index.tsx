@@ -222,6 +222,7 @@ const MapDataAggregation = () => {
                                     <Select
                                         labelId="rate-unit-label"
                                         id="rate-unit"
+                                        value={rateUnit}
                                         label="Unit"
                                         onChange={(e: SelectChangeEvent) => setRateUnit(e.target.value)}
                                     >
