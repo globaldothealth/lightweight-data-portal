@@ -20,7 +20,6 @@ if (!SCHEDULER_ROLE_ARN) {
 
 interface ScheduleConfigRecord {
     id: string;
-    name: string;
     scheduleExpression: string;
     outbreakName: string;
     enabled: boolean;
@@ -42,7 +41,6 @@ const toConfig = (
     const data = unmarshall(image as any);
     return {
         id: String(data.id),
-        name: String(data.name ?? ''),
         scheduleExpression: String(data.scheduleExpression ?? ''),
         outbreakName: String(data.outbreakName ?? ''),
         enabled: Boolean(data.enabled),
