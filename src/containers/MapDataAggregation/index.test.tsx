@@ -53,14 +53,10 @@ describe('MapDataAggregation Container', () => {
         });
     };
 
-    // The MUI Selects in this component don't link their labels to the input,
-    // so they have no accessible name. Locate the combobox via its label's FormControl instead.
-    const getCombobox = (labelText: RegExp): HTMLElement => {
-        const label = screen.getByText(labelText, {selector: 'label'});
-        const formControl = label.closest('.MuiFormControl-root');
-        if (!formControl) throw new Error(`Could not find a FormControl for label ${labelText}`);
-        return within(formControl as HTMLElement).getByRole('combobox');
-    };
+// The MUI Selects in this component wire InputLabel `id` to Select `labelId`,
+    // so they have an accessible name; query the combobox by role + name.
+    const getCombobox = (labelText: RegExp): HTMLElement =>
+        screen.getByRole('combobox', {name: labelText});
 
     // Helper to choose an option from a (non-native) MUI Select
     const selectOption = async (
