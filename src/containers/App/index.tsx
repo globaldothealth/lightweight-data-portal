@@ -7,6 +7,7 @@ import {
     Satellite as DengueGeodataIcon,
     People as PeopleIcon,
     Construction as ConstructionIcon,
+    Map as MapDataAggregationIcon,
 } from '@mui/icons-material';
 import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography, CircularProgress, Paper} from '@mui/material';
 
@@ -15,6 +16,7 @@ import Tools from "../Tools";
 import DengueGeodata from "../DengueGeodata";
 import ManageUsers from "../ManageUsers";
 import LocationAdminExplorer from "../LocationAdminExplorer";
+import MapDataAggregation from "../MapDataAggregation";
 import Sidebar from "../../components/Sidebar";
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {getUserProfile, logout} from "../../redux/app/thunk.ts";
@@ -68,6 +70,12 @@ export default function App() {
             text: 'Manage Users',
             icon: <PeopleIcon/>,
             to: '/manage-users',
+            groups: [Group.ADMINS],
+        },
+        {
+            text: 'Map Data Aggregation',
+            icon: <MapDataAggregationIcon/>,
+            to: '/map-data-aggregation',
             groups: [Group.ADMINS],
         },
     ].filter(item => {
@@ -127,6 +135,9 @@ export default function App() {
                             )}
                             {menuList.some(item => item.to === '/manage-users') && (
                                 <Route path="/manage-users" element={<ManageUsers/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/map-data-aggregation') && (
+                                <Route path="/map-data-aggregation" element={<MapDataAggregation/>}/>
                             )}
                             <Route
                                 path="*"
