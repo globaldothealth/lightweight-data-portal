@@ -13,17 +13,17 @@ def match_admin0_entries_to_geoBoundary_features(entries, s3, bucket, name_match
 
     geo_data = geo_data.get('features', [])
     # Remove CHN from geoBoundaries and source from Natural Earth instead
-    geo_data = [feature for feature in geo_data if feature['properties']['shapeGroup'] not in ["CHN", "HKG"]]
+    geo_data = [feature for feature in geo_data if feature['properties']['shapeGroup'] not in ["CHN", "HKG", "FRA"]]
 
-    # additional_countries = ["SHN", "REU", "VIR", "GIB", "NCL", "MTQ", "GUM", "GLP", "CUW", "ABW", "BMU"]
-    # for country in additional_countries:
-    #     with open(f"geoBoundaries/admin0/geoBoundaries-{country}-ADM0.geojson", "r", encoding="utf-8") as f:
-    #         country_geo_data = json.load(f)
-    #     country_geo_data = country_geo_data['features'][0]
-    #     geo_data.append(country_geo_data)
+    additional_countries = ["SHN", "REU", "VIR", "GIB", "NCL", "MTQ", "GUM", "GLP", "CUW", "ABW", "BMU", "FRA"]
+    for country in additional_countries:
+        response = s3.get_object(Bucket=bucket, Key=f"parsing/admin0/geoBoundaries-{country}-ADM0.geojson")
+        country_geo_data = json.loads(response["Body"].read().decode("utf-8"))
+        country_geo_data = country_geo_data['features'][0]
+        geo_data.append(country_geo_data)
     #
-    # # Countries sourced from Natural Earth (https://www.naturalearthdata.com)
-    # natural_earth_countries = ["HKG", "CHN", "MAF", "PRI"]
+    # Countries sourced from Natural Earth (https://www.naturalearthdata.com)
+    # natural_earth_countries = ["HKG", "CHN", "MAF", "PRI", "FRA"]
     # with open(f"geoBoundaries/admin0/ne_10m_admin_0_countries.geojson", "r", encoding="utf-8") as f:
     #     ne_data = json.load(f)
     # for country in natural_earth_countries:
