@@ -59,7 +59,7 @@ def ebola_bvd_parse_admin2_data(s3, bucket, data_url, outbreak_name, parsed_data
         else:
             if data_entry['countryCode'] in name_matching and entry_name in name_matching[data_entry['countryCode']]:
                 entry_name = name_matching[data_entry['countryCode']][entry_name]
-            matching_feature = geo_data[geo_data['Nom'] == entry_name]
+            matching_feature = geo_data[(geo_data['Nom'] == entry_name) & (geo_data['PROVINCE'] == data_entry['Location Admin1'])]
             if len(matching_feature) > 0:
                 feature = matching_feature.iloc[0]
                 try:
