@@ -1,6 +1,2 @@
-boto3
-country_converter
-geopandas
-pandas
-shapely
+## No third-party dependencies required for ZIP-based Lambda deployment.
 

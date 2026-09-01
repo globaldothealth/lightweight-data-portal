@@ -4,15 +4,14 @@ import { Group } from './auth/groups';
 import { data } from './data/resource';
 import { PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import {
-  DockerImageFunction,
-  DockerImageCode,
+  Function,
+  Code,
   Runtime,
   StartingPosition,
   EventSourceMapping,
 } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { StreamViewType } from 'aws-cdk-lib/aws-dynamodb';
-import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
 import { Duration } from 'aws-cdk-lib';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -102,14 +101,13 @@ backend.addOutput({
   }
 });
 
-// --- Map Data Aggregation Lambda (Docker/Python) ---
+// --- Map Data Aggregation Lambda (ZIP/Python runtime) ---
 const mapDataAggregationStack = backend.createStack('MapDataAggregationStack');
 
-const mapDataAggregationFn = new DockerImageFunction(mapDataAggregationStack, 'MapDataAggregationFn', {
-  code: DockerImageCode.fromImageAsset(
-    path.join(__dirname, 'custom/map-data-aggregation'),
-    { platform: Platform.LINUX_AMD64 }
-  ),
+const mapDataAggregationFn = new Function(mapDataAggregationStack, 'MapDataAggregationFn', {
+  runtime: Runtime.PYTHON_3_11,
+  code: Code.fromAsset(path.join(__dirname, 'custom/map-data-aggregation')),
+  handler: 'index.handler',
   memorySize: 1024,
   timeout: Duration.minutes(5),
   environment: {

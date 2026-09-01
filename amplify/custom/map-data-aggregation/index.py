@@ -28,13 +28,13 @@ def handler(event, context):
     print(f"Running aggregation (configId={config_id}, outbreakName={outbreak_name})")
 
     if outbreak_name == "Ebola BVD":
-        ebola_bvd_parse_admin0_data(s3, bucket, data_url, f'outbreaks/{outbreak_name}/admin0/simplified.json',
+        ebola_bvd_parse_admin0_data(s3, bucket, data_url, f'outbreaks/{outbreak_name}/admin0/latest.json',
                                     f'missing-data/{outbreak_name}/admin0/missing_data.json')
         ebola_bvd_parse_admin1_data(s3, bucket, data_url, outbreak_name,
-                                    f'outbreaks/{outbreak_name}/admin1/simplified.json',
+                                    f'outbreaks/{outbreak_name}/admin1/latest.json',
                                     f'missing-data/{outbreak_name}/admin1/missing_data.json')
         ebola_bvd_parse_admin2_data(s3, bucket, data_url, outbreak_name,
-                                        f'outbreaks/{outbreak_name}/admin2/simplified.json',
+                                        f'outbreaks/{outbreak_name}/admin2/latest.json',
                                         f'missing-data/{outbreak_name}/admin2/missing_data.json')
 
     return {"statusCode": 200, "body": json.dumps({"message": "Data parsed and saved successfully"})}
