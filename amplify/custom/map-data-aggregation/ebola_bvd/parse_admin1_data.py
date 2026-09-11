@@ -48,9 +48,14 @@ def ebola_bvd_parse_admin1_data(s3, bucket, data_url, outbreak_name, parsed_data
     parsed_data = []
     missing_data = []
 
+    already_included = []
+
     for data_entry in data:
-        admin1_name = data_entry['name']
         country_code = data_entry['countryCode']
+        if country_code != 'COD':
+            continue
+
+        admin1_name = data_entry['name']
         if country_code in name_matching:
             if admin1_name in name_matching[country_code]:
                 admin1_name = name_matching[country_code][admin1_name]
@@ -63,6 +68,19 @@ def ebola_bvd_parse_admin1_data(s3, bucket, data_url, outbreak_name, parsed_data
             'case_count': data_entry['caseCount'],
             'last_updated': data_entry['lastUpdated'],
             'id': id,
+        })
+        already_included.append(id)
+
+    remaining_cod_metadata = [
+        entry_id for entry_id in metadata
+        if entry_id.startswith('COD.') and entry_id not in already_included
+    ]
+
+    for entry_id in remaining_cod_metadata:
+        parsed_data.append({
+            'case_count': 0,
+            'last_updated': None,
+            'id': entry_id,
         })
 
     save_json(s3, bucket, parsed_data_key, parsed_data)
