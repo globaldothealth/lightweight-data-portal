@@ -6,6 +6,8 @@ export enum S3Folder {
     AvianInfluenza = 'Avian Influenza',
     COVID19 = 'COVID-19',
     Ebola = 'Ebola',
+    EbolaBVD = 'Ebola BVD',
+    Hantavirus = 'Hantavirus',
     Marburg = 'Marburg',
     Mpox2022 = 'Mpox 2022',
     Mpox2024 ='Mpox 2024'
@@ -15,6 +17,7 @@ export type S3File = {
     filename: string;
     name: string;
     size: string;
+    lastUpdated: string;
 }
 
 interface DataDownloadsState {

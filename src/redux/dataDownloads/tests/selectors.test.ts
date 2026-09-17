@@ -11,7 +11,7 @@ describe('DataDownloads Selectors', () => {
     const mockState = {
         dataDownloads: {
             s3Folder: S3Folder.Mpox2024,
-            s3Files: [{ filename: 'test.csv', name: 'test.csv' }],
+            s3Files: [{ filename: 'test.csv', name: 'test.csv', size: '1 KB', lastUpdated: '2026-09-17' }],
             isLoading: true,
             error: undefined
         }
@@ -22,7 +22,7 @@ describe('DataDownloads Selectors', () => {
     });
 
     it('should select s3Files', () => {
-        expect(selectS3Files(mockState)).toEqual([{ filename: 'test.csv', name: 'test.csv' }]);
+        expect(selectS3Files(mockState)).toEqual([{ filename: 'test.csv', name: 'test.csv', size: '1 KB', lastUpdated: '2026-09-17' }]);
     });
 
     it('should select isLoading', () => {

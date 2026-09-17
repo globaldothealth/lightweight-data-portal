@@ -29,3 +29,9 @@ coverage
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+
+# Python cache from amplify custom scripts
+amplify/custom/**/__pycache__/
+amplify/custom/**/*.pyc
+amplify/custom/**/*.pyo
+
