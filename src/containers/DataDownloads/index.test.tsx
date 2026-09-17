@@ -41,8 +41,8 @@ describe('DataDownloads Container', () => {
     const mockDispatch = vi.fn();
     const visibleFilename1 = 'Mpox_2022.csv';
     const visibleFilename2 = 'Mpox_2024.csv';
-    const file1 = {name: 'Mpox_2022.csv', filename: visibleFilename1};
-    const file2 = {name: 'Mpox_2024.csv', filename: visibleFilename2};
+    const file1 = {name: 'Mpox_2022.csv', filename: visibleFilename1, size: '1.5 MB', lastUpdated: '2024-01-15'};
+    const file2 = {name: 'Mpox_2024.csv', filename: visibleFilename2, size: '2.3 MB', lastUpdated: '2026-09-15'};
     const mockUserProfile = {name: 'Test User'};
     const originalWarn = console.warn.bind(console.warn)
 

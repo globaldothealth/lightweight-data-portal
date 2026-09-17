@@ -34,7 +34,7 @@ describe('DataDownloads Slice', () => {
         });
 
         it('should handle fulfilled', () => {
-            const mockFiles = [{ filename: 'file1.csv', name: 'file1.csv' }];
+            const mockFiles = [{ filename: 'file1.csv', name: 'file1.csv', size: '1 KB', lastUpdated: '2026-09-17' }];
             const action = { type: getFilesFromS3Folder.fulfilled.type, payload: mockFiles };
             const state = dataDownloadsReducer(initialState, action);
             expect(state.isLoading).toBe(false);
