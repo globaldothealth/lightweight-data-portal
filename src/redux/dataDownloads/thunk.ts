@@ -22,6 +22,7 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
                 filename: file.path,
                 name: file.path.split('/').pop() || '',
                 size: formatBytes(file.size || 0, 2),
+                lastUpdated: file.lastModified? file.lastModified.toISOString().split('T')[0] : '',
             })).filter((file: { name: string; filename: string }) => file.name !== ''));
             if (files.length === 0) {
                 return rejectWithValue('No files found in the specified S3 folder.');

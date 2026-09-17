@@ -58,6 +58,15 @@ export default function DataDownloads() {
                                 filtering: false,
                             },
                             {
+                                title: 'Last Updated',
+                                field: 'lastUpdated',
+                                align: 'right',
+                                filtering: false,
+                                headerStyle: {
+                                    whiteSpace: 'nowrap',
+                                },
+                            },
+                            {
                                 title: 'Size',
                                 field: 'size',
                                 align: 'right',
