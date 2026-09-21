@@ -13,6 +13,16 @@ export enum S3Folder {
     Mpox2024 ='Mpox 2024'
 }
 
+export const S3FileDates = {
+    'GHL2024_avianinfluenza.csv': '2025-02-21',
+    'GHL2019_covid19.tar': '2023-10-03',
+    'GHL2022_ebola.csv': '2022-11-27',
+    'GHL2026_hantavirus.csv': '2026-05-25',
+    'GHL2023_marburg.csv': '2023-04-16',
+    'GHL2022_mpox.csv': '2023-10-17',
+    'GHL2024_mpox.csv': '2026-09-15'
+}
+
 export type S3File = {
     filename: string;
     name: string;

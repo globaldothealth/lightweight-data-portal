@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {getUrl, list} from "aws-amplify/storage";
-import {S3File, S3Folder} from "./slice";
+import {S3File, S3FileDates, S3Folder} from "./slice";
 import {User} from "../../models/User.ts";
 import {client} from "../../utils/amplifyClient";
 import {formatBytes} from "../../utils/formatBytes.ts";
@@ -18,12 +18,15 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
                     bucket: 'gh-outbreak-data'
                 }
             });
-            const files: S3File[] = (result.items.map((file) => ({
+            const files: S3File[] = (result.items.map((file) => {
+                const name = file.path.split('/').pop() || '';
+                const lastUpdated = S3FileDates[name] ? S3FileDates[name] : file.lastModified?.toISOString().split('T')[0] || '';
+                return{
                 filename: file.path,
-                name: file.path.split('/').pop() || '',
+                name: name,
                 size: formatBytes(file.size || 0, 2),
-                lastUpdated: file.lastModified? file.lastModified.toISOString().split('T')[0] : '',
-            })).filter((file: { name: string; filename: string }) => file.name !== ''));
+                lastUpdated: lastUpdated,
+            }}).filter((file: { name: string; filename: string }) => file.name !== ''));
             if (files.length === 0) {
                 return rejectWithValue('No files found in the specified S3 folder.');
             }
