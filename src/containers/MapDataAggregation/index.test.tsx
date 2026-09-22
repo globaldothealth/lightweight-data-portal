@@ -161,6 +161,11 @@ describe('MapDataAggregation Container', () => {
         render(<MapDataAggregation/>);
 
         await selectOption(user, /outbreak name/i, outbreak);
+        const valueInput = screen.getByRole('spinbutton', {name: /value/i});
+        await user.clear(valueInput);
+        await user.type(valueInput, '30');
+        await selectOption(user, /unit/i, 'Minutes');
+
         await user.click(screen.getByRole('button', {name: /add configuration/i}));
 
         expect(thunks.createScheduleConfig).toHaveBeenCalledWith({
@@ -184,6 +189,7 @@ describe('MapDataAggregation Container', () => {
         const valueInput = screen.getByRole('spinbutton', {name: /value/i});
         await user.clear(valueInput);
         await user.type(valueInput, '1');
+        await selectOption(user, /unit/i, 'Minutes');
 
         await user.click(screen.getByRole('button', {name: /add configuration/i}));
 
@@ -200,6 +206,9 @@ describe('MapDataAggregation Container', () => {
         render(<MapDataAggregation/>);
 
         await selectOption(user, /outbreak name/i, outbreak);
+        const valueInput = screen.getByRole('spinbutton', {name: /value/i});
+        await user.clear(valueInput);
+        await user.type(valueInput, '30');
         await selectOption(user, /unit/i, 'Hours');
 
         await user.click(screen.getByRole('button', {name: /add configuration/i}));
@@ -248,5 +257,139 @@ describe('MapDataAggregation Container', () => {
         await user.click(getCombobox(/outbreak name/i));
         const option = await screen.findByRole('option', {name: `${outbreak} (already scheduled)`});
         expect(option).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    describe('Rate expression validation', () => {
+        it('shows validation error for rate value 0', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+            setupSelectors({configs: []});
+            render(<MapDataAggregation/>);
+
+            await selectOption(user, /outbreak name/i, outbreak);
+            const valueInput = screen.getByRole('spinbutton', {name: /value/i});
+            await user.clear(valueInput);
+            await user.type(valueInput, '0');
+
+            await user.click(screen.getByRole('button', {name: /add configuration/i}));
+
+            expect(screen.getByRole('alert')).toHaveTextContent('Rate value must be a number between 1 and 999');
+            expect(thunks.createScheduleConfig).not.toHaveBeenCalled();
+        });
+
+        it('shows validation error for rate value 1000', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+            setupSelectors({configs: []});
+            render(<MapDataAggregation/>);
+
+            await selectOption(user, /outbreak name/i, outbreak);
+            const valueInput = screen.getByRole('spinbutton', {name: /value/i});
+            await user.clear(valueInput);
+            await user.type(valueInput, '1000');
+
+            await user.click(screen.getByRole('button', {name: /add configuration/i}));
+
+            expect(screen.getByRole('alert')).toHaveTextContent('Rate value must be a number between 1 and 999');
+            expect(thunks.createScheduleConfig).not.toHaveBeenCalled();
+        });
+
+        it('accepts valid rate values between 1 and 999', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+            setupSelectors({configs: []});
+            render(<MapDataAggregation/>);
+
+            await selectOption(user, /outbreak name/i, outbreak);
+            const valueInput = screen.getByRole('spinbutton', {name: /value/i});
+            await user.clear(valueInput);
+            await user.type(valueInput, '999');
+            await selectOption(user, /unit/i, 'Days');
+
+            await user.click(screen.getByRole('button', {name: /add configuration/i}));
+
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+            expect(thunks.createScheduleConfig).toHaveBeenCalledWith({
+                scheduleExpression: 'rate(999 days)',
+                outbreakName: outbreak,
+                enabled: true,
+            });
+        });
+    });
+
+    describe('Cron expression validation', () => {
+        it('shows validation error for invalid cron expression', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+            setupSelectors({configs: []});
+            render(<MapDataAggregation/>);
+
+            await selectOption(user, /outbreak name/i, outbreak);
+            await selectOption(user, /schedule type/i, 'Cron');
+
+            const cronInput = screen.getByRole('textbox', {name: /cron expression/i});
+            await user.clear(cronInput);
+            await user.type(cronInput, 'invalid');
+
+            await user.click(screen.getByRole('button', {name: /add configuration/i}));
+
+            expect(screen.getByRole('alert')).toHaveTextContent(/invalid/i);
+            expect(thunks.createScheduleConfig).not.toHaveBeenCalled();
+        });
+
+        it('shows validation error for cron expression with too few fields', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+            setupSelectors({configs: []});
+            render(<MapDataAggregation/>);
+
+            await selectOption(user, /outbreak name/i, outbreak);
+            await selectOption(user, /schedule type/i, 'Cron');
+
+            const cronInput = screen.getByRole('textbox', {name: /cron expression/i});
+            await user.clear(cronInput);
+            await user.type(cronInput, '0 0 * * ?');
+
+            await user.click(screen.getByRole('button', {name: /add configuration/i}));
+
+            // Should show validation error for invalid expression
+            await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+            expect(thunks.createScheduleConfig).not.toHaveBeenCalled();
+        });
+
+        it('accepts valid cron expressions', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+            setupSelectors({configs: []});
+            render(<MapDataAggregation/>);
+
+            await selectOption(user, /outbreak name/i, outbreak);
+            await selectOption(user, /schedule type/i, 'Cron');
+
+            const cronInput = screen.getByRole('textbox', {name: /cron expression/i});
+            await user.clear(cronInput);
+            await user.type(cronInput, '0 12 * * ? *');
+
+            await user.click(screen.getByRole('button', {name: /add configuration/i}));
+
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+            expect(thunks.createScheduleConfig).toHaveBeenCalledWith({
+                scheduleExpression: 'cron(0 12 * * ? *)',
+                outbreakName: outbreak,
+                enabled: true,
+            });
+        });
+
+        it('accepts cron expressions with ranges', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+            setupSelectors({configs: []});
+            render(<MapDataAggregation/>);
+
+            await selectOption(user, /outbreak name/i, outbreak);
+            await selectOption(user, /schedule type/i, 'Cron');
+
+            const cronInput = screen.getByRole('textbox', {name: /cron expression/i});
+            await user.clear(cronInput);
+            await user.type(cronInput, '0 9-17 * * MON-FRI ?');
+
+            await user.click(screen.getByRole('button', {name: /add configuration/i}));
+
+            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+            expect(thunks.createScheduleConfig).toHaveBeenCalled();
+        });
     });
 });

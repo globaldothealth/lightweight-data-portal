@@ -20,6 +20,9 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
             });
             const files: S3File[] = (result.items.map((file) => {
                 const name = file.path.split('/').pop() || '';
+                if (name == 'upload_test.csv') {
+                    return {name: '', filename: '', size: '', lastUpdated: ''}; // Exclude this file
+                }
                 const lastUpdated = S3FileDates[name] ? S3FileDates[name] : file.lastModified?.toISOString().split('T')[0] || '';
                 return{
                 filename: file.path,
