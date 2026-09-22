@@ -16,6 +16,9 @@ export const getScheduleConfigs = createAsyncThunk<
                 );
             }
             const response = await client.models.ScheduleConfig.list();
+            if (response.errors && response.errors.length > 0) {
+                return rejectWithValue(`Failed to fetch schedule configurations: ${response.errors[0].message}`);
+            }
             return (response.data ?? []) as ScheduleConfig[];
         } catch (error: unknown) {
             return rejectWithValue(
@@ -37,6 +40,9 @@ export const createScheduleConfig = createAsyncThunk<
                 return rejectWithValue('ScheduleConfig model is not yet deployed. Run amplify sandbox to deploy the backend.');
             }
             const response = await client.models.ScheduleConfig.create(data);
+            if (response.errors && response.errors.length > 0) {
+                return rejectWithValue(`Failed to create schedule configuration: ${response.errors[0].message}`);
+            }
             if (!response.data) {
                 return rejectWithValue('Failed to create schedule configuration');
             }
@@ -60,7 +66,10 @@ export const deleteScheduleConfig = createAsyncThunk<
             if (!client.models.ScheduleConfig) {
                 return rejectWithValue('ScheduleConfig model is not yet deployed. Run amplify sandbox to deploy the backend.');
             }
-            await client.models.ScheduleConfig.delete({id});
+            const response = await client.models.ScheduleConfig.delete({id});
+            if (response.errors && response.errors.length > 0) {
+                return rejectWithValue(`Failed to delete schedule configuration: ${response.errors[0].message}`);
+            }
             return id;
         } catch (error: unknown) {
             return rejectWithValue(

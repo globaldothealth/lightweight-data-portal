@@ -19,8 +19,8 @@ export const S3FileDates = {
     'GHL2022_ebola.csv': '2022-11-27',
     'GHL2026_hantavirus.csv': '2026-05-25',
     'GHL2023_marburg.csv': '2023-04-16',
-    'GHL2022_mpox.csv': '2023-10-17',
-    'GHL2024_mpox.csv': '2026-09-15'
+    'GHL2022_mpox.csv': '2022-09-22',
+    'GHL2024_mpox.csv': '2024-12-16'
 }
 
 export type S3File = {

@@ -26,6 +26,12 @@ const containerList = [
         path: '/manage-users',
         id: 'manage-users',
         expectedIndex: '4'
+    },
+    {
+        containerName: 'MapDataAggregation',
+        path: '/map-data-aggregation',
+        id: 'map-data-aggregation',
+        expectedIndex: '5'
     }
 ];
 

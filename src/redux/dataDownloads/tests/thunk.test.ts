@@ -52,7 +52,7 @@ describe('DataDownloads thunks', () => {
 
             expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toEqual([testFile1, testFile2]);
-            expect(list).toHaveBeenCalledWith({path: payload.s3Folder, options: {bucket: 'gh-outbreak-data'}});
+            expect(list).toHaveBeenCalledWith({path: `${payload.s3Folder}/`, options: {bucket: 'gh-outbreak-data'}});
         });
 
         it('should use an empty path when s3Folder is "All Outbreaks"', async () => {

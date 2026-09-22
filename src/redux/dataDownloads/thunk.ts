@@ -11,7 +11,7 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
     'dataDownloads/getFilesFromS3Folder',
     async (data, {rejectWithValue}) => {
         try {
-            const dataPath = data.s3Folder === S3Folder.All ? '' : data.s3Folder;
+            const dataPath = data.s3Folder === S3Folder.All ? '' : `${data.s3Folder}/`;
             const result = await list({
                 path: dataPath,
                 options: {

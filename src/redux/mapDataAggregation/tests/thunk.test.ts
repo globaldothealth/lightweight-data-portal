@@ -53,6 +53,19 @@ describe('MapDataAggregation thunks', () => {
             expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('Failed to fetch schedule configurations');
         });
+
+        it('should reject when GraphQL errors are returned in response', async () => {
+            const graphqlError = { message: 'Access denied' };
+            vi.mocked(client.models.ScheduleConfig.list).mockResolvedValue({
+                data: null,
+                errors: [graphqlError]
+            } as never);
+
+            const result = await getScheduleConfigs()(mockDispatch, vi.fn(), undefined);
+
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
+            expect(result.payload).toBe('Failed to fetch schedule configurations: Access denied');
+        });
     });
 
     describe('createScheduleConfig', () => {
@@ -76,6 +89,19 @@ describe('MapDataAggregation thunks', () => {
 
             expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe('failed');
+        });
+
+        it('should reject when GraphQL errors are returned in response', async () => {
+            const graphqlError = { message: 'Invalid schedule expression' };
+            vi.mocked(client.models.ScheduleConfig.create).mockResolvedValue({
+                data: null,
+                errors: [graphqlError]
+            } as never);
+
+            const result = await createScheduleConfig(scheduleConfigParams)(mockDispatch, vi.fn(), undefined);
+
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
+            expect(result.payload).toBe('Failed to create schedule configuration: Invalid schedule expression');
         });
     });
 
@@ -108,6 +134,19 @@ describe('MapDataAggregation thunks', () => {
 
             expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
             expect(result.payload).toBe(errorMessage);
+        });
+
+        it('should reject when GraphQL errors are returned in response', async () => {
+            const graphqlError = { message: 'Permission denied' };
+            vi.mocked(client.models.ScheduleConfig.delete).mockResolvedValue({
+                data: null,
+                errors: [graphqlError]
+            } as never);
+
+            const result = await deleteScheduleConfig(scheduleConfigId)(mockDispatch, vi.fn(), undefined);
+
+            expect(result.meta.requestStatus).toBe(REQUEST_STATUS.REJECTED);
+            expect(result.payload).toBe('Failed to delete schedule configuration: Permission denied');
         });
     });
 });
