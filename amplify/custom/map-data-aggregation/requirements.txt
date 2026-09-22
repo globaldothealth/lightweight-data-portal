@@ -1,0 +1,2 @@
+## No third-party dependencies required for ZIP-based Lambda deployment.
+

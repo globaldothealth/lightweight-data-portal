@@ -30,6 +30,15 @@ const schema = a
             .authorization((allow) => [
                 allow.ownerDefinedIn("userId"),
             ]),
+        ScheduleConfig: a
+            .model({
+                scheduleExpression: a.string().required(),
+                outbreakName: a.string().required(),
+                enabled: a.boolean().required(),
+            })
+            .authorization((allow) => [
+                allow.group(Group.Admin),
+            ]),
         addUserToGroup: a
             .mutation()
             .arguments({
@@ -74,9 +83,6 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
     schema,
     authorizationModes: {
-        defaultAuthorizationMode: "apiKey",
-        apiKeyAuthorizationMode: {
-            expiresInDays: 30,
-        },
+        defaultAuthorizationMode: "userPool",
     },
 });

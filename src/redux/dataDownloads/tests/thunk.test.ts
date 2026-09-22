@@ -35,15 +35,15 @@ describe('DataDownloads thunks', () => {
 
     describe('getFilesFromS3Folder', () => {
         const payload = {s3Folder: 'test-folder'};
-        const testFile1 = {filename: 'test-folder/file1.txt', name: 'file1.txt', size: '1 KB'};
-        const testFile2 = {filename: 'test-folder/file2.jpg', name: 'file2.jpg', size: '2 KB'};
+        const testFile1 = {filename: 'test-folder/file1.txt', name: 'file1.txt', size: '1 KB', lastUpdated: '2026-09-01' };
+        const testFile2 = {filename: 'test-folder/file2.jpg', name: 'file2.jpg', size: '2 KB', lastUpdated: '2026-09-02' };
         const testFile3 = {filename: 'test-folder/'};
 
         it('should fulfill with formatted files list', async () => {
             vi.mocked(list).mockResolvedValue({
                 items: [
-                    {path: testFile1.filename, size: 1000},
-                    {path: testFile2.filename, size: 2000},
+                    {path: testFile1.filename, size: 1000, lastModified: new Date('2026-09-01') },
+                    {path: testFile2.filename, size: 2000, lastModified: new Date('2026-09-02') },
                     {path: testFile3.filename},
                 ]
             } as never);
@@ -52,7 +52,7 @@ describe('DataDownloads thunks', () => {
 
             expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
             expect(result.payload).toEqual([testFile1, testFile2]);
-            expect(list).toHaveBeenCalledWith({path: payload.s3Folder, options: {bucket: 'gh-outbreak-data'}});
+            expect(list).toHaveBeenCalledWith({path: `${payload.s3Folder}/`, options: {bucket: 'gh-outbreak-data'}});
         });
 
         it('should use an empty path when s3Folder is "All Outbreaks"', async () => {

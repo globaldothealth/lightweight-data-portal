@@ -6,15 +6,28 @@ export enum S3Folder {
     AvianInfluenza = 'Avian Influenza',
     COVID19 = 'COVID-19',
     Ebola = 'Ebola',
+    EbolaBVD = 'Ebola BVD',
+    Hantavirus = 'Hantavirus',
     Marburg = 'Marburg',
     Mpox2022 = 'Mpox 2022',
     Mpox2024 ='Mpox 2024'
+}
+
+export const S3FileDates = {
+    'GHL2024_avianinfluenza.csv': '2025-02-21',
+    'GHL2019_covid19.tar': '2023-10-03',
+    'GHL2022_ebola.csv': '2022-11-27',
+    'GHL2026_hantavirus.csv': '2026-05-25',
+    'GHL2023_marburg.csv': '2023-04-16',
+    'GHL2022_mpox.csv': '2022-09-22',
+    'GHL2024_mpox.csv': '2024-12-16'
 }
 
 export type S3File = {
     filename: string;
     name: string;
     size: string;
+    lastUpdated: string;
 }
 
 interface DataDownloadsState {
