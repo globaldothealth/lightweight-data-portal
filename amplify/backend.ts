@@ -74,6 +74,16 @@ backend.auth.resources.groups[Group.Admin].role.addToPrincipalPolicy(
     );
 });
 
+// Grant Admin and Curator groups write access to upload data
+[Group.Admin, Group.Curator].forEach(group => {
+    backend.auth.resources.groups[group].role.addToPrincipalPolicy(
+        new PolicyStatement({
+            actions: ['s3:PutObject'],
+            resources: [`arn:aws:s3:::${ghOutbreakData}/*`],
+        })
+    );
+});
+
 backend.addOutput({
   storage: {
     buckets: [
@@ -197,4 +207,3 @@ new EventSourceMapping(mapDataAggregationStack, 'ScheduleManagerStreamMapping', 
   batchSize: 5,
   retryAttempts: 3,
 });
-

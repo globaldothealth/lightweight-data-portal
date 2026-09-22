@@ -1,5 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {getUrl, list} from "aws-amplify/storage";
+import {getUrl, list, uploadData} from "aws-amplify/storage";
 import {S3File, S3FileDates, S3Folder} from "./slice";
 import {User} from "../../models/User.ts";
 import {client} from "../../utils/amplifyClient";
@@ -20,9 +20,6 @@ export const getFilesFromS3Folder = createAsyncThunk<S3File[],
             });
             const files: S3File[] = (result.items.map((file) => {
                 const name = file.path.split('/').pop() || '';
-                if (name == 'upload_test.csv') {
-                    return {name: '', filename: '', size: '', lastUpdated: ''}; // Exclude this file
-                }
                 const lastUpdated = S3FileDates[name] ? S3FileDates[name] : file.lastModified?.toISOString().split('T')[0] || '';
                 return{
                 filename: file.path,
@@ -63,3 +60,27 @@ export const handleDownload = createAsyncThunk<void,
         }
     },
 );
+
+export const uploadDataToS3 = createAsyncThunk<void,
+    { file: File, outbreakName: string },
+    { rejectValue: string }>(
+    'dataDownloads/uploadDataToS3',
+    async (data, {rejectWithValue}) => {
+        try {
+            const s3Path = `${data.outbreakName}/upload_test.csv`;
+
+            await uploadData({
+                path: s3Path,
+                data: data.file,
+                options: {
+                    bucket: 'gh-outbreak-data',
+                    contentType: 'text/csv',
+                },
+            });
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "An unknown error occurred";
+            return rejectWithValue(`Error uploading file to S3: ${message}`);
+        }
+    },
+);
+

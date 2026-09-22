@@ -8,11 +8,13 @@ import {
     People as PeopleIcon,
     Construction as ConstructionIcon,
     Map as MapDataAggregationIcon,
+    Upload as UploadDataIcon,
 } from '@mui/icons-material';
 import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography, CircularProgress, Paper} from '@mui/material';
 
 import DataDownloads from "../DataDownloads";
 import Tools from "../Tools";
+import UploadData from "../UploadData";
 import DengueGeodata from "../DengueGeodata";
 import ManageUsers from "../ManageUsers";
 import LocationAdminExplorer from "../LocationAdminExplorer";
@@ -59,6 +61,12 @@ export default function App() {
             icon: <DengueGeodataIcon/>,
             to: '/dengue-geodata',
             groups: [Group.ADMINS, Group.CURATORS, Group.RESEARCHERS],
+        },
+        {
+            text: 'Upload Data',
+            icon: <UploadDataIcon/>,
+            to: '/upload-data',
+            groups: [Group.CURATORS],
         },
         {
             text: 'Location Admin Explorer',
@@ -126,6 +134,9 @@ export default function App() {
                             )}
                             {menuList.some(item => item.to === '/tools') && (
                                 <Route path="/tools" element={<Tools/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/upload-data') && (
+                                <Route path="/upload-data" element={<UploadData/>}/>
                             )}
                             {menuList.some(item => item.to === '/dengue-geodata') && (
                                 <Route path="/dengue-geodata" element={<DengueGeodata/>}/>
