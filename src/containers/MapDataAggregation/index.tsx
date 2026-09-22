@@ -21,6 +21,7 @@ import {
     CircularProgress,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import cronParser from 'cron-parser';
 
 import {useAppDispatch, useAppSelector} from '../../hooks/redux';
 import {
@@ -38,6 +39,24 @@ import {OUTBREAK_OPTIONS, OutbreakName} from '../../config/outbreaks';
 
 type ScheduleType = 'rate' | 'cron';
 
+const enum availableRateUnits {minutes = 'minutes', hours = 'hours', days = 'days'}
+
+const validateRateExpression = (value: string): string | null => {
+    const numValue = Number.parseInt(value, 10);
+    if (Number.isNaN(numValue) || numValue < 1 || numValue > 999) {
+        return 'Rate value must be a number between 1 and 999';
+    }
+    return null;
+};
+
+const validateCronExpression = (expression: string): string | null => {
+    try {
+        cronParser.parse(expression, { strict: true });
+        return null;
+    } catch (error) {
+        return error instanceof Error ? error.message : 'Invalid cron expression';
+    }
+};
 
 const MapDataAggregation = () => {
     const dispatch = useAppDispatch();
@@ -47,9 +66,10 @@ const MapDataAggregation = () => {
 
     const [outbreakName, setOutbreakName] = useState<OutbreakName | ''>('');
     const [scheduleType, setScheduleType] = useState<ScheduleType>('rate');
-    const [rateValue, setRateValue] = useState('30');
-    const [rateUnit, setRateUnit] = useState('minutes');
+    const [rateValue, setRateValue] = useState('12');
+    const [rateUnit, setRateUnit] = useState(availableRateUnits.hours);
     const [cronExpression, setCronExpression] = useState('0 0 * * ? *');
+    const [validationError, setValidationError] = useState<string | null>(null);
 
     useEffect(() => {
         dispatch(getScheduleConfigs());
@@ -66,7 +86,26 @@ const MapDataAggregation = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!outbreakName) return;
+        setValidationError(null);
+
+        if (!outbreakName) {
+            setValidationError('Please select an outbreak name');
+            return;
+        }
+
+        // Validate schedule expression based on type
+        let error: string | null;
+        if (scheduleType === 'rate') {
+            error = validateRateExpression(rateValue);
+        } else {
+            error = validateCronExpression(cronExpression);
+        }
+
+        if (error) {
+            setValidationError(error);
+            return;
+        }
+
         dispatch(
             createScheduleConfig({
                 scheduleExpression: buildScheduleExpression(),
@@ -76,8 +115,9 @@ const MapDataAggregation = () => {
         );
         setOutbreakName('');
         setRateValue('30');
-        setRateUnit('minutes');
+        setRateUnit(availableRateUnits.minutes);
         setCronExpression('0 0 * * ? *');
+        setValidationError(null);
     };
 
     const handleDelete = (id: string) => {
@@ -97,6 +137,12 @@ const MapDataAggregation = () => {
             {error && (
                 <Grid size={12}>
                     <Alert severity="error">{error}</Alert>
+                </Grid>
+            )}
+
+            {validationError && (
+                <Grid size={12}>
+                    <Alert severity="error">{validationError}</Alert>
                 </Grid>
             )}
 
@@ -201,7 +247,10 @@ const MapDataAggregation = () => {
                                 id="schedule-type"
                                 value={scheduleType}
                                 label="Schedule Type"
-                                onChange={(e: SelectChangeEvent) => setScheduleType(e.target.value as ScheduleType)}
+                                onChange={(e: SelectChangeEvent) => {
+                                    setScheduleType(e.target.value as ScheduleType);
+                                    setValidationError(null);
+                                }}
                             >
                                 <MenuItem value="rate">Rate</MenuItem>
                                 <MenuItem value="cron">Cron</MenuItem>
@@ -214,9 +263,14 @@ const MapDataAggregation = () => {
                                     label="Value"
                                     type="number"
                                     value={rateValue}
-                                    onChange={(e) => setRateValue(e.target.value)}
+                                    onChange={(e) => {
+                                        const filtered = e.target.value.replace(/[^0-9]/g, '');
+                                        setRateValue(filtered);
+                                        setValidationError(null);
+                                    }}
                                     required
                                     sx={{flex: 1}}
+                                    error={scheduleType === 'rate' && validationError !== null}
                                 />
                                 <FormControl sx={{flex: 1}}>
                                     <InputLabel id="rate-unit-label">Unit</InputLabel>
@@ -225,11 +279,14 @@ const MapDataAggregation = () => {
                                         id="rate-unit"
                                         value={rateUnit}
                                         label="Unit"
-                                        onChange={(e: SelectChangeEvent) => setRateUnit(e.target.value)}
+                                        onChange={(e: SelectChangeEvent) => {
+                                            setRateUnit(e.target.value as availableRateUnits);
+                                            setValidationError(null);
+                                        }}
                                     >
-                                        <MenuItem value="minutes">Minutes</MenuItem>
-                                        <MenuItem value="hours">Hours</MenuItem>
-                                        <MenuItem value="days">Days</MenuItem>
+                                        <MenuItem value={availableRateUnits.minutes}>Minutes</MenuItem>
+                                        <MenuItem value={availableRateUnits.hours}>Hours</MenuItem>
+                                        <MenuItem value={availableRateUnits.days}>Days</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -239,9 +296,13 @@ const MapDataAggregation = () => {
                             <TextField
                                 label="Cron Expression"
                                 value={cronExpression}
-                                onChange={(e) => setCronExpression(e.target.value)}
+                                onChange={(e) => {
+                                    setCronExpression(e.target.value);
+                                    setValidationError(null);
+                                }}
                                 required
                                 fullWidth
+                                error={scheduleType === 'cron' && validationError !== null}
                                 helperText="Format: minute hour day-of-month month day-of-week year (e.g. 0 0 * * ? *)"
                             />
                         )}
@@ -249,7 +310,7 @@ const MapDataAggregation = () => {
                         <Button
                             type="submit"
                             variant="contained"
-                            disabled={isLoading || !outbreakName || usedOutbreakNames.has(outbreakName as OutbreakName)}
+                            disabled={isLoading || !outbreakName || usedOutbreakNames.has(outbreakName as OutbreakName) || validationError !== null}
                         >
                             Add Configuration
                         </Button>
