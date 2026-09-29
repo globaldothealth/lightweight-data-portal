@@ -67,7 +67,7 @@ export const uploadDataToS3 = createAsyncThunk<void,
     'dataDownloads/uploadDataToS3',
     async (data, {rejectWithValue}) => {
         try {
-            const s3Path = `${data.outbreakName}/upload_test.csv`;
+            const s3Path = `${data.outbreakName}/GHL2026_ebolabvd.csv`;
 
             await uploadData({
                 path: s3Path,
