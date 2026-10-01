@@ -16,22 +16,28 @@ const containerList = [
     {containerName: 'Tools', path: '/tools', id: 'tools', expectedIndex: '1'},
     {containerName: 'DengueGeodata', path: '/dengue-geodata', id: 'dengue-geodata', expectedIndex: '2'},
     {
+        containerName: 'UploadData',
+        path: '/upload-data',
+        id: 'upload-data',
+        expectedIndex: '3'
+    },
+    {
         containerName: 'LocationAdminExplorer',
         path: '/location-admin-explorer',
         id: 'location-admin-explorer',
-        expectedIndex: '3'
+        expectedIndex: '4'
     },
     {
         containerName: 'ManageUsers',
         path: '/manage-users',
         id: 'manage-users',
-        expectedIndex: '4'
+        expectedIndex: '5'
     },
     {
         containerName: 'MapDataAggregation',
         path: '/map-data-aggregation',
         id: 'map-data-aggregation',
-        expectedIndex: '5'
+        expectedIndex: '6'
     }
 ];
 
