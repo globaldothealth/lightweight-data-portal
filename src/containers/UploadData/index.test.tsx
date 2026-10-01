@@ -50,7 +50,10 @@ const renderWithStore = (stateOverrides = {}) => {
 describe('UploadData Container', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(uploadData).mockResolvedValue(undefined as never);
+        // Mock uploadData to return a task with a result promise
+        vi.mocked(uploadData).mockResolvedValue({
+            result: Promise.resolve(undefined)
+        } as never);
     });
 
     it('renders the upload data form with all required elements', () => {
@@ -150,6 +153,27 @@ describe('UploadData Container', () => {
         await user.click(combobox);
         const listbox = await screen.findByRole('listbox');
         expect(within(listbox).getByRole('option', { name: S3Folder.EbolaBVD })).toBeInTheDocument();
+    });
+
+    it('prevents file selection while upload is in progress', async () => {
+        const user = userEvent.setup();
+        renderWithStore({ isLoading: true, error: undefined });
+
+        const file = new File(['test data'], 'test.csv', { type: 'text/csv' });
+        const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+
+        // Try to upload a file while isLoading is true
+        await user.upload(input, file);
+
+        // File should not be selected because upload is in progress
+        expect(screen.getByText('No file selected')).toBeInTheDocument();
+    });
+
+    it('disables the file picker button while upload is in progress', async () => {
+        renderWithStore({ isLoading: true, error: undefined });
+
+        const selectButton = screen.getByRole('button', { name: /Select CSV File/i });
+        expect(selectButton).toBeDisabled();
     });
 
     it('clears the success alert when a different file is selected', async () => {

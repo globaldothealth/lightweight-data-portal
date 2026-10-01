@@ -38,11 +38,13 @@ export default function UploadData() {
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (isLoading) {
+            return;
+        }
+
         const file = event.target.files?.[0] ?? null;
         setSelectedFile(file);
-        if (!isLoading) {
-            dispatch(resetUploadState());
-        }
+        dispatch(resetUploadState());
         setSubmitted(false);
     };
 
@@ -107,7 +109,7 @@ export default function UploadData() {
                             style={{display: 'none'}}
                         />
 
-                        <Button variant="outlined" onClick={handleOpenFilePicker}>
+                        <Button variant="outlined" onClick={handleOpenFilePicker} disabled={isLoading}>
                             Select CSV File
                         </Button>
 

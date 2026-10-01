@@ -16,7 +16,9 @@ describe('UploadData thunk', () => {
     });
 
     it('should fulfill when upload succeeds', async () => {
-        vi.mocked(uploadData).mockResolvedValue(undefined as never);
+        vi.mocked(uploadData).mockResolvedValue({
+            result: Promise.resolve(undefined)
+        } as never);
 
         const result = await uploadDataToS3({
             file: new File(['content'], 'test.csv', {type: 'text/csv'}),
@@ -36,7 +38,9 @@ describe('UploadData thunk', () => {
     });
 
     it('should reject and return default error message when upload fails without an error message', async () => {
-        vi.mocked(uploadData).mockRejectedValue(undefined);
+        vi.mocked(uploadData).mockResolvedValue({
+            result: Promise.reject(undefined)
+        } as never);
 
         const result = await uploadDataToS3({
             file: new File(['content'], 'test.csv', {type: 'text/csv'}),
@@ -49,7 +53,9 @@ describe('UploadData thunk', () => {
 
     it('should reject and return the thrown error message when upload fails', async () => {
         const errorMessage = 'S3 upload denied';
-        vi.mocked(uploadData).mockRejectedValue(new Error(errorMessage));
+        vi.mocked(uploadData).mockResolvedValue({
+            result: Promise.reject(new Error(errorMessage))
+        } as never);
 
         const result = await uploadDataToS3({
             file: new File(['content'], 'test.csv', {type: 'text/csv'}),

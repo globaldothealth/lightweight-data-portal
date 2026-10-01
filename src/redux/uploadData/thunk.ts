@@ -9,7 +9,7 @@ export const uploadDataToS3 = createAsyncThunk<void,
         try {
             const s3Path = `${data.outbreakName}/GHL2026_ebolabvd.csv`;
 
-            await uploadData({
+            const task = await uploadData({
                 path: s3Path,
                 data: data.file,
                 options: {
@@ -17,10 +17,10 @@ export const uploadDataToS3 = createAsyncThunk<void,
                     contentType: 'text/csv',
                 },
             });
+            await task.result;
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'An unknown error occurred';
             return rejectWithValue(`Error uploading file to S3: ${message}`);
         }
     },
 );
-
