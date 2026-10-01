@@ -66,7 +66,7 @@ export default function App() {
             text: 'Upload Data',
             icon: <UploadDataIcon/>,
             to: '/upload-data',
-            groups: [Group.CURATORS],
+            groups: [Group.ADMINS, Group.CURATORS],
         },
         {
             text: 'Location Admin Explorer',

@@ -52,6 +52,8 @@ export default function UploadData() {
         event.preventDefault();
         if (!outbreakName || !selectedFile) return;
 
+        setSubmitted(false);
+
         try {
             await dispatch(uploadDataToS3({
                 file: selectedFile,
@@ -131,7 +133,7 @@ export default function UploadData() {
                             </Alert>
                         )}
 
-                        {(submitted || (isUploaded && selectedFile !== null)) && !error && (
+                        {(submitted || isUploaded) && !error && (
                             <Alert severity="success">
                                 File successfully uploaded to S3!
                             </Alert>

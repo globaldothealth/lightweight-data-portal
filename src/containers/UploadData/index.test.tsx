@@ -176,6 +176,30 @@ describe('UploadData Container', () => {
         expect(selectButton).toBeDisabled();
     });
 
+    it('clears the success alert when re-uploading the same file', async () => {
+        const user = userEvent.setup();
+        renderWithStore();
+
+        const file = new File(['test data'], 'test.csv', { type: 'text/csv' });
+        const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+
+        // First upload
+        await user.upload(input, file);
+        await user.click(screen.getByRole('button', { name: /Upload Data/i }));
+        expect(await screen.findByText('File successfully uploaded to S3!')).toBeInTheDocument();
+
+        // Mock a delayed upload for the second submission to catch the cleared state
+        vi.mocked(uploadData).mockResolvedValueOnce({
+            result: new Promise(resolve => setTimeout(resolve, 100))
+        } as never);
+
+        // Re-submit the same file
+        await user.click(screen.getByRole('button', { name: /Upload Data/i }));
+
+        // Success alert should be cleared immediately when re-submitting
+        expect(screen.queryByText('File successfully uploaded to S3!')).not.toBeInTheDocument();
+    });
+
     it('clears the success alert when a different file is selected', async () => {
         const user = userEvent.setup();
         renderWithStore();
