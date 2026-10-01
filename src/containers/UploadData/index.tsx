@@ -16,12 +16,16 @@ import {
 
 import {S3Folder} from "../../redux/dataDownloads/slice";
 import {uploadDataToS3} from "../../redux/uploadData/thunk";
+import {resetUploadState} from "../../redux/uploadData/slice";
+import {selectError, selectIsLoading, selectIsUploaded} from "../../redux/uploadData/selectors";
 import {AppDispatch, RootState} from "../../redux/store";
 
 
 export default function UploadData() {
     const dispatch = useDispatch<AppDispatch>();
-    const { isLoading, error } = useSelector((state: RootState) => state.uploadData);
+    const isLoading = useSelector((state: RootState) => selectIsLoading(state));
+    const error = useSelector((state: RootState) => selectError(state));
+    const isUploaded = useSelector((state: RootState) => selectIsUploaded(state));
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [outbreakName, setOutbreakName] = useState<S3Folder | "">(S3Folder.EbolaBVD);
@@ -36,6 +40,9 @@ export default function UploadData() {
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] ?? null;
         setSelectedFile(file);
+        if (!isLoading) {
+            dispatch(resetUploadState());
+        }
         setSubmitted(false);
     };
 
@@ -46,12 +53,12 @@ export default function UploadData() {
         try {
             await dispatch(uploadDataToS3({
                 file: selectedFile,
-                outbreakName: outbreakName as string
+                outbreakName: outbreakName as string,
             })).unwrap();
             setSubmitted(true);
         } catch (err) {
-            // Error is handled by Redux and displayed in the error state
             console.error('Upload failed:', err);
+            setSubmitted(false);
         }
     };
 
@@ -122,7 +129,7 @@ export default function UploadData() {
                             </Alert>
                         )}
 
-                        {submitted && !error && (
+                        {(submitted || isUploaded) && !error && (
                             <Alert severity="success">
                                 File successfully uploaded to S3!
                             </Alert>

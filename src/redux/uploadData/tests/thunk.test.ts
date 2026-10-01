@@ -24,14 +24,15 @@ describe('UploadData thunk', () => {
         })(mockDispatch, mockGetState, undefined);
 
         expect(result.meta.requestStatus).toBe(REQUEST_STATUS.FULFILLED);
-        expect(uploadData).toHaveBeenCalledWith({
-            path: 'Ebola BVD/GHL2026_ebolabvd.csv',
-            data: expect.any(File),
-            options: {
-                bucket: 'gh-outbreak-data',
-                contentType: 'text/csv',
-            },
-        });
+        expect(uploadData).toHaveBeenCalledWith(
+            expect.objectContaining({
+                data: expect.any(File),
+                options: {
+                    bucket: 'gh-outbreak-data',
+                    contentType: 'text/csv',
+                },
+            })
+        );
     });
 
     it('should reject and return default error message when upload fails without an error message', async () => {

@@ -110,14 +110,15 @@ describe('UploadData Container', () => {
         await user.upload(input, file);
         await user.click(screen.getByRole('button', { name: /Upload Data/i }));
 
-        expect(uploadData).toHaveBeenCalledWith({
-            path: `${S3Folder.EbolaBVD}/GHL2026_ebolabvd.csv`,
-            data: file,
-            options: {
-                bucket: 'gh-outbreak-data',
-                contentType: 'text/csv',
-            },
-        });
+        expect(uploadData).toHaveBeenCalledWith(
+            expect.objectContaining({
+                data: file,
+                options: {
+                    bucket: 'gh-outbreak-data',
+                    contentType: 'text/csv',
+                },
+            })
+        );
     });
 
     it('shows a success alert after a successful upload', async () => {

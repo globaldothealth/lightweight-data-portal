@@ -6,6 +6,7 @@ describe('UploadData Slice', () => {
     const initialState = {
         isLoading: false,
         error: undefined,
+        isUploaded: false,
     };
 
     it('should handle initial state', () => {
@@ -18,6 +19,7 @@ describe('UploadData Slice', () => {
             const state = uploadDataReducer(initialState, action);
             expect(state.isLoading).toBe(true);
             expect(state.error).toBeUndefined();
+            expect(state.isUploaded).toBe(false);
         });
 
         it('should handle fulfilled', () => {
@@ -25,6 +27,7 @@ describe('UploadData Slice', () => {
             const state = uploadDataReducer({ ...initialState, isLoading: true }, action);
             expect(state.isLoading).toBe(false);
             expect(state.error).toBeUndefined();
+            expect(state.isUploaded).toBe(true);
         });
 
         it('should handle rejected', () => {
@@ -33,6 +36,7 @@ describe('UploadData Slice', () => {
             const state = uploadDataReducer({ ...initialState, isLoading: true }, action);
             expect(state.isLoading).toBe(false);
             expect(state.error).toBe(error);
+            expect(state.isUploaded).toBe(false);
         });
     });
 });
