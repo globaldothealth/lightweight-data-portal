@@ -131,7 +131,7 @@ export default function UploadData() {
                             </Alert>
                         )}
 
-                        {(submitted || isUploaded) && !error && (
+                        {(submitted || (isUploaded && selectedFile !== null)) && !error && (
                             <Alert severity="success">
                                 File successfully uploaded to S3!
                             </Alert>
