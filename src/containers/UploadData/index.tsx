@@ -15,13 +15,17 @@ import {
 } from "@mui/material";
 
 import {S3Folder} from "../../redux/dataDownloads/slice";
-import {uploadDataToS3} from "../../redux/dataDownloads/thunk";
+import {uploadDataToS3} from "../../redux/uploadData/thunk";
+import {resetUploadState} from "../../redux/uploadData/slice";
+import {selectError, selectIsLoading, selectIsUploaded} from "../../redux/uploadData/selectors";
 import {AppDispatch, RootState} from "../../redux/store";
 
 
 export default function UploadData() {
     const dispatch = useDispatch<AppDispatch>();
-    const { isLoading, error } = useSelector((state: RootState) => state.dataDownloads);
+    const isLoading = useSelector((state: RootState) => selectIsLoading(state));
+    const error = useSelector((state: RootState) => selectError(state));
+    const isUploaded = useSelector((state: RootState) => selectIsUploaded(state));
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [outbreakName, setOutbreakName] = useState<S3Folder | "">(S3Folder.EbolaBVD);
@@ -34,8 +38,13 @@ export default function UploadData() {
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (isLoading) {
+            return;
+        }
+
         const file = event.target.files?.[0] ?? null;
         setSelectedFile(file);
+        dispatch(resetUploadState());
         setSubmitted(false);
     };
 
@@ -43,15 +52,17 @@ export default function UploadData() {
         event.preventDefault();
         if (!outbreakName || !selectedFile) return;
 
+        setSubmitted(false);
+
         try {
             await dispatch(uploadDataToS3({
                 file: selectedFile,
-                outbreakName: outbreakName as string
+                outbreakName: outbreakName as string,
             })).unwrap();
             setSubmitted(true);
         } catch (err) {
-            // Error is handled by Redux and displayed in the error state
             console.error('Upload failed:', err);
+            setSubmitted(false);
         }
     };
 
@@ -100,7 +111,7 @@ export default function UploadData() {
                             style={{display: 'none'}}
                         />
 
-                        <Button variant="outlined" onClick={handleOpenFilePicker}>
+                        <Button variant="outlined" onClick={handleOpenFilePicker} disabled={isLoading}>
                             Select CSV File
                         </Button>
 
@@ -122,7 +133,7 @@ export default function UploadData() {
                             </Alert>
                         )}
 
-                        {submitted && !error && (
+                        {(submitted || isUploaded) && !error && (
                             <Alert severity="success">
                                 File successfully uploaded to S3!
                             </Alert>
