@@ -15,13 +15,13 @@ import {
 } from "@mui/material";
 
 import {S3Folder} from "../../redux/dataDownloads/slice";
-import {uploadDataToS3} from "../../redux/dataDownloads/thunk";
+import {uploadDataToS3} from "../../redux/uploadData/thunk";
 import {AppDispatch, RootState} from "../../redux/store";
 
 
 export default function UploadData() {
     const dispatch = useDispatch<AppDispatch>();
-    const { isLoading, error } = useSelector((state: RootState) => state.dataDownloads);
+    const { isLoading, error } = useSelector((state: RootState) => state.uploadData);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [outbreakName, setOutbreakName] = useState<S3Folder | "">(S3Folder.EbolaBVD);
