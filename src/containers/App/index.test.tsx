@@ -13,14 +13,9 @@ import {Group} from "../../models/User.ts";
 // This will ensure we have coverage for all containers and correct menu index passed to Sidebar.
 const containerList = [
     {containerName: 'DataDownloads', path: '/data-downloads', id: 'data-downloads', expectedIndex: '0'},
-    {containerName: 'Tools', path: '/tools', id: 'tools', expectedIndex: '1'},
-    {containerName: 'DengueGeodata', path: '/dengue-geodata', id: 'dengue-geodata', expectedIndex: '2'},
-    {
-        containerName: 'UploadData',
-        path: '/upload-data',
-        id: 'upload-data',
-        expectedIndex: '3'
-    },
+    {containerName: 'Sources', path: '/sources', id: 'sources', expectedIndex: '1'},
+    {containerName: 'Tools', path: '/tools', id: 'tools', expectedIndex: '2'},
+    {containerName: 'DengueGeodata', path: '/dengue-geodata', id: 'dengue-geodata', expectedIndex: '3'},
     {
         containerName: 'LocationAdminExplorer',
         path: '/location-admin-explorer',
@@ -28,9 +23,9 @@ const containerList = [
         expectedIndex: '4'
     },
     {
-        containerName: 'ManageUsers',
-        path: '/manage-users',
-        id: 'manage-users',
+        containerName: 'UploadData',
+        path: '/upload-data',
+        id: 'upload-data',
         expectedIndex: '5'
     },
     {
@@ -38,6 +33,12 @@ const containerList = [
         path: '/map-data-aggregation',
         id: 'map-data-aggregation',
         expectedIndex: '6'
+    },
+    {
+        containerName: 'ManageUsers',
+        path: '/manage-users',
+        id: 'manage-users',
+        expectedIndex: '7'
     }
 ];
 
