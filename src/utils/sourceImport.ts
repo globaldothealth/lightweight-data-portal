@@ -1,7 +1,7 @@
 import Papa from "papaparse";
 import {sourceId} from "./sourceId";
 
-export type SourceStatus = 'PENDING_DOWNLOAD' | 'DOWNLOAD_FAILED' | 'PENDING_VERIFICATION' | 'VERIFIED';
+export type SourceStatus = 'PENDING_VERIFICATION' | 'VERIFIED';
 
 export interface SourceCsvRow {
     /** 1-based number of the data row (header excluded, blank lines ignored). */
@@ -92,9 +92,8 @@ export function parseSourceCsv(text: string): ParsedSourceCsv {
 
 /**
  * Decides what to write for each row. Safe to run repeatedly with the same CSV:
- * - unknown id                                  -> create (status depends on whether the PDF is already in S3)
- * - waiting for a file, and the PDF now exists  -> move to PENDING_VERIFICATION
- * - anything else (incl. curated records)       -> left untouched
+ * - unknown id                                  -> create with PENDING_VERIFICATION
+ * - already PENDING_VERIFICATION or VERIFIED   -> left untouched
  */
 export function buildImportPlan(
     rows: SourceCsvRow[],
@@ -105,17 +104,18 @@ export function buildImportPlan(
 
     rows.forEach(({id, url}) => {
         const current = existing.get(id);
-        const hasFile = fileIds.has(id);
 
         if (current === undefined) {
-            plan.toCreate.push({id, url, status: hasFile ? 'PENDING_VERIFICATION' : 'PENDING_DOWNLOAD'});
-        } else if ((current === 'PENDING_DOWNLOAD' || current === 'DOWNLOAD_FAILED') && hasFile) {
-            plan.toUpdate.push({id, status: 'PENDING_VERIFICATION'});
+            // New source always starts as PENDING_VERIFICATION
+            plan.toCreate.push({id, url, status: 'PENDING_VERIFICATION'});
         } else {
+            // Never update existing sources; they stay in their current state
             plan.unchanged++;
         }
     });
 
     return plan;
 }
+
+
 

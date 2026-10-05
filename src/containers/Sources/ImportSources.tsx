@@ -97,10 +97,9 @@ export default function ImportSources() {
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
             <Typography color="text.secondary">
                 Select an outbreak first, then choose a CSV file with a <code>url</code> column and an optional{' '}
-                <code>id</code> column. Rows without an id are saved too, with an id generated from the URL; if the
-                PDF is not in S3 yet, a curator will need to upload it. The import is safe to repeat: new sources
-                are added, sources that were waiting for a file are updated once the PDF exists in S3, and sources
-                already awaiting verification or verified are never changed.
+                <code>id</code> column. Rows without an id are saved too, with an id generated from the URL. All sources
+                are imported with status "Pending Verification" for curator review. The import is safe to repeat: new sources
+                are added, and existing sources are never changed.
             </Typography>
 
             <FormControl fullWidth>
@@ -156,8 +155,7 @@ export default function ImportSources() {
             {plan && (phase === 'ready' || phase === 'importing') && (
                 <Alert severity="info">
                     <div>{plan.toCreate.length} new source(s) to create</div>
-                    <div>{plan.toUpdate.length} existing source(s) to update (PDF now present)</div>
-                    <div>{plan.unchanged} unchanged</div>
+                    <div>{plan.unchanged} already exist (will not be changed)</div>
                 </Alert>
             )}
 
@@ -180,7 +178,7 @@ export default function ImportSources() {
             {phase === 'done' && result && (
                 <>
                     <Alert severity={result.failed.length ? 'warning' : 'success'}>
-                        Import finished: {result.created} created, {result.updated} updated
+                        Import finished: {result.created} created
                         {result.failed.length > 0 && `, ${result.failed.length} failed`}.
                     </Alert>
                     {result.failed.length > 0 && (

@@ -40,8 +40,6 @@ const schema = a
                 allow.group(Group.Admin),
             ]),
         SourceStatus: a.enum([
-            'PENDING_DOWNLOAD',
-            'DOWNLOAD_FAILED',
             'PENDING_VERIFICATION',
             'VERIFIED',
         ]),

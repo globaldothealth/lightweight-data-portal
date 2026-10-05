@@ -5,10 +5,32 @@ import type {ImportPlan, SourceStatus} from "./sourceImport";
 export const SOURCES_BUCKET = 'gh-outbreak-sources';
 const WRITE_CONCURRENCY = 5;
 
+export interface SourceRecord {
+    id: string;
+    url: string;
+    outbreakName: string;
+    status: SourceStatus;
+    downloadedAt?: string | null;
+    verifiedBy?: string | null;
+    verifiedAt?: string | null;
+    errorMessage?: string | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
+}
+
 export interface ImportResult {
     created: number;
     updated: number;
     failed: { id: string; message: string }[];
+}
+
+export const SOURCE_STATUSES: SourceStatus[] = [
+    'PENDING_VERIFICATION',
+    'VERIFIED',
+];
+
+export function formatSourceStatus(status: SourceStatus): string {
+    return status.replace(/_/g, ' ');
 }
 
 /** All existing Source records of an outbreak, keyed by id. */
@@ -29,6 +51,52 @@ export async function fetchExistingSources(outbreakName: string): Promise<Map<st
     } while (nextToken);
 
     return existing;
+}
+
+export async function fetchSourcesForOutbreak(
+    outbreakName: string,
+    statusFilter?: SourceStatus | 'ALL',
+): Promise<SourceRecord[]> {
+    const results: SourceRecord[] = [];
+    let nextToken: string | null | undefined;
+
+    do {
+        // Use list() with a filter instead of the composite index to avoid status validation issues
+        const filter = statusFilter && statusFilter !== 'ALL'
+            ? {outbreakName: {eq: outbreakName}, status: {eq: statusFilter}}
+            : {outbreakName: {eq: outbreakName}};
+
+        const response = await client.models.Source.list(
+            filter,
+            {nextToken, limit: 1000},
+        );
+
+        if (response.errors?.length) {
+            throw new Error(response.errors[0].message);
+        }
+
+        results.push(...(response.data ?? []).map((source) => ({
+            id: source.id,
+            url: source.url,
+            outbreakName: source.outbreakName,
+            status: source.status as SourceStatus,
+            downloadedAt: source.downloadedAt,
+            verifiedBy: source.verifiedBy,
+            verifiedAt: source.verifiedAt,
+            errorMessage: source.errorMessage,
+            createdAt: source.createdAt,
+            updatedAt: source.updatedAt,
+        })));
+        nextToken = response.nextToken;
+    } while (nextToken);
+
+    return results.sort((a, b) => {
+        // Sort by status (PENDING_VERIFICATION first, then VERIFIED), then by URL
+        const statusOrder = {PENDING_VERIFICATION: 0, VERIFIED: 1};
+        const orderDelta = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
+        if (orderDelta !== 0) return orderDelta;
+        return a.url.localeCompare(b.url);
+    });
 }
 
 /** Ids of all PDF files stored under the outbreak's folder (file name without ".pdf"). */

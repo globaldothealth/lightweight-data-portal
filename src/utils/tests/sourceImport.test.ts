@@ -81,34 +81,22 @@ describe('buildImportPlan', () => {
         {rowNumber: 3, url: 'https://c.com', id: ID_C},
     ];
 
-    it('creates new rows with a status based on whether the PDF exists', () => {
+    it('creates new rows with PENDING_VERIFICATION status', () => {
         const plan = buildImportPlan(rows, new Map(), new Set([ID_A]));
         expect(plan.toCreate).toEqual([
             {id: ID_A, url: 'https://a.com', status: 'PENDING_VERIFICATION'},
-            {id: ID_B, url: 'https://b.com', status: 'PENDING_DOWNLOAD'},
-            {id: ID_C, url: 'https://c.com', status: 'PENDING_DOWNLOAD'},
+            {id: ID_B, url: 'https://b.com', status: 'PENDING_VERIFICATION'},
+            {id: ID_C, url: 'https://c.com', status: 'PENDING_VERIFICATION'},
         ]);
         expect(plan.toUpdate).toEqual([]);
     });
 
-    it('updates records waiting for a file once the PDF exists', () => {
-        const existing = new Map<string, SourceStatus>([[ID_A, 'PENDING_DOWNLOAD'], [ID_B, 'DOWNLOAD_FAILED']]);
+    it('never updates existing sources', () => {
+        const existing = new Map<string, SourceStatus>([[ID_A, 'PENDING_VERIFICATION'], [ID_B, 'VERIFIED']]);
         const plan = buildImportPlan(rows.slice(0, 2), existing, new Set([ID_A, ID_B]));
         expect(plan.toCreate).toEqual([]);
-        expect(plan.toUpdate).toEqual([
-            {id: ID_A, status: 'PENDING_VERIFICATION'},
-            {id: ID_B, status: 'PENDING_VERIFICATION'},
-        ]);
-    });
-
-    it('never touches curated records or records that still have no file', () => {
-        const existing = new Map<string, SourceStatus>([
-            [ID_A, 'VERIFIED'],
-            [ID_B, 'PENDING_VERIFICATION'],
-            [ID_C, 'PENDING_DOWNLOAD'],
-        ]);
-        const plan = buildImportPlan(rows, existing, new Set([ID_A, ID_B]));
-        expect(plan).toEqual({toCreate: [], toUpdate: [], unchanged: 3});
+        expect(plan.toUpdate).toEqual([]);
+        expect(plan.unchanged).toEqual(2);
     });
 
     it('is idempotent: re-running with the resulting state changes nothing', () => {
