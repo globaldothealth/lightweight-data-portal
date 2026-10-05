@@ -61,13 +61,11 @@ export async function fetchSourcesForOutbreak(
     let nextToken: string | null | undefined;
 
     do {
-        // Use list() with a filter instead of the composite index to avoid status validation issues
-        const filter = statusFilter && statusFilter !== 'ALL'
-            ? {outbreakName: {eq: outbreakName}, status: {eq: statusFilter}}
-            : {outbreakName: {eq: outbreakName}};
-
-        const response = await client.models.Source.list(
-            filter,
+        // Sort key conditions on index queries take an operator object ({eq: ...}), not a bare value.
+        const response = await client.models.Source.listSourcesByOutbreakAndStatus(
+            statusFilter && statusFilter !== 'ALL'
+                ? {outbreakName, status: {eq: statusFilter}}
+                : {outbreakName},
             {nextToken, limit: 1000},
         );
 
@@ -90,7 +88,12 @@ export async function fetchSourcesForOutbreak(
         nextToken = response.nextToken;
     } while (nextToken);
 
-    return results.sort((a, b) => {
+    // Safety net: never show records of another status, whatever the backend returned.
+    const filtered = statusFilter && statusFilter !== 'ALL'
+        ? results.filter((source) => source.status === statusFilter)
+        : results;
+
+    return filtered.sort((a, b) => {
         // Sort by status (PENDING_VERIFICATION first, then VERIFIED), then by URL
         const statusOrder = {PENDING_VERIFICATION: 0, VERIFIED: 1};
         const orderDelta = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
@@ -171,5 +174,30 @@ export async function applyImportPlan(
     });
 
     return result;
+}
+
+export async function verifySource(id: string, verifiedBy: string): Promise<void> {
+    const now = new Date().toISOString();
+    const {errors} = await client.models.Source.update({
+        id,
+        status: 'VERIFIED',
+        verifiedBy,
+        verifiedAt: now,
+    });
+    if (errors?.length) {
+        throw new Error(errors[0].message);
+    }
+}
+
+export async function unverifySource(id: string): Promise<void> {
+    const {errors} = await client.models.Source.update({
+        id,
+        status: 'PENDING_VERIFICATION',
+        verifiedBy: null,
+        verifiedAt: null,
+    });
+    if (errors?.length) {
+        throw new Error(errors[0].message);
+    }
 }
 
