@@ -32,11 +32,18 @@ const ghOutbreakData = 'gh-outbreak-data';
 const ghDataDownloadsBucketName = 'gh-data-downloads';
 const globalDengueForecastingBucketName = 'global-dengue-forecasting';
 const aggregatedMapDataBucketName = 'aggregated-map-data';
+const ghOutbreakSourcesBucketName = 'gh-outbreak-sources';
 
 backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
   new PolicyStatement({
     actions: ['s3:GetObject', 's3:ListBucket'],
     resources: [`arn:aws:s3:::${ghOutbreakData}`, `arn:aws:s3:::${ghOutbreakData}/*`],
+  })
+);
+backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
+  new PolicyStatement({
+    actions: ['s3:GetObject', 's3:ListBucket'],
+    resources: [`arn:aws:s3:::${ghOutbreakSourcesBucketName}`, `arn:aws:s3:::${ghOutbreakSourcesBucketName}/*`],
   })
 );
 
@@ -72,6 +79,12 @@ backend.auth.resources.groups[Group.Admin].role.addToPrincipalPolicy(
             resources: [`arn:aws:s3:::${globalDengueForecastingBucketName}`, `arn:aws:s3:::${globalDengueForecastingBucketName}/*`],
         })
     );
+    backend.auth.resources.groups[group].role.addToPrincipalPolicy(
+        new PolicyStatement({
+            actions: ['s3:GetObject', 's3:ListBucket'],
+            resources: [`arn:aws:s3:::${ghOutbreakSourcesBucketName}`, `arn:aws:s3:::${ghOutbreakSourcesBucketName}/*`],
+        })
+    );
 });
 
 // Grant Admin and Curator groups write access to upload data
@@ -80,6 +93,13 @@ backend.auth.resources.groups[Group.Admin].role.addToPrincipalPolicy(
         new PolicyStatement({
             actions: ['s3:PutObject'],
             resources: [`arn:aws:s3:::${ghOutbreakData}/*`],
+        })
+    );
+    // Curators/admins upload replacement source PDFs
+    backend.auth.resources.groups[group].role.addToPrincipalPolicy(
+        new PolicyStatement({
+            actions: ['s3:PutObject'],
+            resources: [`arn:aws:s3:::${ghOutbreakSourcesBucketName}/*`],
         })
     );
 });
@@ -105,6 +125,11 @@ backend.addOutput({
       {
         name: aggregatedMapDataBucketName,
         bucket_name: aggregatedMapDataBucketName,
+        aws_region: backend.auth.resources.userPool.stack.region,
+      },
+      {
+        name: ghOutbreakSourcesBucketName,
+        bucket_name: ghOutbreakSourcesBucketName,
         aws_region: backend.auth.resources.userPool.stack.region,
       }
     ]

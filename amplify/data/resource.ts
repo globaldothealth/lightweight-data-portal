@@ -39,6 +39,32 @@ const schema = a
             .authorization((allow) => [
                 allow.group(Group.Admin),
             ]),
+        SourceStatus: a.enum([
+            'PENDING_DOWNLOAD',
+            'DOWNLOAD_FAILED',
+            'PENDING_VERIFICATION',
+            'VERIFIED',
+        ]),
+        // The record id is a UUIDv5 of the normalized source URL and doubles as the S3 file name:
+        // s3://gh-outbreak-sources/<outbreakName>/<id>.pdf
+        Source: a
+            .model({
+                url: a.string().required(),
+                outbreakName: a.string().required(),
+                status: a.ref('SourceStatus').required(),
+                downloadedAt: a.string(),
+                verifiedBy: a.string(),
+                verifiedAt: a.string(),
+                errorMessage: a.string(),
+            })
+            .secondaryIndexes((index) => [
+                index('outbreakName').sortKeys(['status']).queryField('listSourcesByOutbreakAndStatus'),
+                index('url').queryField('listSourcesByUrl'),
+            ])
+            .authorization((allow) => [
+                allow.groups([Group.Admin, Group.Curator]),
+                allow.authenticated().to(['read']),
+            ]),
         addUserToGroup: a
             .mutation()
             .arguments({
