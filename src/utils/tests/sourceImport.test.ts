@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {buildImportPlan, parseSourceCsv, SourceStatus} from '../sourceImport';
+import {buildImportPlan, parseSourceCsv} from '../sourceImport';
 
 const ID_A = 'a971f0c5-9842-5769-aba2-654277b34f38';
 const ID_B = 'f4f3907d-94ef-56d5-b9af-d9cb8378735f';
@@ -81,29 +81,31 @@ describe('buildImportPlan', () => {
         {rowNumber: 3, url: 'https://c.com', id: ID_C},
     ];
 
-    it('creates new rows with PENDING_VERIFICATION status', () => {
-        const plan = buildImportPlan(rows, new Map(), new Set([ID_A]));
+    it('creates every unknown row (as PENDING_VERIFICATION, regardless of any PDF in S3)', () => {
+        const plan = buildImportPlan(rows, new Set());
         expect(plan.toCreate).toEqual([
-            {id: ID_A, url: 'https://a.com', status: 'PENDING_VERIFICATION'},
-            {id: ID_B, url: 'https://b.com', status: 'PENDING_VERIFICATION'},
-            {id: ID_C, url: 'https://c.com', status: 'PENDING_VERIFICATION'},
+            {id: ID_A, url: 'https://a.com'},
+            {id: ID_B, url: 'https://b.com'},
+            {id: ID_C, url: 'https://c.com'},
         ]);
-        expect(plan.toUpdate).toEqual([]);
+        expect(plan.unchanged).toBe(0);
     });
 
-    it('never updates existing sources', () => {
-        const existing = new Map<string, SourceStatus>([[ID_A, 'PENDING_VERIFICATION'], [ID_B, 'VERIFIED']]);
-        const plan = buildImportPlan(rows.slice(0, 2), existing, new Set([ID_A, ID_B]));
-        expect(plan.toCreate).toEqual([]);
-        expect(plan.toUpdate).toEqual([]);
-        expect(plan.unchanged).toEqual(2);
+    it('never touches rows whose id already exists', () => {
+        const plan = buildImportPlan(rows.slice(0, 2), new Set([ID_A, ID_B]));
+        expect(plan).toEqual({toCreate: [], unchanged: 2});
+    });
+
+    it('only creates the rows that are missing', () => {
+        const plan = buildImportPlan(rows, new Set([ID_B]));
+        expect(plan.toCreate.map((c) => c.id)).toEqual([ID_A, ID_C]);
+        expect(plan.unchanged).toBe(1);
     });
 
     it('is idempotent: re-running with the resulting state changes nothing', () => {
-        const first = buildImportPlan(rows, new Map(), new Set([ID_A]));
-        const afterFirst = new Map<string, SourceStatus>(first.toCreate.map((c) => [c.id, c.status]));
-        const second = buildImportPlan(rows, afterFirst, new Set([ID_A]));
-        expect(second).toEqual({toCreate: [], toUpdate: [], unchanged: 3});
+        const first = buildImportPlan(rows, new Set());
+        const second = buildImportPlan(rows, new Set(first.toCreate.map((c) => c.id)));
+        expect(second).toEqual({toCreate: [], unchanged: 3});
     });
 });
 

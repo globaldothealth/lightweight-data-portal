@@ -14,7 +14,7 @@ import {
 
 import {OUTBREAK_OPTIONS, OutbreakName} from "../../config/outbreaks";
 import {buildImportPlan, ImportPlan, parseSourceCsv, ParsedSourceCsv} from "../../utils/sourceImport";
-import {applyImportPlan, fetchExistingSources, fetchSourceFileIds, ImportResult} from "../../utils/sourcesApi";
+import {applyImportPlan, fetchExistingSourceIds, ImportResult} from "../../utils/sourcesApi";
 
 type Phase = 'idle' | 'analyzing' | 'ready' | 'importing' | 'done';
 
@@ -63,11 +63,7 @@ export default function ImportSources() {
                 return;
             }
 
-            const [existing, fileIds] = await Promise.all([
-                fetchExistingSources(outbreakName),
-                fetchSourceFileIds(outbreakName),
-            ]);
-            setPlan(buildImportPlan(parsedCsv.rows, existing, fileIds));
+            setPlan(buildImportPlan(parsedCsv.rows, await fetchExistingSourceIds(outbreakName)));
             setPhase('ready');
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -79,7 +75,7 @@ export default function ImportSources() {
         if (!plan || !outbreakName) return;
 
         setPhase('importing');
-        setProgress({done: 0, total: plan.toCreate.length + plan.toUpdate.length});
+        setProgress({done: 0, total: plan.toCreate.length});
         try {
             const importResult = await applyImportPlan(plan, outbreakName, (done, total) => setProgress({done, total}));
             setResult(importResult);
@@ -91,7 +87,7 @@ export default function ImportSources() {
     };
 
     const busy = phase === 'analyzing' || phase === 'importing';
-    const nothingToWrite = !plan || plan.toCreate.length + plan.toUpdate.length === 0;
+    const nothingToWrite = !plan || plan.toCreate.length === 0;
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>

@@ -1,157 +1,94 @@
-import {useEffect, useRef, useState} from "react";
-import {
-    Alert,
-    Box,
-    Button,
-    CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    FormControl,
-    InputLabel,
-    Link,
-    MenuItem,
-    Paper,
-    Select,
-    Typography,
-} from "@mui/material";
+import {useRef, useState} from "react";
+import {Alert, Box, Button, CircularProgress, Typography} from "@mui/material";
 import {Check as CheckIcon, CloudUpload as CloudUploadIcon, OpenInNew as OpenInNewIcon} from '@mui/icons-material';
-import {getUrl, uploadData} from "aws-amplify/storage";
+import {uploadData} from "aws-amplify/storage";
 import {useAppSelector} from "../../hooks/redux";
 import {selectUserProfile} from "../../redux/app/selectors";
-import {OUTBREAK_OPTIONS, OutbreakName} from '../../config/outbreaks';
-import {fetchSourcesForOutbreak, SourceRecord, SOURCES_BUCKET, verifySource} from '../../utils/sourcesApi';
+import {OutbreakName} from '../../config/outbreaks';
+import {SOURCES_BUCKET, SourceRecord, sourcePdfPath, verifySource} from '../../utils/sourcesApi';
+import ConfirmDialog from "./ConfirmDialog";
+import OutbreakSelect from "./OutbreakSelect";
+import SourceCard from "./SourceCard";
+import {useOpenSourcePdf} from "./useOpenSourcePdf";
+import {useSourceList} from "./useSourceList";
 
+/** Sources waiting for review: curators and admins can open or replace the PDF, then verify the source. */
 export default function VerifySources() {
     const userProfile = useAppSelector(selectUserProfile);
     const [outbreakName, setOutbreakName] = useState<OutbreakName | ''>('Ebola BVD');
-    const [sources, setSources] = useState<SourceRecord[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [openingPdf, setOpeningPdf] = useState<string | null>(null);
+    const {sources, loading, loadError, removeSource} = useSourceList(outbreakName, 'PENDING_VERIFICATION');
+    const [actionError, setActionError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const {openingId, openPdf} = useOpenSourcePdf(setActionError);
+    const [pendingVerify, setPendingVerify] = useState<SourceRecord | null>(null);
     const [verifyingId, setVerifyingId] = useState<string | null>(null);
     const [uploadingId, setUploadingId] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [selectedSourceForUpload, setSelectedSourceForUpload] = useState<SourceRecord | null>(null);
-    const [confirmDialog, setConfirmDialog] = useState<{open: boolean; sourceId: string | null; action: 'verify'} | null>(null);
+    const replaceTarget = useRef<SourceRecord | null>(null);
 
-    const handleOpenPdf = async (source: SourceRecord) => {
-        setOpeningPdf(source.id);
-        try {
-            const url = await getUrl({
-                path: `${source.outbreakName}/${source.id}.pdf`,
-                options: {bucket: SOURCES_BUCKET},
-            });
-            window.open(url.url.toString(), '_blank');
-        } catch (err) {
-            console.error('Failed to open PDF:', err);
-            alert(`Failed to open PDF: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        } finally {
-            setOpeningPdf(null);
-        }
-    };
+    const busy = verifyingId !== null || uploadingId !== null;
 
-    const handleReplacePdf = (source: SourceRecord) => {
-        setSelectedSourceForUpload(source);
+    const handleReplaceClick = (source: SourceRecord) => {
+        replaceTarget.current = source;
         fileInputRef.current?.click();
     };
 
     const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (!file || !selectedSourceForUpload) {
+        event.target.value = ''; // allow selecting the same file again
+        const source = replaceTarget.current;
+        if (!file || !source) return;
+
+        if (file.type !== 'application/pdf') {
+            setActionError('Please select a PDF file');
             return;
         }
 
-        if (!file.type.includes('pdf')) {
-            setError('Please select a PDF file');
-            return;
-        }
-
-        setUploadingId(selectedSourceForUpload.id);
-        setError(null);
+        setUploadingId(source.id);
+        setActionError(null);
         setSuccessMessage(null);
 
         try {
-            const s3Path = `${selectedSourceForUpload.outbreakName}/${selectedSourceForUpload.id}.pdf`;
+            // Same key as the existing file (the id is the file name), so the PDF is replaced.
             await uploadData({
-                path: s3Path,
+                path: sourcePdfPath(source),
                 data: file,
-                options: {
-                    bucket: SOURCES_BUCKET,
-                    contentType: 'application/pdf',
-                },
+                options: {bucket: SOURCES_BUCKET, contentType: 'application/pdf'},
             }).result;
-            setSuccessMessage(`PDF replaced successfully!`);
-            setUploadingId(null);
-            setSelectedSourceForUpload(null);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to upload PDF');
-            setUploadingId(null);
+            setSuccessMessage('PDF replaced successfully!');
+        } catch (err: unknown) {
+            setActionError(err instanceof Error ? err.message : 'Failed to upload PDF');
         } finally {
-            // Reset file input
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
+            setUploadingId(null);
         }
-    };
-
-    const handleVerifyClick = (source: SourceRecord) => {
-        setConfirmDialog({open: true, sourceId: source.id, action: 'verify'});
     };
 
     const handleConfirmVerify = async () => {
-        if (!confirmDialog?.sourceId || !userProfile?.email) return;
+        if (!pendingVerify) return;
 
-        const sourceId = confirmDialog.sourceId;
-        setConfirmDialog(null);
-        setVerifyingId(sourceId);
-        setError(null);
+        const {id} = pendingVerify;
+        setPendingVerify(null);
+        if (!userProfile?.email) {
+            setActionError('User email not found');
+            return;
+        }
+
+        setVerifyingId(id);
+        setActionError(null);
         setSuccessMessage(null);
 
         try {
-            await verifySource(sourceId, userProfile.email);
-            setSuccessMessage(`Source verified successfully!`);
-            // Reload sources after verification to ensure consistency
-            setTimeout(async () => {
-                try {
-                    const updated = await fetchSourcesForOutbreak(outbreakName, 'PENDING_VERIFICATION');
-                    setSources(updated);
-                } catch (err) {
-                    console.error('Failed to reload sources:', err);
-                }
-                setVerifyingId(null);
-            }, 1500);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to verify source');
+            await verifySource(id, userProfile.email);
+            removeSource(id);
+            setSuccessMessage('Source verified successfully!');
+        } catch (err: unknown) {
+            setActionError(err instanceof Error ? err.message : 'Failed to verify source');
+        } finally {
             setVerifyingId(null);
         }
     };
 
-    const handleCloseConfirmDialog = () => {
-        setConfirmDialog(null);
-    };
-
-    useEffect(() => {
-        if (!outbreakName) {
-            setSources([]);
-            setError(null);
-            return;
-        }
-
-        setLoading(true);
-        setError(null);
-        setSuccessMessage(null);
-        fetchSourcesForOutbreak(outbreakName, 'PENDING_VERIFICATION')
-            .then((items) => setSources(items))
-            .catch((err: unknown) => {
-                setError(err instanceof Error ? err.message : 'Failed to load sources');
-                setSources([]);
-            })
-            .finally(() => setLoading(false));
-    }, [outbreakName]);
+    const error = loadError ?? actionError;
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
@@ -163,31 +100,23 @@ export default function VerifySources() {
                 style={{display: 'none'}}
             />
 
-            <FormControl fullWidth>
-                <InputLabel id="verify-sources-outbreak-label">Outbreak</InputLabel>
-                <Select
-                    labelId="verify-sources-outbreak-label"
-                    value={outbreakName}
-                    label="Outbreak"
-                    onChange={(event) => setOutbreakName(event.target.value as OutbreakName)}
-                    disabled={loading || verifyingId !== null || uploadingId !== null}
-                >
-                    {OUTBREAK_OPTIONS.map((option) => (
-                        <MenuItem key={option} value={option}>{option}</MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
+            <OutbreakSelect
+                id="verify-sources-outbreak"
+                value={outbreakName}
+                onChange={setOutbreakName}
+                disabled={loading || busy}
+            />
 
             {outbreakName && (
                 <>
-                    {loading && <CircularProgress size={24} />}
+                    {loading && <CircularProgress size={24}/>}
                     {error && <Alert severity="error">{error}</Alert>}
                     {successMessage && <Alert severity="success" onClose={() => setSuccessMessage(null)}>{successMessage}</Alert>}
 
-                    {!loading && !error && (
+                    {!loading && !loadError && (
                         <>
                             <Typography color="text.secondary">
-                                {sources.length} source{sources.length > 1 && 's'} pending verification
+                                {sources.length} source{sources.length === 1 ? '' : 's'} pending verification
                             </Typography>
 
                             {sources.length === 0 ? (
@@ -197,36 +126,28 @@ export default function VerifySources() {
                             ) : (
                                 <Box sx={{display: 'flex', flexDirection: 'column', gap: 1.5}}>
                                     {sources.map((source) => (
-                                        <Paper key={source.id} sx={{p: 2, border: 1, borderColor: 'divider'}}>
-                                            <Box sx={{display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', alignItems: 'flex-start'}}>
-                                                <Box sx={{minWidth: 0, flex: 1}}>
-                                                    <Link href={source.url} target="_blank" rel="noreferrer" sx={{wordBreak: 'break-all', display: 'block', mb: 1}}>
-                                                        {source.url}
-                                                    </Link>
-                                                    <Typography variant="caption" color="text.secondary">
-                                                        {source.outbreakName}
-                                                    </Typography>
-                                                </Box>
-                                                <Box sx={{display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap'}}>
+                                        <SourceCard
+                                            key={source.id}
+                                            source={source}
+                                            actions={
+                                                <>
                                                     {source.id && (
                                                         <>
                                                             <Button
-                                                                variant="contained"
-                                                                color="primary"
+                                                                variant="outlined"
                                                                 size="small"
-                                                                startIcon={<OpenInNewIcon />}
-                                                                onClick={() => handleOpenPdf(source)}
-                                                                disabled={openingPdf === source.id || verifyingId !== null || uploadingId !== null}
+                                                                startIcon={<OpenInNewIcon/>}
+                                                                onClick={() => openPdf(source)}
+                                                                disabled={openingId === source.id || busy}
                                                             >
-                                                                {openingPdf === source.id ? 'Loading...' : 'Open PDF'}
+                                                                {openingId === source.id ? 'Loading...' : 'Open PDF'}
                                                             </Button>
                                                             <Button
-                                                                variant="contained"
-                                                                color='warning'
+                                                                variant="outlined"
                                                                 size="small"
-                                                                startIcon={<CloudUploadIcon />}
-                                                                onClick={() => handleReplacePdf(source)}
-                                                                disabled={verifyingId !== null || uploadingId !== null}
+                                                                startIcon={<CloudUploadIcon/>}
+                                                                onClick={() => handleReplaceClick(source)}
+                                                                disabled={busy}
                                                             >
                                                                 {uploadingId === source.id ? 'Uploading...' : 'Replace PDF'}
                                                             </Button>
@@ -236,20 +157,15 @@ export default function VerifySources() {
                                                         variant="contained"
                                                         color="success"
                                                         size="small"
-                                                        startIcon={<CheckIcon />}
-                                                        onClick={() => handleVerifyClick(source)}
-                                                        disabled={verifyingId !== null || uploadingId !== null}
+                                                        startIcon={<CheckIcon/>}
+                                                        onClick={() => setPendingVerify(source)}
+                                                        disabled={busy}
                                                     >
                                                         {verifyingId === source.id ? 'Verifying...' : 'Verify'}
                                                     </Button>
-                                                </Box>
-                                            </Box>
-                                            {source.errorMessage && (
-                                                <Typography variant="body2" color="error.main" sx={{mt: 1}}>
-                                                    {source.errorMessage}
-                                                </Typography>
-                                            )}
-                                        </Paper>
+                                                </>
+                                            }
+                                        />
                                     ))}
                                 </Box>
                             )}
@@ -258,20 +174,15 @@ export default function VerifySources() {
                 </>
             )}
 
-            <Dialog open={confirmDialog?.open ?? false} onClose={handleCloseConfirmDialog}>
-                <DialogTitle>Confirm Verify</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Are you sure you want to verify this source? It will be marked as verified and visible in Browse Sources.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseConfirmDialog}>Cancel</Button>
-                    <Button onClick={handleConfirmVerify} color="success" variant="contained">
-                        Verify
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <ConfirmDialog
+                open={pendingVerify !== null}
+                title="Confirm Verify"
+                message="Are you sure you want to verify this source? It will be marked as verified and visible in Browse Sources."
+                confirmLabel="Verify"
+                confirmColor="success"
+                onConfirm={handleConfirmVerify}
+                onCancel={() => setPendingVerify(null)}
+            />
         </Box>
     );
 }

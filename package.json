@@ -30,7 +30,8 @@
     "react-dom": "^19.2.0",
     "react-google-button": "^0.8.0",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.13.1"
+    "react-router-dom": "^7.13.1",
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "@aws-amplify/backend": "^1.21.0",

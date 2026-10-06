@@ -1,4 +1,3 @@
-import {list} from "aws-amplify/storage";
 import {client} from "./amplifyClient";
 import type {ImportPlan, SourceStatus} from "./sourceImport";
 
@@ -20,169 +19,81 @@ export interface SourceRecord {
 
 export interface ImportResult {
     created: number;
-    updated: number;
     failed: { id: string; message: string }[];
 }
 
-export const SOURCE_STATUSES: SourceStatus[] = [
-    'PENDING_VERIFICATION',
-    'VERIFIED',
-];
+/** S3 key of a source's PDF: the record id doubles as the file name. */
+export const sourcePdfPath = (source: Pick<SourceRecord, 'outbreakName' | 'id'>) =>
+    `${source.outbreakName}/${source.id}.pdf`;
 
-export function formatSourceStatus(status: SourceStatus): string {
-    return status.replace(/_/g, ' ');
-}
-
-/** All existing Source records of an outbreak, keyed by id. */
-export async function fetchExistingSources(outbreakName: string): Promise<Map<string, SourceStatus>> {
-    const existing = new Map<string, SourceStatus>();
-    let nextToken: string | null | undefined;
-
-    do {
-        const response = await client.models.Source.listSourcesByOutbreakAndStatus(
-            {outbreakName},
-            {nextToken, limit: 1000},
-        );
-        if (response.errors?.length) {
-            throw new Error(response.errors[0].message);
-        }
-        response.data.forEach((source) => existing.set(source.id, source.status as SourceStatus));
-        nextToken = response.nextToken;
-    } while (nextToken);
-
-    return existing;
-}
-
-export async function fetchSourcesForOutbreak(
-    outbreakName: string,
-    statusFilter?: SourceStatus | 'ALL',
-): Promise<SourceRecord[]> {
-    const results: SourceRecord[] = [];
+/** All Source records of an outbreak (optionally of a single status), following pagination. */
+async function listSources(outbreakName: string, status?: SourceStatus): Promise<SourceRecord[]> {
+    const records: SourceRecord[] = [];
     let nextToken: string | null | undefined;
 
     do {
         // Sort key conditions on index queries take an operator object ({eq: ...}), not a bare value.
         const response = await client.models.Source.listSourcesByOutbreakAndStatus(
-            statusFilter && statusFilter !== 'ALL'
-                ? {outbreakName, status: {eq: statusFilter}}
-                : {outbreakName},
+            status ? {outbreakName, status: {eq: status}} : {outbreakName},
             {nextToken, limit: 1000},
         );
-
         if (response.errors?.length) {
             throw new Error(response.errors[0].message);
         }
-
-        results.push(...(response.data ?? []).map((source) => ({
-            id: source.id,
-            url: source.url,
-            outbreakName: source.outbreakName,
-            status: source.status as SourceStatus,
-            downloadedAt: source.downloadedAt,
-            verifiedBy: source.verifiedBy,
-            verifiedAt: source.verifiedAt,
-            errorMessage: source.errorMessage,
-            createdAt: source.createdAt,
-            updatedAt: source.updatedAt,
-        })));
+        records.push(...(response.data ?? []).map((source) => ({...source, status: source.status as SourceStatus})));
         nextToken = response.nextToken;
     } while (nextToken);
 
+    return records;
+}
+
+/** Sources of an outbreak with the given status, sorted by URL. */
+export async function fetchSourcesForOutbreak(outbreakName: string, status: SourceStatus): Promise<SourceRecord[]> {
+    const records = await listSources(outbreakName, status);
     // Safety net: never show records of another status, whatever the backend returned.
-    const filtered = statusFilter && statusFilter !== 'ALL'
-        ? results.filter((source) => source.status === statusFilter)
-        : results;
-
-    return filtered.sort((a, b) => {
-        // Sort by status (PENDING_VERIFICATION first, then VERIFIED), then by URL
-        const statusOrder = {PENDING_VERIFICATION: 0, VERIFIED: 1};
-        const orderDelta = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
-        if (orderDelta !== 0) return orderDelta;
-        return a.url.localeCompare(b.url);
-    });
+    return records.filter((source) => source.status === status).sort((a, b) => a.url.localeCompare(b.url));
 }
 
-/** Ids of all PDF files stored under the outbreak's folder (file name without ".pdf"). */
-export async function fetchSourceFileIds(outbreakName: string): Promise<Set<string>> {
-    const result = await list({
-        path: `${outbreakName}/`,
-        options: {bucket: SOURCES_BUCKET, listAll: true},
-    });
-
-    const ids = new Set<string>();
-    result.items.forEach((item) => {
-        const name = item.path.split('/').pop() ?? '';
-        if (name.toLowerCase().endsWith('.pdf')) {
-            ids.add(name.slice(0, -'.pdf'.length).toLowerCase());
-        }
-    });
-    return ids;
+/** Ids of all existing Source records of an outbreak, whatever their status. */
+export async function fetchExistingSourceIds(outbreakName: string): Promise<Set<string>> {
+    return new Set((await listSources(outbreakName)).map((source) => source.id));
 }
 
-async function runWithConcurrency<T>(items: T[], limit: number, worker: (item: T) => Promise<void>) {
-    let next = 0;
-    const runners = Array.from({length: Math.min(limit, items.length)}, async () => {
-        while (next < items.length) {
-            const item = items[next++];
-            await worker(item);
-        }
-    });
-    await Promise.all(runners);
-}
-
+/** Creates the planned sources as PENDING_VERIFICATION, a few at a time. Existing records are never overwritten. */
 export async function applyImportPlan(
     plan: ImportPlan,
     outbreakName: string,
     onProgress: (done: number, total: number) => void,
 ): Promise<ImportResult> {
-    const result: ImportResult = {created: 0, updated: 0, failed: []};
-    const total = plan.toCreate.length + plan.toUpdate.length;
+    const result: ImportResult = {created: 0, failed: []};
+    const total = plan.toCreate.length;
     let done = 0;
 
-    const tasks: (() => Promise<void>)[] = [
-        ...plan.toCreate.map((item) => async () => {
-            // Create fails if the id already exists, so existing records are never overwritten.
-            const {errors} = await client.models.Source.create({
-                id: item.id,
-                url: item.url,
-                outbreakName,
-                status: item.status,
-            });
-            if (errors?.length) {
-                throw new Error(errors[0].message);
+    for (let start = 0; start < total; start += WRITE_CONCURRENCY) {
+        await Promise.all(plan.toCreate.slice(start, start + WRITE_CONCURRENCY).map(async ({id, url}) => {
+            try {
+                // Create fails if the id already exists.
+                const {errors} = await client.models.Source.create({id, url, outbreakName, status: 'PENDING_VERIFICATION'});
+                if (errors?.length) {
+                    throw new Error(errors[0].message);
+                }
+                result.created++;
+            } catch (error: unknown) {
+                result.failed.push({id, message: error instanceof Error ? error.message : 'Unknown error'});
             }
-            result.created++;
-        }),
-        ...plan.toUpdate.map((item) => async () => {
-            const {errors} = await client.models.Source.update({id: item.id, status: item.status});
-            if (errors?.length) {
-                throw new Error(errors[0].message);
-            }
-            result.updated++;
-        }),
-    ];
-    const ids = [...plan.toCreate.map((i) => i.id), ...plan.toUpdate.map((i) => i.id)];
-
-    await runWithConcurrency(tasks.map((task, index) => ({task, id: ids[index]})), WRITE_CONCURRENCY, async ({task, id}) => {
-        try {
-            await task();
-        } catch (error: unknown) {
-            result.failed.push({id, message: error instanceof Error ? error.message : 'Unknown error'});
-        }
-        done++;
-        onProgress(done, total);
-    });
+            onProgress(++done, total);
+        }));
+    }
 
     return result;
 }
 
 export async function verifySource(id: string, verifiedBy: string): Promise<void> {
-    const now = new Date().toISOString();
     const {errors} = await client.models.Source.update({
         id,
         status: 'VERIFIED',
         verifiedBy,
-        verifiedAt: now,
+        verifiedAt: new Date().toISOString(),
     });
     if (errors?.length) {
         throw new Error(errors[0].message);

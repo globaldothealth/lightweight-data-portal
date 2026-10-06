@@ -23,8 +23,9 @@ export interface ParsedSourceCsv {
 }
 
 export interface ImportPlan {
-    toCreate: { id: string; url: string; status: SourceStatus }[];
-    toUpdate: { id: string; status: SourceStatus }[];
+    /** Sources that do not exist yet; they are always created as PENDING_VERIFICATION. */
+    toCreate: { id: string; url: string }[];
+    /** Rows whose id already exists; existing sources are never modified. */
     unchanged: number;
 }
 
@@ -92,25 +93,17 @@ export function parseSourceCsv(text: string): ParsedSourceCsv {
 
 /**
  * Decides what to write for each row. Safe to run repeatedly with the same CSV:
- * - unknown id                                  -> create with PENDING_VERIFICATION
- * - already PENDING_VERIFICATION or VERIFIED   -> left untouched
+ * - unknown id  -> create (always as PENDING_VERIFICATION, whether or not the PDF is already in S3)
+ * - known id    -> left untouched
  */
-export function buildImportPlan(
-    rows: SourceCsvRow[],
-    existing: Map<string, SourceStatus>,
-    fileIds: Set<string>,
-): ImportPlan {
-    const plan: ImportPlan = {toCreate: [], toUpdate: [], unchanged: 0};
+export function buildImportPlan(rows: SourceCsvRow[], existingIds: Set<string>): ImportPlan {
+    const plan: ImportPlan = {toCreate: [], unchanged: 0};
 
     rows.forEach(({id, url}) => {
-        const current = existing.get(id);
-
-        if (current === undefined) {
-            // New source always starts as PENDING_VERIFICATION
-            plan.toCreate.push({id, url, status: 'PENDING_VERIFICATION'});
-        } else {
-            // Never update existing sources; they stay in their current state
+        if (existingIds.has(id)) {
             plan.unchanged++;
+        } else {
+            plan.toCreate.push({id, url});
         }
     });
 
