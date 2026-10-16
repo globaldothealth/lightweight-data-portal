@@ -9,11 +9,13 @@ import {
     Construction as ConstructionIcon,
     Map as MapDataAggregationIcon,
     Upload as UploadDataIcon,
+    Source as SourcesIcon,
 } from '@mui/icons-material';
 import {AppBar, Box, CssBaseline, IconButton, Toolbar, Link, Typography, CircularProgress, Paper} from '@mui/material';
 
 import DataDownloads from "../DataDownloads";
 import Tools from "../Tools";
+import Sources from "../Sources";
 import UploadData from "../UploadData";
 import DengueGeodata from "../DengueGeodata";
 import ManageUsers from "../ManageUsers";
@@ -52,6 +54,11 @@ export default function App() {
             to: '/data-downloads',
         },
         {
+            text: 'Sources',
+            icon: <SourcesIcon/>,
+            to: '/sources',
+        },
+        {
             text: 'Tools',
             icon: <ConstructionIcon/>,
             to: '/tools',
@@ -63,27 +70,27 @@ export default function App() {
             groups: [Group.ADMINS, Group.CURATORS, Group.RESEARCHERS],
         },
         {
-            text: 'Upload Data',
-            icon: <UploadDataIcon/>,
-            to: '/upload-data',
-            groups: [Group.ADMINS, Group.CURATORS],
-        },
-        {
             text: 'Location Admin Explorer',
             icon: <LocationAdminExplorerIcon/>,
             to: '/location-admin-explorer',
             groups: [Group.ADMINS, Group.CURATORS],
         },
         {
-            text: 'Manage Users',
-            icon: <PeopleIcon/>,
-            to: '/manage-users',
-            groups: [Group.ADMINS],
+            text: 'Upload Data',
+            icon: <UploadDataIcon/>,
+            to: '/upload-data',
+            groups: [Group.ADMINS, Group.CURATORS],
         },
         {
             text: 'Map Data Aggregation',
             icon: <MapDataAggregationIcon/>,
             to: '/map-data-aggregation',
+            groups: [Group.ADMINS],
+        },
+        {
+            text: 'Manage Users',
+            icon: <PeopleIcon/>,
+            to: '/manage-users',
             groups: [Group.ADMINS],
         },
     ].filter(item => {
@@ -134,6 +141,9 @@ export default function App() {
                             )}
                             {menuList.some(item => item.to === '/tools') && (
                                 <Route path="/tools" element={<Tools/>}/>
+                            )}
+                            {menuList.some(item => item.to === '/sources') && (
+                                <Route path="/sources" element={<Sources/>}/>
                             )}
                             {menuList.some(item => item.to === '/upload-data') && (
                                 <Route path="/upload-data" element={<UploadData/>}/>

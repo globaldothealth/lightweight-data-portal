@@ -6,6 +6,7 @@ COUNTRY_NAME_TO_ISO3 = {
     'Congo, The Democratic Republic of the': 'COD',
     'Uganda': 'UGA',
     'France': 'FRA',
+    'Kenya': 'KEN',
 }
 
 

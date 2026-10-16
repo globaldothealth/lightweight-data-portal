@@ -1,0 +1,213 @@
+import {useRef, useState} from "react";
+import {
+    Alert,
+    Box,
+    Button,
+    FormControl,
+    InputLabel,
+    LinearProgress,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    Typography,
+} from "@mui/material";
+
+import {OUTBREAK_OPTIONS, OutbreakName} from "../../config/outbreaks";
+import {buildImportPlan, ImportPlan, parseSourceCsv, ParsedSourceCsv} from "../../utils/sourceImport";
+import {applyImportPlan, fetchExistingSourceIds, ImportResult} from "../../utils/sourcesApi";
+import {importSnapshotsFromS3, SnapshotImportResult} from "../../utils/snapshotsApi";
+
+type Phase = 'idle' | 'analyzing' | 'ready' | 'importing' | 'done';
+
+const MAX_LISTED_ISSUES = 10;
+
+export default function ImportSources() {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [outbreakName, setOutbreakName] = useState<OutbreakName | ''>('');
+    const [fileName, setFileName] = useState<string | null>(null);
+    const [phase, setPhase] = useState<Phase>('idle');
+    const [parsed, setParsed] = useState<ParsedSourceCsv | null>(null);
+    const [plan, setPlan] = useState<ImportPlan | null>(null);
+    const [progress, setProgress] = useState({done: 0, total: 0});
+    const [result, setResult] = useState<ImportResult | null>(null);
+    const [snapshotResult, setSnapshotResult] = useState<SnapshotImportResult | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const reset = () => {
+        setFileName(null);
+        setPhase('idle');
+        setParsed(null);
+        setPlan(null);
+        setProgress({done: 0, total: 0});
+        setResult(null);
+        setSnapshotResult(null);
+        setError(null);
+    };
+
+    const handleOutbreakChange = (event: SelectChangeEvent) => {
+        setOutbreakName(event.target.value as OutbreakName);
+        reset();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        event.target.value = ''; // allow selecting the same file again
+        if (!file || !outbreakName) return;
+
+        reset();
+        setFileName(file.name);
+        setPhase('analyzing');
+
+        try {
+            const parsedCsv = parseSourceCsv(await file.text());
+            setParsed(parsedCsv);
+            if (parsedCsv.error) {
+                setPhase('idle');
+                return;
+            }
+
+            setPlan(buildImportPlan(parsedCsv.rows, await fetchExistingSourceIds(outbreakName)));
+            setPhase('ready');
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
+            setPhase('idle');
+        }
+    };
+
+    const handleImport = async () => {
+        if (!plan || !outbreakName) return;
+
+        setPhase('importing');
+        setProgress({done: 0, total: plan.toCreate.length});
+        try {
+            const importResult = await applyImportPlan(plan, outbreakName, (done, total) => setProgress({done, total}));
+            setResult(importResult);
+            // Every source in the file (new or existing) gets a snapshot for each PDF already in S3.
+            const sources = parsed?.rows ?? [];
+            setProgress({done: 0, total: sources.length});
+            setSnapshotResult(await importSnapshotsFromS3(sources, outbreakName, (done, total) => setProgress({done, total})));
+            setPhase('done');
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
+            setPhase('ready');
+        }
+    };
+
+    const busy = phase === 'analyzing' || phase === 'importing';
+    const nothingToWrite = !parsed || parsed.rows.length === 0;
+
+    return (
+        <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+            <Typography color="text.secondary">
+                Select an outbreak first, then choose a CSV file with a <code>url</code> column and an optional{' '}
+                <code>id</code> column. Rows without an id are saved too, with an id generated from the URL. Imported
+                sources have no PDF yet: curators add snapshots (a PDF and its capture date) in the Verify Sources tab,
+                and every snapshot is verified separately. The import is safe to repeat: new sources are added,
+                existing sources are never changed, and a pending snapshot is created for every PDF already stored in S3
+                for the sources in the file.
+            </Typography>
+
+            <FormControl fullWidth>
+                <InputLabel id="import-sources-outbreak-label">Outbreak Name</InputLabel>
+                <Select
+                    labelId="import-sources-outbreak-label"
+                    value={outbreakName}
+                    label="Outbreak Name"
+                    onChange={handleOutbreakChange}
+                    disabled={busy}
+                >
+                    {OUTBREAK_OPTIONS.map((option) => (
+                        <MenuItem key={option} value={option}>{option}</MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,text/csv"
+                onChange={handleFileChange}
+                style={{display: 'none'}}
+                data-testid="import-sources-file-input"
+            />
+            <Button
+                variant="outlined"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={!outbreakName || busy}
+            >
+                Select CSV File
+            </Button>
+            <Typography color="text.secondary">
+                {fileName ? `Selected file: ${fileName}` : 'No file selected'}
+            </Typography>
+
+            {phase === 'analyzing' && <LinearProgress/>}
+
+            {error && <Alert severity="error">{error}</Alert>}
+            {parsed?.error && <Alert severity="error">{parsed.error}</Alert>}
+
+            {parsed && !parsed.error && parsed.invalid.length > 0 && (
+                <Alert severity="warning">
+                    {parsed.invalid.length} invalid row(s) will be skipped:
+                    {parsed.invalid.slice(0, MAX_LISTED_ISSUES).map((issue) => (
+                        <div key={issue.rowNumber}>Row {issue.rowNumber}: {issue.reason}</div>
+                    ))}
+                    {parsed.invalid.length > MAX_LISTED_ISSUES &&
+                        <div>…and {parsed.invalid.length - MAX_LISTED_ISSUES} more.</div>}
+                </Alert>
+            )}
+
+            {plan && (phase === 'ready' || phase === 'importing') && (
+                <Alert severity="info">
+                    <div>{plan.toCreate.length} new source(s) to create</div>
+                    <div>{plan.unchanged} already exist (will not be changed)</div>
+                </Alert>
+            )}
+
+            {phase === 'importing' && (
+                <>
+                    <LinearProgress
+                        variant="determinate"
+                        value={progress.total ? (progress.done / progress.total) * 100 : 0}
+                    />
+                    <Typography color="text.secondary">{progress.done} / {progress.total}</Typography>
+                </>
+            )}
+
+            {phase === 'ready' && (
+                <Button variant="contained" onClick={handleImport} disabled={nothingToWrite}>
+                    {nothingToWrite ? 'Nothing to import' : 'Import'}
+                </Button>
+            )}
+
+            {phase === 'done' && result && (
+                <>
+                    <Alert severity={result.failed.length ? 'warning' : 'success'}>
+                        Import finished: {result.created} created
+                        {result.failed.length > 0 && `, ${result.failed.length} failed`}.
+                    </Alert>
+                    {snapshotResult && (
+                        <Alert severity={snapshotResult.failed.length ? 'warning' : 'success'}>
+                            Snapshots from S3: {snapshotResult.pdfsFound} PDF(s) found, {snapshotResult.created} created,{' '}
+                            {snapshotResult.existing} already existed
+                            {snapshotResult.failed.length > 0 && `, ${snapshotResult.failed.length} failed`}.
+                            {snapshotResult.failed.slice(0, MAX_LISTED_ISSUES).map((failure) => (
+                                <div key={failure.id}>{failure.id}: {failure.message}</div>
+                            ))}
+                        </Alert>
+                    )}
+                    {result.failed.length > 0 && (
+                        <Alert severity="error">
+                            {result.failed.slice(0, MAX_LISTED_ISSUES).map((failure) => (
+                                <div key={failure.id}>{failure.id}: {failure.message}</div>
+                            ))}
+                            {result.failed.length > MAX_LISTED_ISSUES &&
+                                <div>…and {result.failed.length - MAX_LISTED_ISSUES} more.</div>}
+                        </Alert>
+                    )}
+                </>
+            )}
+        </Box>
+    );
+}
+
