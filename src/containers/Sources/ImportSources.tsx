@@ -14,7 +14,13 @@ import {
 
 import {OUTBREAK_OPTIONS, OutbreakName} from "../../config/outbreaks";
 import {buildImportPlan, ImportPlan, parseSourceCsv, ParsedSourceCsv} from "../../utils/sourceImport";
-import {applyImportPlan, fetchExistingSourceIds, ImportResult} from "../../utils/sourcesApi";
+import {
+    applyImportPlan,
+    fetchExistingSourceIds,
+    ImportResult,
+    importSnapshotsFromS3,
+    SnapshotImportResult,
+} from "../../utils/sourcesApi";
 
 type Phase = 'idle' | 'analyzing' | 'ready' | 'importing' | 'done';
 
@@ -29,6 +35,7 @@ export default function ImportSources() {
     const [plan, setPlan] = useState<ImportPlan | null>(null);
     const [progress, setProgress] = useState({done: 0, total: 0});
     const [result, setResult] = useState<ImportResult | null>(null);
+    const [snapshotResult, setSnapshotResult] = useState<SnapshotImportResult | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     const reset = () => {
@@ -38,6 +45,7 @@ export default function ImportSources() {
         setPlan(null);
         setProgress({done: 0, total: 0});
         setResult(null);
+        setSnapshotResult(null);
         setError(null);
     };
 
@@ -79,6 +87,10 @@ export default function ImportSources() {
         try {
             const importResult = await applyImportPlan(plan, outbreakName, (done, total) => setProgress({done, total}));
             setResult(importResult);
+            // Every source in the file (new or existing) gets a snapshot for each PDF already in S3.
+            const sources = parsed?.rows ?? [];
+            setProgress({done: 0, total: sources.length});
+            setSnapshotResult(await importSnapshotsFromS3(sources, outbreakName, (done, total) => setProgress({done, total})));
             setPhase('done');
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -87,15 +99,17 @@ export default function ImportSources() {
     };
 
     const busy = phase === 'analyzing' || phase === 'importing';
-    const nothingToWrite = !plan || plan.toCreate.length === 0;
+    const nothingToWrite = !parsed || parsed.rows.length === 0;
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
             <Typography color="text.secondary">
                 Select an outbreak first, then choose a CSV file with a <code>url</code> column and an optional{' '}
-                <code>id</code> column. Rows without an id are saved too, with an id generated from the URL. All sources
-                are imported with status "Pending Verification" for curator review. The import is safe to repeat: new sources
-                are added, and existing sources are never changed.
+                <code>id</code> column. Rows without an id are saved too, with an id generated from the URL. Imported
+                sources have no PDF yet: curators add snapshots (a PDF and its capture date) in the Verify Sources tab,
+                and every snapshot is verified separately. The import is safe to repeat: new sources are added,
+                existing sources are never changed, and a pending snapshot is created for every PDF already stored in S3
+                for the sources in the file.
             </Typography>
 
             <FormControl fullWidth>
@@ -177,6 +191,16 @@ export default function ImportSources() {
                         Import finished: {result.created} created
                         {result.failed.length > 0 && `, ${result.failed.length} failed`}.
                     </Alert>
+                    {snapshotResult && (
+                        <Alert severity={snapshotResult.failed.length ? 'warning' : 'success'}>
+                            Snapshots from S3: {snapshotResult.pdfsFound} PDF(s) found, {snapshotResult.created} created,{' '}
+                            {snapshotResult.existing} already existed
+                            {snapshotResult.failed.length > 0 && `, ${snapshotResult.failed.length} failed`}.
+                            {snapshotResult.failed.slice(0, MAX_LISTED_ISSUES).map((failure) => (
+                                <div key={failure.id}>{failure.id}: {failure.message}</div>
+                            ))}
+                        </Alert>
+                    )}
                     {result.failed.length > 0 && (
                         <Alert severity="error">
                             {result.failed.slice(0, MAX_LISTED_ISSUES).map((failure) => (

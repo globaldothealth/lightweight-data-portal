@@ -1,60 +1,60 @@
 import {useRef, useState} from "react";
 import {Alert, Box, Button, CircularProgress, Typography} from "@mui/material";
-import {Check as CheckIcon, CloudUpload as CloudUploadIcon, OpenInNew as OpenInNewIcon} from '@mui/icons-material';
-import {uploadData} from "aws-amplify/storage";
+import {
+    Check as CheckIcon,
+    CloudUpload as CloudUploadIcon,
+    OpenInNew as OpenInNewIcon,
+} from '@mui/icons-material';
 import {useAppSelector} from "../../hooks/redux";
 import {selectUserProfile} from "../../redux/app/selectors";
 import {OutbreakName} from '../../config/outbreaks';
-import {SOURCES_BUCKET, SourceRecord, sourcePdfPath, verifySource} from '../../utils/sourcesApi';
+import {replaceSnapshotPdf, SnapshotRecord, verifySnapshot} from '../../utils/sourcesApi';
 import ConfirmDialog from "./ConfirmDialog";
 import OutbreakSelect from "./OutbreakSelect";
 import SourceCard from "./SourceCard";
-import {useOpenSourcePdf} from "./useOpenSourcePdf";
-import {useSourceList} from "./useSourceList";
+import {useOpenSnapshotPdf} from "./useOpenSnapshotPdf";
+import {useSnapshotList} from "./useSnapshotList";
 
-/** Sources waiting for review: curators and admins can open or replace the PDF, then verify the source. */
+/**
+ * Snapshots waiting for review. Curators and admins can open or replace a snapshot's PDF, and verify it.
+ */
 export default function VerifySources() {
     const userProfile = useAppSelector(selectUserProfile);
     const [outbreakName, setOutbreakName] = useState<OutbreakName | ''>('Ebola BVD');
-    const {sources, loading, loadError, removeSource} = useSourceList(outbreakName, 'PENDING_VERIFICATION');
+    const {snapshots, loading, loadError, removeSnapshot} = useSnapshotList(outbreakName, 'PENDING_VERIFICATION');
     const [actionError, setActionError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const {openingId, openPdf} = useOpenSourcePdf(setActionError);
-    const [pendingVerify, setPendingVerify] = useState<SourceRecord | null>(null);
+    const {openingId, openPdf} = useOpenSnapshotPdf(setActionError);
+    const [pendingVerify, setPendingVerify] = useState<SnapshotRecord | null>(null);
     const [verifyingId, setVerifyingId] = useState<string | null>(null);
     const [uploadingId, setUploadingId] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const replaceTarget = useRef<SourceRecord | null>(null);
+    const replaceTarget = useRef<SnapshotRecord | null>(null);
 
     const busy = verifyingId !== null || uploadingId !== null;
 
-    const handleReplaceClick = (source: SourceRecord) => {
-        replaceTarget.current = source;
+    const handleReplaceClick = (snapshot: SnapshotRecord) => {
+        replaceTarget.current = snapshot;
         fileInputRef.current?.click();
     };
 
     const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         event.target.value = ''; // allow selecting the same file again
-        const source = replaceTarget.current;
-        if (!file || !source) return;
+        const snapshot = replaceTarget.current;
+        if (!file || !snapshot) return;
 
         if (file.type !== 'application/pdf') {
             setActionError('Please select a PDF file');
             return;
         }
 
-        setUploadingId(source.id);
+        setUploadingId(snapshot.id);
         setActionError(null);
         setSuccessMessage(null);
 
         try {
-            // Same key as the existing file (the id is the file name), so the PDF is replaced.
-            await uploadData({
-                path: sourcePdfPath(source),
-                data: file,
-                options: {bucket: SOURCES_BUCKET, contentType: 'application/pdf'},
-            }).result;
+            await replaceSnapshotPdf(snapshot, file);
             setSuccessMessage('PDF replaced successfully!');
         } catch (err: unknown) {
             setActionError(err instanceof Error ? err.message : 'Failed to upload PDF');
@@ -78,11 +78,11 @@ export default function VerifySources() {
         setSuccessMessage(null);
 
         try {
-            await verifySource(id, userProfile.email);
-            removeSource(id);
-            setSuccessMessage('Source verified successfully!');
+            await verifySnapshot(id, userProfile.email);
+            removeSnapshot(id);
+            setSuccessMessage('Snapshot verified successfully!');
         } catch (err: unknown) {
-            setActionError(err instanceof Error ? err.message : 'Failed to verify source');
+            setActionError(err instanceof Error ? err.message : 'Failed to verify snapshot');
         } finally {
             setVerifyingId(null);
         }
@@ -116,52 +116,49 @@ export default function VerifySources() {
                     {!loading && !loadError && (
                         <>
                             <Typography color="text.secondary">
-                                {sources.length} source{sources.length === 1 ? '' : 's'} pending verification
+                                {snapshots.length} snapshot{snapshots.length === 1 ? '' : 's'} pending verification
                             </Typography>
 
-                            {sources.length === 0 ? (
+                            {snapshots.length === 0 ? (
                                 <Typography color="text.secondary">
-                                    No sources awaiting verification for this outbreak.
+                                    No snapshots awaiting verification for this outbreak. Sources are only URLs; use "Add snapshot" to attach a capture date and PDF to a source.
                                 </Typography>
                             ) : (
                                 <Box sx={{display: 'flex', flexDirection: 'column', gap: 1.5}}>
-                                    {sources.map((source) => (
+                                    {snapshots.map((snapshot) => (
                                         <SourceCard
-                                            key={source.id}
-                                            source={source}
+                                            key={snapshot.id}
+                                            url={snapshot.url}
+                                            caption={`Snapshot of ${snapshot.capturedAt}`}
                                             actions={
                                                 <>
-                                                    {source.id && (
-                                                        <>
-                                                            <Button
-                                                                variant="outlined"
-                                                                size="small"
-                                                                startIcon={<OpenInNewIcon/>}
-                                                                onClick={() => openPdf(source)}
-                                                                disabled={openingId === source.id || busy}
-                                                            >
-                                                                {openingId === source.id ? 'Loading...' : 'Open PDF'}
-                                                            </Button>
-                                                            <Button
-                                                                variant="outlined"
-                                                                size="small"
-                                                                startIcon={<CloudUploadIcon/>}
-                                                                onClick={() => handleReplaceClick(source)}
-                                                                disabled={busy}
-                                                            >
-                                                                {uploadingId === source.id ? 'Uploading...' : 'Replace PDF'}
-                                                            </Button>
-                                                        </>
-                                                    )}
+                                                    <Button
+                                                        variant="outlined"
+                                                        size="small"
+                                                        startIcon={<OpenInNewIcon/>}
+                                                        onClick={() => openPdf(snapshot)}
+                                                        disabled={openingId === snapshot.id || busy}
+                                                    >
+                                                        {openingId === snapshot.id ? 'Loading...' : 'Open PDF'}
+                                                    </Button>
+                                                    <Button
+                                                        variant="outlined"
+                                                        size="small"
+                                                        startIcon={<CloudUploadIcon/>}
+                                                        onClick={() => handleReplaceClick(snapshot)}
+                                                        disabled={busy}
+                                                    >
+                                                        {uploadingId === snapshot.id ? 'Uploading...' : 'Replace PDF'}
+                                                    </Button>
                                                     <Button
                                                         variant="contained"
                                                         color="success"
                                                         size="small"
                                                         startIcon={<CheckIcon/>}
-                                                        onClick={() => setPendingVerify(source)}
+                                                        onClick={() => setPendingVerify(snapshot)}
                                                         disabled={busy}
                                                     >
-                                                        {verifyingId === source.id ? 'Verifying...' : 'Verify'}
+                                                        {verifyingId === snapshot.id ? 'Verifying...' : 'Verify'}
                                                     </Button>
                                                 </>
                                             }
@@ -174,10 +171,11 @@ export default function VerifySources() {
                 </>
             )}
 
+
             <ConfirmDialog
                 open={pendingVerify !== null}
                 title="Confirm Verify"
-                message="Are you sure you want to verify this source? It will be marked as verified and visible in Browse Sources."
+                message={`Are you sure you want to verify the snapshot of ${pendingVerify?.capturedAt ?? 'this date'}? It will be marked as verified and visible in Browse Sources.`}
                 confirmLabel="Verify"
                 confirmColor="success"
                 onConfirm={handleConfirmVerify}

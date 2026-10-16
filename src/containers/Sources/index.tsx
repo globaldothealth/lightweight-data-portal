@@ -12,6 +12,7 @@ import {selectUserProfile} from "../../redux/app/selectors";
 import {Group} from "../../models/User";
 import BrowseSources from "./BrowseSources";
 import VerifySources from "./VerifySources";
+import MissingSources from "./MissingSources";
 import ImportSources from "./ImportSources";
 
 interface TabPanelProps {
@@ -46,6 +47,7 @@ export default function Sources() {
     const tabs = [
         {key: 'browse', label: 'Browse Sources', visible: isCurator, content: <BrowseSources/>},
         {key: 'verify', label: 'Verify Sources', visible: canVerifySources, content: <VerifySources/>},
+        {key: 'missing', label: 'Missing Sources', visible: canVerifySources, content: <MissingSources/>},
         {key: 'import', label: 'Import Sources', visible: isAdmin, content: <ImportSources/>},
     ].filter((tab) => tab.visible);
 

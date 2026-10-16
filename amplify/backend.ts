@@ -95,10 +95,10 @@ backend.auth.resources.groups[Group.Admin].role.addToPrincipalPolicy(
             resources: [`arn:aws:s3:::${ghOutbreakData}/*`],
         })
     );
-    // Curators/admins upload replacement source PDFs
+    // Curators/admins upload replacement source PDFs and delete the PDFs of removed snapshots
     backend.auth.resources.groups[group].role.addToPrincipalPolicy(
         new PolicyStatement({
-            actions: ['s3:PutObject'],
+            actions: ['s3:PutObject', 's3:DeleteObject'],
             resources: [`arn:aws:s3:::${ghOutbreakSourcesBucketName}/*`],
         })
     );

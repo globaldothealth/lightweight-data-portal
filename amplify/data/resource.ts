@@ -43,21 +43,38 @@ const schema = a
             'PENDING_VERIFICATION',
             'VERIFIED',
         ]),
-        // The record id is a UUIDv5 of the normalized source URL and doubles as the S3 file name:
-        // s3://gh-outbreak-sources/<outbreakName>/<id>.pdf
+        // A source is one URL; its record id is a UUIDv5 of the normalized URL.
+        // The PDFs and their verification belong to Snapshot.
         Source: a
             .model({
                 url: a.string().required(),
                 outbreakName: a.string().required(),
-                status: a.ref('SourceStatus').required(),
                 downloadedAt: a.string(),
-                verifiedBy: a.string(),
-                verifiedAt: a.string(),
                 errorMessage: a.string(),
             })
             .secondaryIndexes((index) => [
-                index('outbreakName').sortKeys(['status']).queryField('listSourcesByOutbreakAndStatus'),
+                index('outbreakName').queryField('listSourcesByOutbreak'),
                 index('url').queryField('listSourcesByUrl'),
+            ])
+            .authorization((allow) => [
+                allow.groups([Group.Admin, Group.Curator]),
+                allow.authenticated().to(['read']),
+            ]),
+        // The content of a source at one point in time: one PDF per capture date, verified individually.
+        // id = `${sourceId}_${capturedAt}` (so a date can only be added once per source) and the file is
+        // s3://gh-outbreak-sources/<outbreakName>/<sourceId>/<capturedAt>.pdf
+        Snapshot: a
+            .model({
+                sourceId: a.string().required(),
+                outbreakName: a.string().required(),
+                capturedAt: a.string().required(), // YYYY-MM-DD (UTC)
+                status: a.ref('SourceStatus').required(),
+                verifiedBy: a.string(),
+                verifiedAt: a.string(),
+            })
+            .secondaryIndexes((index) => [
+                index('outbreakName').sortKeys(['status']).queryField('listSnapshotsByOutbreakAndStatus'),
+                index('sourceId').sortKeys(['capturedAt']).queryField('listSnapshotsBySource'),
             ])
             .authorization((allow) => [
                 allow.groups([Group.Admin, Group.Curator]),
