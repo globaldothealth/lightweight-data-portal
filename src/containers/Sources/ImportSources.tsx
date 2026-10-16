@@ -14,13 +14,8 @@ import {
 
 import {OUTBREAK_OPTIONS, OutbreakName} from "../../config/outbreaks";
 import {buildImportPlan, ImportPlan, parseSourceCsv, ParsedSourceCsv} from "../../utils/sourceImport";
-import {
-    applyImportPlan,
-    fetchExistingSourceIds,
-    ImportResult,
-    importSnapshotsFromS3,
-    SnapshotImportResult,
-} from "../../utils/sourcesApi";
+import {applyImportPlan, fetchExistingSourceIds, ImportResult} from "../../utils/sourcesApi";
+import {importSnapshotsFromS3, SnapshotImportResult} from "../../utils/snapshotsApi";
 
 type Phase = 'idle' | 'analyzing' | 'ready' | 'importing' | 'done';
 

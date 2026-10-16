@@ -9,11 +9,12 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import {OutbreakName} from "../../config/outbreaks";
-import {useAppSelector} from "../../hooks/redux";
-import {selectUserProfile} from "../../redux/app/selectors";
-import {isValidSnapshotDate, snapshotPdfPath, todayUtc} from "../../utils/snapshot";
-import {createSnapshot, SourceRecord} from "../../utils/sourcesApi";
+import {OutbreakName} from "../../../config/outbreaks.ts";
+import {useAppDispatch, useAppSelector} from "../../../hooks/redux.ts";
+import {selectUserProfile} from "../../../redux/app/selectors.ts";
+import {addSnapshot, thunkErrorMessage} from "../../../redux/sources/thunk.ts";
+import {isValidSnapshotDate, snapshotPdfPath, todayUtc} from "../../../utils/snapshot.ts";
+import type {SourceRecord} from "../../../utils/sourcesApi.ts";
 
 interface AddSnapshotDialogProps {
     outbreakName: OutbreakName;
@@ -26,6 +27,7 @@ interface AddSnapshotDialogProps {
 
 /** Adds a snapshot (capture date + PDF) to a source. Mount it only while it should be shown, so its state resets. */
 export default function AddSnapshotDialog({outbreakName, fixedSource, onClose, onAdded}: AddSnapshotDialogProps) {
+    const dispatch = useAppDispatch();
     const userProfile = useAppSelector(selectUserProfile);
 
     const [capturedAt, setCapturedAt] = useState(todayUtc());
@@ -59,11 +61,16 @@ export default function AddSnapshotDialog({outbreakName, fixedSource, onClose, o
         setSubmitting(true);
         setError(null);
         try {
-            await createSnapshot(fixedSource, capturedAt, userProfile.email, file ?? undefined);
+            await dispatch(addSnapshot({
+                source: fixedSource,
+                capturedAt,
+                verifiedBy: userProfile.email,
+                file: file ?? undefined,
+            })).unwrap();
             onAdded(`Snapshot of ${capturedAt} added and verified. It is visible in Browse Sources.`);
             onClose();
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Failed to add snapshot');
+            setError(thunkErrorMessage(err, 'Failed to add snapshot'));
             setSubmitting(false);
         }
     };

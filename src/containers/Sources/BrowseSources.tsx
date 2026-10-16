@@ -2,13 +2,16 @@ import {useMemo, useState} from "react";
 import {Alert, Box, Button, CircularProgress, TextField, Typography} from "@mui/material";
 import {Add as AddIcon, Close as CloseIcon, Delete as DeleteIcon, OpenInNew as OpenInNewIcon} from '@mui/icons-material';
 import {OutbreakName} from '../../config/outbreaks';
-import {deleteSnapshot, SnapshotRecord, SourceRecord, unverifySnapshot} from '../../utils/sourcesApi';
-import AddSnapshotDialog from "./AddSnapshotDialog";
-import ConfirmDialog from "./ConfirmDialog";
-import OutbreakSelect from "./OutbreakSelect";
-import SourceCard from "./SourceCard";
-import {useOpenSnapshotPdf} from "./useOpenSnapshotPdf";
-import {useSnapshotList} from "./useSnapshotList";
+import {useAppDispatch} from "../../hooks/redux";
+import {removeSnapshot, thunkErrorMessage, unverifySnapshotById} from "../../redux/sources/thunk";
+import type {SnapshotRecord} from '../../utils/snapshotsApi';
+import type {SourceRecord} from '../../utils/sourcesApi';
+import AddSnapshotDialog from "./components/AddSnapshotDialog.tsx";
+import ConfirmDialog from "./components/ConfirmDialog.tsx";
+import OutbreakSelect from "./components/OutbreakSelect.tsx";
+import SourceCard from "./components/SourceCard.tsx";
+import {useOpenSnapshotPdf} from "./hooks/useOpenSnapshotPdf.ts";
+import {useSnapshotList} from "./hooks/useSnapshotList.ts";
 
 interface SourceGroup {
     sourceId: string;
@@ -29,9 +32,10 @@ function groupBySource(snapshots: SnapshotRecord[]): SourceGroup[] {
 
 /** Verified snapshots of an outbreak, per source. Only shown to curators, who can send a snapshot back to verification. */
 export default function BrowseSources() {
+    const dispatch = useAppDispatch();
     const [outbreakName, setOutbreakName] = useState<OutbreakName | ''>('Ebola BVD');
     const [query, setQuery] = useState('');
-    const {snapshots, loading, loadError, removeSnapshot, reload} = useSnapshotList(outbreakName, 'VERIFIED');
+    const {snapshots, loading, loadError} = useSnapshotList(outbreakName, 'VERIFIED');
     const [actionError, setActionError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const {openingId, openPdf} = useOpenSnapshotPdf(setActionError);
@@ -62,11 +66,10 @@ export default function BrowseSources() {
         setSuccessMessage(null);
 
         try {
-            await unverifySnapshot(id);
-            removeSnapshot(id);
+            await dispatch(unverifySnapshotById(id)).unwrap();
             setSuccessMessage('Snapshot moved back to pending verification.');
         } catch (err: unknown) {
-            setActionError(err instanceof Error ? err.message : 'Failed to unverify snapshot');
+            setActionError(thunkErrorMessage(err, 'Failed to unverify snapshot'));
         } finally {
             setUnverifyingId(null);
         }
@@ -82,21 +85,20 @@ export default function BrowseSources() {
         setSuccessMessage(null);
 
         try {
-            await deleteSnapshot(snapshot);
-            removeSnapshot(snapshot.id);
+            await dispatch(removeSnapshot(snapshot)).unwrap();
             setSuccessMessage(`Snapshot of ${snapshot.capturedAt} removed.`);
         } catch (err: unknown) {
-            reload(); // the record may already be gone even if the PDF deletion failed
-            setActionError(err instanceof Error ? err.message : 'Failed to remove snapshot');
+            // The thunk reloads the list, since the record may already be gone even if the PDF deletion failed.
+            setActionError(thunkErrorMessage(err, 'Failed to remove snapshot'));
         } finally {
             setRemovingId(null);
         }
     };
 
+    // The store reloads the verified list after a snapshot is added.
     const handleAdded = (message: string) => {
         setActionError(null);
         setSuccessMessage(message);
-        reload();
     };
 
     const error = loadError ?? actionError;

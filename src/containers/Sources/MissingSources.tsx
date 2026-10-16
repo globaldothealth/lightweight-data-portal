@@ -1,55 +1,25 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useState} from "react";
 import {Alert, Box, Button, CircularProgress, Typography} from "@mui/material";
 import {CloudUpload as CloudUploadIcon} from '@mui/icons-material';
 import {OutbreakName} from '../../config/outbreaks';
-import {fetchSourcesWithoutSnapshots, SourceRecord} from '../../utils/sourcesApi';
-import AddSnapshotDialog from "./AddSnapshotDialog";
-import OutbreakSelect from "./OutbreakSelect";
-import SourceCard from "./SourceCard";
-
-interface LoadedSources {
-    /** Which outbreak/reload this result belongs to, so a stale result is never shown for another selection. */
-    key: string;
-    sources: SourceRecord[];
-    error: string | null;
-}
+import type {SourceRecord} from '../../utils/sourcesApi';
+import AddSnapshotDialog from "./components/AddSnapshotDialog.tsx";
+import OutbreakSelect from "./components/OutbreakSelect.tsx";
+import SourceCard from "./components/SourceCard.tsx";
+import {useMissingSources} from "./hooks/useMissingSources.ts";
 
 /** Sources that have no snapshot at all. A curator attaches a PDF, which creates a verified snapshot. */
 export default function MissingSources() {
     const [outbreakName, setOutbreakName] = useState<OutbreakName | ''>('Ebola BVD');
-    const [version, setVersion] = useState(0);
-    const key = `${outbreakName}|${version}`;
-    const [loaded, setLoaded] = useState<LoadedSources | null>(null);
+    const {sources, loading, loadError} = useMissingSources(outbreakName);
     const [target, setTarget] = useState<SourceRecord | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!outbreakName) return;
-
-        let cancelled = false;
-        fetchSourcesWithoutSnapshots(outbreakName)
-            .then((sources) => {
-                if (!cancelled) setLoaded({key, sources, error: null});
-            })
-            .catch((err: unknown) => {
-                if (cancelled) return;
-                setLoaded({key, sources: [], error: err instanceof Error ? err.message : 'Failed to load sources'});
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [outbreakName, key]);
-
+    // The store drops the source from the list once its snapshot is added.
     const handleAdded = useCallback((message: string) => {
         setSuccessMessage(message);
-        setVersion((current) => current + 1);
     }, []);
 
-    const current = loaded?.key === key ? loaded : null;
-    const loading = outbreakName !== '' && current === null;
-    const sources = current?.sources ?? [];
-    const loadError = current?.error ?? null;
 
     return (
         <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>

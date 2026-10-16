@@ -1,7 +1,8 @@
 import {useState} from "react";
 import {getUrl} from "aws-amplify/storage";
-import {snapshotPdfPath} from "../../utils/snapshot";
-import {SOURCES_BUCKET, SnapshotRecord} from "../../utils/sourcesApi";
+import {snapshotPdfPath} from "../../../utils/snapshot.ts";
+import {SOURCES_BUCKET} from "../../../utils/sourcesApi.ts";
+import type {SnapshotRecord} from "../../../utils/snapshotsApi.ts";
 
 /** Opens a snapshot's PDF in a new tab through a signed S3 URL. Failures are reported through `onError`. */
 export function useOpenSnapshotPdf(onError: (message: string) => void) {

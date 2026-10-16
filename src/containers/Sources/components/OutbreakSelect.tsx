@@ -1,5 +1,5 @@
 import {FormControl, InputLabel, MenuItem, Select} from "@mui/material";
-import {OUTBREAK_OPTIONS, OutbreakName} from "../../config/outbreaks";
+import {OUTBREAK_OPTIONS, OutbreakName} from "../../../config/outbreaks.ts";
 
 interface OutbreakSelectProps {
     /** Unique prefix for the accessibility ids. */

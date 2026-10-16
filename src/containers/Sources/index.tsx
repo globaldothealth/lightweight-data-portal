@@ -1,4 +1,4 @@
-import {type ReactNode, type SyntheticEvent, useState} from "react";
+import {type ReactNode, type SyntheticEvent} from "react";
 import {
     Box,
     Grid,
@@ -7,9 +7,9 @@ import {
     Tabs,
     Typography,
 } from "@mui/material";
-import {useAppSelector} from "../../hooks/redux";
-import {selectUserProfile} from "../../redux/app/selectors";
-import {Group} from "../../models/User";
+import {useAppDispatch, useAppSelector} from "../../hooks/redux";
+import {selectActiveTab, selectVisibleTabs} from "../../redux/sources/selectors";
+import {setSelectedTab, type SourcesTabKey} from "../../redux/sources/slice";
 import BrowseSources from "./BrowseSources";
 import VerifySources from "./VerifySources";
 import MissingSources from "./MissingSources";
@@ -35,26 +35,20 @@ function TabPanel({children, value, tabKey}: TabPanelProps) {
 }
 
 
+const TAB_CONTENT: Record<SourcesTabKey, ReactNode> = {
+    browse: <BrowseSources/>,
+    verify: <VerifySources/>,
+    missing: <MissingSources/>,
+    import: <ImportSources/>,
+};
+
 export default function Sources() {
-    const [selectedKey, setSelectedKey] = useState('browse');
-    const userProfile = useAppSelector(selectUserProfile);
+    const dispatch = useAppDispatch();
+    const tabs = useAppSelector(selectVisibleTabs);
+    const activeKey = useAppSelector(selectActiveTab);
 
-    const groups = userProfile?.groups ?? [];
-    const isAdmin = groups.includes(Group.ADMINS);
-    const isCurator = groups.includes(Group.CURATORS);
-    const canVerifySources = isAdmin || isCurator;
-
-    const tabs = [
-        {key: 'browse', label: 'Browse Sources', visible: isCurator, content: <BrowseSources/>},
-        {key: 'verify', label: 'Verify Sources', visible: canVerifySources, content: <VerifySources/>},
-        {key: 'missing', label: 'Missing Sources', visible: canVerifySources, content: <MissingSources/>},
-        {key: 'import', label: 'Import Sources', visible: isAdmin, content: <ImportSources/>},
-    ].filter((tab) => tab.visible);
-
-    const activeKey = tabs.some((tab) => tab.key === selectedKey) ? selectedKey : tabs[0].key;
-
-    const handleTabChange = (_event: SyntheticEvent, newKey: string) => {
-        setSelectedKey(newKey);
+    const handleTabChange = (_event: SyntheticEvent, newKey: SourcesTabKey) => {
+        dispatch(setSelectedTab(newKey));
     };
 
     return (
@@ -64,8 +58,10 @@ export default function Sources() {
             </Grid>
             <Grid size={12}>
                 <Paper sx={{p: '1rem'}}>
-                    {tabs.length === 1 ? (
-                        tabs[0].content
+                    {!activeKey ? (
+                        <Typography color="text.secondary">You do not have access to any source tools.</Typography>
+                    ) : tabs.length === 1 ? (
+                        TAB_CONTENT[activeKey]
                     ) : (
                         <>
                             <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
@@ -83,7 +79,7 @@ export default function Sources() {
                             </Box>
                             {tabs.map((tab) => (
                                 <TabPanel key={tab.key} value={activeKey} tabKey={tab.key}>
-                                    {tab.content}
+                                    {TAB_CONTENT[tab.key]}
                                 </TabPanel>
                             ))}
                         </>

@@ -1,52 +1,29 @@
-import {useCallback, useEffect, useState} from "react";
-import type {OutbreakName} from "../../config/outbreaks";
-import type {SourceStatus} from "../../utils/sourceImport";
-import {fetchSnapshotsForOutbreak, SnapshotRecord} from "../../utils/sourcesApi";
+import {useEffect} from "react";
+import type {OutbreakName} from "../../../config/outbreaks.ts";
+import {useAppDispatch, useAppSelector} from "../../../hooks/redux.ts";
+import {selectSnapshotList} from "../../../redux/sources/selectors.ts";
+import {loadSnapshots} from "../../../redux/sources/thunk.ts";
+import type {SourceStatus} from "../../../utils/sourceImport.ts";
 
-interface LoadedSnapshots {
-    /** Which outbreak/status/reload this result belongs to, so a stale result is never shown for another selection. */
-    key: string;
-    snapshots: SnapshotRecord[];
-    error: string | null;
-}
-
-/** Loads the snapshots of an outbreak with the given status; a snapshot can be dropped locally after acting on it. */
+/**
+ * Loads the snapshots of an outbreak with the given status. Verifying, unverifying and removing a snapshot
+ * update the list in the store, so the component does not have to.
+ */
 export function useSnapshotList(outbreakName: OutbreakName | '', status: SourceStatus) {
-    const [version, setVersion] = useState(0);
-    const key = `${outbreakName}|${status}|${version}`;
-    const [loaded, setLoaded] = useState<LoadedSnapshots | null>(null);
+    const dispatch = useAppDispatch();
+    const list = useAppSelector(selectSnapshotList(status));
 
     useEffect(() => {
-        if (!outbreakName) return;
+        if (outbreakName) {
+            dispatch(loadSnapshots({outbreakName, status}));
+        }
+    }, [dispatch, outbreakName, status]);
 
-        let cancelled = false; // ignore a slow response once the selection has changed
-        fetchSnapshotsForOutbreak(outbreakName, status)
-            .then((snapshots) => {
-                if (!cancelled) setLoaded({key, snapshots, error: null});
-            })
-            .catch((err: unknown) => {
-                if (cancelled) return;
-                setLoaded({key, snapshots: [], error: err instanceof Error ? err.message : 'Failed to load snapshots'});
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [outbreakName, status, key]);
-
-    const removeSnapshot = useCallback((id: string) => {
-        setLoaded((previous) => previous && {...previous, snapshots: previous.snapshots.filter((snapshot) => snapshot.id !== id)});
-    }, []);
-
-    const reload = useCallback(() => setVersion((current) => current + 1), []);
-
-    const current = loaded?.key === key ? loaded : null;
+    // Until the request for the selected outbreak starts, the list still belongs to another one.
+    const stale = list.outbreakName !== outbreakName;
     return {
-        snapshots: current?.snapshots ?? [],
-        loading: outbreakName !== '' && current === null,
-        loadError: current?.error ?? null,
-        removeSnapshot,
-        reload,
+        snapshots: stale ? [] : list.items,
+        loading: outbreakName !== '' && (list.loading || stale),
+        loadError: stale ? null : list.error,
     };
 }
-

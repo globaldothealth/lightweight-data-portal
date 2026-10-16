@@ -5,23 +5,25 @@ import {
     CloudUpload as CloudUploadIcon,
     OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
-import {useAppSelector} from "../../hooks/redux";
+import {useAppDispatch, useAppSelector} from "../../hooks/redux";
 import {selectUserProfile} from "../../redux/app/selectors";
+import {replaceSnapshotFile, thunkErrorMessage, verifySnapshotById} from "../../redux/sources/thunk";
 import {OutbreakName} from '../../config/outbreaks';
-import {replaceSnapshotPdf, SnapshotRecord, verifySnapshot} from '../../utils/sourcesApi';
-import ConfirmDialog from "./ConfirmDialog";
-import OutbreakSelect from "./OutbreakSelect";
-import SourceCard from "./SourceCard";
-import {useOpenSnapshotPdf} from "./useOpenSnapshotPdf";
-import {useSnapshotList} from "./useSnapshotList";
+import type {SnapshotRecord} from '../../utils/snapshotsApi';
+import ConfirmDialog from "./components/ConfirmDialog.tsx";
+import OutbreakSelect from "./components/OutbreakSelect.tsx";
+import SourceCard from "./components/SourceCard.tsx";
+import {useOpenSnapshotPdf} from "./hooks/useOpenSnapshotPdf.ts";
+import {useSnapshotList} from "./hooks/useSnapshotList.ts";
 
 /**
  * Snapshots waiting for review. Curators and admins can open or replace a snapshot's PDF, and verify it.
  */
 export default function VerifySources() {
+    const dispatch = useAppDispatch();
     const userProfile = useAppSelector(selectUserProfile);
     const [outbreakName, setOutbreakName] = useState<OutbreakName | ''>('Ebola BVD');
-    const {snapshots, loading, loadError, removeSnapshot} = useSnapshotList(outbreakName, 'PENDING_VERIFICATION');
+    const {snapshots, loading, loadError} = useSnapshotList(outbreakName, 'PENDING_VERIFICATION');
     const [actionError, setActionError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const {openingId, openPdf} = useOpenSnapshotPdf(setActionError);
@@ -54,10 +56,10 @@ export default function VerifySources() {
         setSuccessMessage(null);
 
         try {
-            await replaceSnapshotPdf(snapshot, file);
+            await dispatch(replaceSnapshotFile({snapshot, file})).unwrap();
             setSuccessMessage('PDF replaced successfully!');
         } catch (err: unknown) {
-            setActionError(err instanceof Error ? err.message : 'Failed to upload PDF');
+            setActionError(thunkErrorMessage(err, 'Failed to upload PDF'));
         } finally {
             setUploadingId(null);
         }
@@ -78,11 +80,10 @@ export default function VerifySources() {
         setSuccessMessage(null);
 
         try {
-            await verifySnapshot(id, userProfile.email);
-            removeSnapshot(id);
+            await dispatch(verifySnapshotById({id, verifiedBy: userProfile.email})).unwrap();
             setSuccessMessage('Snapshot verified successfully!');
         } catch (err: unknown) {
-            setActionError(err instanceof Error ? err.message : 'Failed to verify snapshot');
+            setActionError(thunkErrorMessage(err, 'Failed to verify snapshot'));
         } finally {
             setVerifyingId(null);
         }
